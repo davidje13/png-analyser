@@ -1,0 +1,14 @@
+import './bKGD.mjs';
+import './cHRM.mjs';
+import './gAMA.mjs';
+import './hIST.mjs';
+import './iCCP.mjs';
+import './iTXt.mjs';
+import './pHYs.mjs';
+import './sBIT.mjs';
+import './sPLT.mjs';
+import './sRGB.mjs';
+import './tEXt.mjs';
+import './tIME.mjs';
+import './tRNS.mjs';
+import './zTXt.mjs';
