@@ -1,8 +1,6 @@
 const CHUNK_META = [];
 const CHUNK_META_LOOKUP = new Map();
 
-export const ANY = Symbol();
-
 export const getChunkInfo = (type) => CHUNK_META_LOOKUP.get(type);
 
 export const getAllChunkTypes = () => CHUNK_META;
@@ -13,6 +11,8 @@ export function registerChunk(type, {
   sequential = false,
   notBefore = [],
   notAfter = [],
+  allowBeforeIHDR = false,
+  allowAfterIEND = false,
   requires = [],
 } = {}, read = () => {}) {
   const data = {
@@ -20,11 +20,17 @@ export function registerChunk(type, {
     min,
     max,
     sequential,
-    notBefore: notBefore === ANY ? [ANY] : notBefore?.map(char32),
-    notAfter: notAfter === ANY ? [ANY] : notAfter?.map(char32),
-    requires: requires?.map(char32),
+    notBefore: notBefore.map(char32),
+    notAfter: notAfter.map(char32),
+    requires: requires.map(char32),
     read,
   };
+  if (!allowBeforeIHDR) {
+    data.notBefore.push(char32('IHDR'));
+  }
+  if (!allowAfterIEND) {
+    data.notAfter.push(char32('IEND'));
+  }
   if (CHUNK_META_LOOKUP.has(data.type)) {
     throw new Error(`duplicate chunk type ${data.type}`);
   }

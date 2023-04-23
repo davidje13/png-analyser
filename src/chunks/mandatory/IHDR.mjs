@@ -1,6 +1,6 @@
-import { registerChunk, ANY } from '../registry.mjs';
+import { registerChunk } from '../registry.mjs';
 
-registerChunk('IHDR', { min: 1, max: 1, notAfter: ANY }, (chunk, state, warnings) => {
+registerChunk('IHDR', { min: 1, max: 1 }, (chunk, state, warnings) => {
   state.ihdr = chunk;
   if (chunk.data.length !== 13) {
     warnings.push('IHDR length should be 13');

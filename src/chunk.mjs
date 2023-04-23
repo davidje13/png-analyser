@@ -1,6 +1,6 @@
-import { inflateSync } from 'node:zlib';
+import { inflateSync, inflateRawSync } from 'node:zlib';
 import { CRC } from './crc.mjs';
-import { getAllChunkTypes, getChunkInfo, ANY } from './chunks/registry.mjs';
+import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
 import './chunks/index.mjs';
 
 // http://www.libpng.org/pub/png/spec/iso/index-noobject.html
@@ -77,42 +77,24 @@ export function parseChunks(chunks, warnings) {
         }
       }
     }
-    if (meta.notAfter) {
-      const lastP = types.lastIndexOf(meta.type);
-      for (const other of meta.notAfter) {
-        if (other === ANY) {
-          if (lastP !== 0) {
-            warnings.push(`${name} must be first chunk`);
-            break;
-          }
-        } else {
-          const otherP = types.indexOf(other);
-          if (otherP !== -1 && otherP < lastP) {
-            warnings.push(`${name} cannot be before ${printType(other)}`);
-            break;
-          }
-        }
+    const p = types.indexOf(meta.type);
+    const lastP = types.lastIndexOf(meta.type);
+    for (const other of meta.notAfter) {
+      const otherP = types.indexOf(other);
+      if (otherP !== -1 && otherP < lastP) {
+        warnings.push(`${name} cannot be before ${printType(other)}`);
+        break;
       }
     }
-    if (meta.notBefore) {
-      const p = types.indexOf(meta.type);
-      for (const other of meta.notBefore) {
-        if (other === ANY) {
-          if (p !== types.length - 1) {
-            warnings.push(`${name} must be last chunk`);
-            break;
-          }
-        } else if (types.lastIndexOf(other) > p) {
-          warnings.push(`${name} cannot be after ${printType(other)}`);
-          break;
-        }
+    for (const other of meta.notBefore) {
+      if (types.lastIndexOf(other) > p) {
+        warnings.push(`${name} cannot be after ${printType(other)}`);
+        break;
       }
     }
-    if (meta.requires) {
-      for (const requirement of meta.requires) {
-        if (!types.includes(requirement)) {
-          warnings.push(`${name} requires ${requirement}`);
-        }
+    for (const requirement of meta.requires) {
+      if (!types.includes(requirement)) {
+        warnings.push(`${name} requires ${requirement}`);
       }
     }
   }
@@ -135,12 +117,16 @@ export function parseChunks(chunks, warnings) {
   }
 
   try {
-    const inflated = inflateSync(Buffer.concat(state.idats));
-    return inflated;
+    if (state.isApple) {
+      state.idat = inflateRawSync(Buffer.concat(state.idats));
+    } else {
+      state.idat = inflateSync(Buffer.concat(state.idats));
+    }
   } catch (e) {
     warnings.push(`idat compressed data is unreadable ${e}`);
-    return Buffer.alloc(0);
+    state.idat = Buffer.alloc(0);
   }
+  return state;
 }
 
 const hex32 = (v) => v.toString(16).padStart(8, '0');
