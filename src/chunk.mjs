@@ -1,4 +1,3 @@
-import { inflateSync, inflateRawSync } from 'node:zlib';
 import { CRC } from './crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
 import './chunks/index.mjs';
@@ -115,17 +114,10 @@ export function parseChunks(chunks, warnings) {
       meta.read(chunk, state, warnings);
     }
   }
-
-  try {
-    if (state.isApple) {
-      state.idat = inflateRawSync(Buffer.concat(state.idats));
-    } else {
-      state.idat = inflateSync(Buffer.concat(state.idats));
-    }
-  } catch (e) {
-    warnings.push(`idat compressed data is unreadable ${e}`);
-    state.idat = Buffer.alloc(0);
+  for (const meta of getAllChunkTypes()) {
+    meta.post(state, warnings);
   }
+
   return state;
 }
 

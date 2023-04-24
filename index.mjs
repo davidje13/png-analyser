@@ -3,18 +3,32 @@
 import { readFileSync } from 'fs';
 import { readPNG } from './src/png.mjs';
 
-const filterChunk = process.argv[2].length === 4 ? process.argv[2] : null;
+const filterIn = [];
+const filterOut = [];
+const paths = [];
+for (let i = 2; i < process.argv.length; ++i) {
+  const arg = process.argv[i];
+  if (arg[0] === '+') {
+    filterIn.push(arg.substring(1));
+  } else if(arg[0] === '-') {
+    filterOut.push(arg.substring(1));
+  } else {
+    paths.push(arg);
+  }
+}
 
-for (let i = filterChunk ? 3 : 2; i < process.argv.length; ++i) {
-  const path = process.argv[i];
+for (const path of paths) {
   process.stdout.write(`--- ${path}\n`);
-  const data = readFileSync(process.argv[i]);
+  const data = readFileSync(path);
   displayData(readPNG(data));
 }
 
-function displayData({ warnings, chunks }) {
+function displayData({ warnings, chunks, state }) {
   for (const { name, type, data, advance, write, ...parsed } of chunks) {
-    if (filterChunk && name !== filterChunk) {
+    if (filterOut.includes(name)) {
+      continue;
+    }
+    if (filterIn.length && !filterIn.includes(name)) {
       continue;
     }
     process.stdout.write(`${name} [${data.length}]: `);
@@ -27,7 +41,7 @@ function displayData({ warnings, chunks }) {
   }
 
   for (const warning of warnings) {
-    console.log(`WARN: ${warning}`);
+    process.stdout.write(`WARN: ${warning}\n`);
   }
 }
 

@@ -14,7 +14,7 @@ export function registerChunk(type, {
   allowBeforeIHDR = false,
   allowAfterIEND = false,
   requires = [],
-} = {}, read = () => {}) {
+} = {}, read = () => {}, post = () => {}) {
   const data = {
     type: char32(type),
     min,
@@ -24,6 +24,7 @@ export function registerChunk(type, {
     notAfter: notAfter.map(char32),
     requires: requires.map(char32),
     read,
+    post,
   };
   if (!allowBeforeIHDR) {
     data.notBefore.push(char32('IHDR'));
