@@ -1,3 +1,14 @@
+// mkTS and mkBS contain content like:
+
+// MKBv{FRCi{1}XLCi{0}LYLv{LAYv{BKGb{0}}}}
+
+// 3-char node names, 1-char node types, {}-wrapped node content
+// i = int (base 16, encoded as ASCII text)
+// f = float (base 10, encoded as ASCII text)
+// b = boolean (0 or 1, encoded as ASCII text)
+// s = string (2-byte big-endian number-of-characters, then text encoded as utf16-BE)
+// v = vector (contains other nodes)
+
 export function readNested(buf, warnings) {
   const root = [];
   const stack = [];
