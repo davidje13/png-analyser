@@ -5,7 +5,7 @@ import { readNested, simplifyNested } from './structure.mjs';
 registerChunk('mkBS', {}, (chunk, state, warnings) => {
   try {
     const inflated = inflateSync(chunk.data);
-    chunk.root = simplifyNested(readNested(inflated, warnings));
+    chunk.root = simplifyNested(readNested(inflated, warnings)).value;
     // TODO
   } catch (e) {
     warnings.push(`mkBS compressed data is unreadable ${e}`);
