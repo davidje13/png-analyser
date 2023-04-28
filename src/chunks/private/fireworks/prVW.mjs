@@ -65,6 +65,7 @@ registerChunk('prVW', { max: 1 }, (/** @type {prVWChunk} */ chunk, /** @type {pr
       return r.join('');
     };
     chunk.display = (summary, content) => {
+      summary.append(`(${chunk.previewWidth}x${chunk.previewHeight})`);
       content.append(asCanvas(image, false));
     };
   } catch (e) {

@@ -15,14 +15,19 @@ registerChunk('sBIT', { max: 1, notAfter: ['PLTE', 'IDAT'] }, (/** @type {sBITCh
     warnings.push('cannot parse sBIT data unambiguously without IHDR');
     return;
   }
-  const channels = (state.ihdr.rgb ? 3 : 1) + (state.ihdr.alpha ? 1 : 0);
-  if (chunk.data.byteLength !== channels) {
+  const channels = state.ihdr.channels ?? [];
+  if (chunk.data.byteLength !== channels.length) {
     warnings.push(`significant bits size ${chunk.data.byteLength} does not match image channels ${channels}`);
     return;
   }
   state.sbit = chunk;
-  chunk.originalBits = [];
-  for (let i = 0; i < channels; ++i) {
-    chunk.originalBits.push(chunk.data.getUint8(i));
+  /** @type {number[]} */ const originalBits = [];
+  for (let i = 0; i < channels.length; ++i) {
+    originalBits.push(chunk.data.getUint8(i));
   }
+  chunk.originalBits = originalBits;
+
+  chunk.display = (summary, content) => {
+    summary.append(channels.map((c, i) => `${c} = ${originalBits[i]}-bit`).join(', '));
+  };
 });

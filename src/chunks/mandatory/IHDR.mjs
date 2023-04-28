@@ -15,6 +15,7 @@ import { registerChunk } from '../registry.mjs';
  *   indexed?: boolean,
  *   rgb?: boolean,
  *   alpha?: boolean,
+ *   channels?: string[],
  * }} IHDRChunk
  */
 
@@ -35,6 +36,15 @@ registerChunk('IHDR', { min: 1, max: 1 }, (/** @type {IHDRChunk} */ chunk, /** @
   chunk.indexed = Boolean(chunk.colourType & 1);
   chunk.rgb = Boolean(chunk.colourType & 2);
   chunk.alpha = Boolean(chunk.colourType & 4);
+  chunk.channels = [];
+  if (chunk.rgb) {
+    chunk.channels.push('red', 'green', 'blue');
+  } else {
+    chunk.channels.push('luminosity');
+  }
+  if (chunk.alpha) {
+    chunk.channels.push('alpha');
+  }
 
   if (chunk.width === 0) {
     warnings.push('image width is 0');

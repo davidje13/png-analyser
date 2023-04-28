@@ -1,5 +1,6 @@
 import { findIndex, getLatin1 } from '../../data_utils.mjs';
 import { registerChunk } from '../registry.mjs';
+import { textDisplay, textWrite } from './shared_text.mjs';
 
 registerChunk('tEXt', {}, (
   /** @type {import('./shared_text.mjs').textChunk} */ chunk,
@@ -21,4 +22,7 @@ registerChunk('tEXt', {}, (
   chunk.translatedKeyword = '';
   chunk.keyword = getLatin1(chunk.data, 0, sep);
   chunk.value = getLatin1(chunk.data, sep + 1);
+
+  chunk.write = () => textWrite(chunk);
+  chunk.display = (summary, content) => textDisplay(chunk, summary, content);
 });

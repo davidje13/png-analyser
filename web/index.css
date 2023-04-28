@@ -1,5 +1,5 @@
 body {
-  background: #EEEEEE;
+  background: #DDDDDD;
 }
 
 .drop-target {
@@ -18,7 +18,27 @@ body {
   color: red;
 }
 
-.output-section {
+.output {
+  font: 1em monospace;
+}
+
+.chunk {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #EEEEEE;
+}
+
+summary {
+  cursor: pointer;
+}
+
+.chunk-header {
+  font-weight: bold;
+}
+
+.chunk-value {
   font: 1em monospace;
   white-space: pre-wrap;
+  margin-top: 5px;
+  margin-left: 20px;
 }

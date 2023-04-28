@@ -15,7 +15,7 @@ import { registerChunk } from '../registry.mjs';
 
 registerChunk('bKGD', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (/** @type {bKGDChunk} */ chunk, /** @type {bKGDState} */ state, warnings) => {
   if (!state.ihdr) {
-    warnings.push('cannot parse tRNS data unambiguously without IHDR');
+    warnings.push('cannot parse bKGD data unambiguously without IHDR');
     return;
   }
   state.bkgd = chunk;

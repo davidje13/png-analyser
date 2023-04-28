@@ -1,6 +1,7 @@
 import { findIndex, getLatin1, getUTF8, subView } from '../../data_utils.mjs';
 import { inflate } from '../../deflate.mjs';
 import { registerChunk } from '../registry.mjs';
+import { textDisplay, textWrite } from './shared_text.mjs';
 
 registerChunk('iTXt', {}, (
   /** @type {import('./shared_text.mjs').textChunk} */ chunk,
@@ -48,4 +49,7 @@ registerChunk('iTXt', {}, (
     }
   }
   chunk.value = getUTF8(uncompressedValue);
+
+  chunk.write = () => textWrite(chunk);
+  chunk.display = (summary, content) => textDisplay(chunk, summary, content);
 });

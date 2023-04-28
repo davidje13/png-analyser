@@ -88,7 +88,7 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
     return r.join('');
   };
   chunk.display = (summary, content) => {
-    summary.append(` ID=${chunk.id?.toString(16).padStart(8, '0')}`);
+    summary.append(`ID=${chunk.id?.toString(16).padStart(8, '0')}`);
     if (chunk.img) {
       content.append(asCanvas(chunk.img, true));
     } else {

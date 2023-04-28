@@ -8,36 +8,53 @@ async function process(data) {
   const png = readPNG(data);
 
   const output = document.createElement('section');
+  output.classList.add('output');
 
   if (png.warnings.length > 0) {
     const oDetails = document.createElement('details');
     oDetails.setAttribute('open', 'open');
     const oSummary = document.createElement('summary');
-    oSummary.innerText = 'Warnings';
+    oSummary.append('Warnings');
     oDetails.append(oSummary);
     for (const warning of png.warnings) {
       const owarn = document.createElement('div');
       owarn.classList.add('warning');
-      owarn.innerText = warning;
+      owarn.append(warning);
       oDetails.append(owarn);
     }
     output.append(oDetails);
   }
 
   for (const { name, type, data, advance, write, display, ...parsed } of png.chunks) {
-    const oDetails = document.createElement('details');
-    oDetails.setAttribute('open', 'open');
-    const oSummary = document.createElement('summary');
-    oSummary.innerText = `${name} [${data.byteLength}]`;
+    const oSummaryExtra = document.createElement('span');
     const oData = document.createElement('div');
-    oData.classList.add('output-section');
+    oData.classList.add('chunk-value');
+    let anyContent = false;
     if (display) {
-      display(oSummary, oData);
+      display(oSummaryExtra, oData);
+      anyContent = oData.childNodes.length > 0;
     } else {
-      oData.innerText = printNice(parsed);
+      const content = printNice(parsed);
+      oData.append(content);
+      anyContent = content !== '{}';
     }
-    oDetails.append(oSummary, oData);
-    output.append(oDetails);
+    const oHeader = document.createElement('span');
+    oHeader.classList.add('chunk-header');
+    oHeader.append(`${name} [${data.byteLength}]`);
+    if (anyContent) {
+      const oDetails = document.createElement('details');
+      oDetails.setAttribute('open', 'open');
+      oDetails.classList.add('chunk');
+      const oSummary = document.createElement('summary');
+      oSummary.append(oHeader, ' ', oSummaryExtra);
+      oDetails.append(oSummary, oData);
+      output.append(oDetails);
+    } else {
+      const oItem = document.createElement('div');
+      oItem.classList.add('chunk');
+      oItem.append(oHeader, ' ', oSummaryExtra);
+      output.append(oItem);
+    }
   }
   out.append(output);
 }
@@ -46,7 +63,7 @@ const out = document.createElement('div');
 
 const drop = document.createElement('div');
 drop.classList.add('drop-target');
-drop.innerText = 'Drop a PNG file here';
+drop.append('Drop a PNG file here');
 
 drop.addEventListener('dragover', (e) => {
   e.preventDefault();

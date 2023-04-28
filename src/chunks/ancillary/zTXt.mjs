@@ -1,6 +1,7 @@
 import { findIndex, getLatin1, subView } from '../../data_utils.mjs';
 import { inflate } from '../../deflate.mjs';
 import { registerChunk } from '../registry.mjs';
+import { textDisplay, textWrite } from './shared_text.mjs';
 
 registerChunk('zTXt', {}, (
   /** @type {import('./shared_text.mjs').textChunk} */ chunk,
@@ -32,4 +33,7 @@ registerChunk('zTXt', {}, (
       chunk.value = '';
     }
   }
+
+  chunk.write = () => textWrite(chunk);
+  chunk.display = (summary, content) => textDisplay(chunk, summary, content);
 });
