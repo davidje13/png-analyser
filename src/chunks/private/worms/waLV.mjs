@@ -2,27 +2,52 @@ import { registerChunk } from '../../registry.mjs';
 
 // https://worms2d.info/Colour_map#PNG_chunk
 
-function read(chunk, state, warnings) {
-  state.wormsLevel = chunk;
+/**
+ * @typedef {import('../../registry.mjs').State & {
+ *   walv?: waLVChunk,
+ * }} waLVState
+ * @typedef {import('../../registry.mjs').Chunk & {
+ *   originalLandSeed?: number,
+ *   objectSeed?: number,
+ *   isCavern?: boolean,
+ *   originalLandSeedStyle?: number,
+ *   indestructableBorders?: boolean,
+ *   objectPercentage?: number,
+ *   bridgePercentage?: number,
+ *   waterLevel?: number,
+ *   soilTextureIndex?: number,
+ *   soilTextureIndexVersion?: number,
+ *   waterColour?: number,
+ *   wormPlaces?: number,
+ * }} waLVChunk
+ */
 
-  if (chunk.data.length < 40) {
-    warnings.push(`waLV chunk length ${chunk.data.length} is less than 40`);
+/**
+ * @param {waLVChunk} chunk
+ * @param {waLVState} state
+ * @param {string[]} warnings
+ */
+function read(chunk, state, warnings) {
+  state.walv = chunk;
+
+  if (chunk.data.byteLength < 40) {
+    warnings.push(`waLV chunk length ${chunk.data.byteLength} is less than 40`);
   }
-  chunk.originalLandSeed = chunk.data.readUInt32BE(0);
-  chunk.objectSeed = chunk.data.readUInt32BE(4);
-  chunk.isCavern = Boolean(chunk.data.readUInt32BE(8));
-  chunk.originalLandSeedStyle = chunk.data.readUInt32BE(12);
-  chunk.indestructableBorders = !Boolean(chunk.data.readUInt32BE(16));
-  chunk.objectPercentage = chunk.data.readUInt32BE(20);
-  chunk.bridgePercentage = chunk.data.readUInt32BE(24);
-  chunk.waterLevel = chunk.data.readUInt32BE(28);
-  chunk.soilTextureIndex = chunk.data.readUInt16BE(32);
-  chunk.soilTextureIndexVersion = chunk.data.readUInt16BE(34);
-  chunk.waterColour = chunk.data.readUInt32BE(36);
-  if (chunk.data.length === 41) {
-    chunk.wormPlaces = chunk.data[40];
-  } else if (chunk.data.length > 41) {
-    chunk.wormPlaces = chunk.data.readUInt16BE(40);
+  chunk.originalLandSeed = chunk.data.getUint32(0);
+  chunk.objectSeed = chunk.data.getUint32(4);
+  chunk.isCavern = Boolean(chunk.data.getUint32(8));
+  chunk.originalLandSeedStyle = chunk.data.getUint32(12);
+  chunk.indestructableBorders = !Boolean(chunk.data.getUint32(16));
+  chunk.objectPercentage = chunk.data.getUint32(20);
+  chunk.bridgePercentage = chunk.data.getUint32(24);
+  chunk.waterLevel = chunk.data.getUint32(28);
+  chunk.soilTextureIndex = chunk.data.getUint16(32);
+  chunk.soilTextureIndexVersion = chunk.data.getUint16(34);
+  chunk.waterColour = chunk.data.getUint32(36);
+  if (chunk.data.byteLength === 41) {
+    chunk.wormPlaces = chunk.data.getUint8(40);
+  } else if (chunk.data.byteLength > 41) {
+    chunk.wormPlaces = chunk.data.getUint16(40);
   }
 
   if (chunk.objectPercentage > 100) {

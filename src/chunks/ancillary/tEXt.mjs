@@ -1,15 +1,24 @@
+import { findIndex, getLatin1 } from '../../data_utils.mjs';
 import { registerChunk } from '../registry.mjs';
 
-registerChunk('tEXt', {}, (chunk, state, warnings) => {
+registerChunk('tEXt', {}, (
+  /** @type {import('./shared_text.mjs').textChunk} */ chunk,
+  /** @type {import('./shared_text.mjs').textState} */ state,
+  warnings,
+) => {
   state.texts ||= [];
   state.texts.push(chunk);
-  let sep = chunk.data.indexOf(0);
+  let sep = findIndex(chunk.data, 0x00);
   if (sep === -1) {
     warnings.push('tEXt does not contain null separator');
-    sep = chunk.data.length;
+    sep = chunk.data.byteLength;
   } else if (sep === 0 || sep > 79) {
     warnings.push(`invalid tEXt keyword length ${sep}`);
   }
-  chunk.keyword = chunk.data.subarray(0, sep).toString('latin1');
-  chunk.value = chunk.data.subarray(sep + 1).toString('latin1');
+  chunk.isCompressed = false;
+  chunk.compressionMethod = 0;
+  chunk.languageTag = '';
+  chunk.translatedKeyword = '';
+  chunk.keyword = getLatin1(chunk.data, 0, sep);
+  chunk.value = getLatin1(chunk.data, sep + 1);
 });

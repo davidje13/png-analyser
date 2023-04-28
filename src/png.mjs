@@ -3,11 +3,14 @@
 import { checkHeader } from './header.mjs';
 import { readChunk, parseChunks } from './chunk.mjs';
 
+/**
+ * @param {ArrayBuffer | ArrayBufferView} data
+ */
 export function readPNG(data) {
-  const warnings = [];
+  /** @type {string[]} */ const warnings = [];
   const begin = checkHeader(data, warnings);
   const chunks = [];
-  for (let p = begin; p < data.length;) {
+  for (let p = begin; p < data.byteLength;) {
     const chunk = readChunk(data, p, warnings);
     chunks.push(chunk);
     p += chunk.advance;

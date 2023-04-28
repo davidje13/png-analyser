@@ -1,13 +1,23 @@
 import { registerChunk } from '../../registry.mjs';
 
-registerChunk('grAb', { max: 1, notAfter: ['IDAT'] }, (chunk, state, warnings) => {
-  if (chunk.data.length !== 8) {
-    warnings.push(`grAb chunk length ${chunk.data.length} is not 8`);
-    if (chunk.data.length < 8) {
+/**
+ * @typedef {import('../../registry.mjs').State & {
+ *   grab?: grAbChunk,
+ * }} grAbState
+ * @typedef {import('../../registry.mjs').Chunk & {
+ *   xOffset?: number,
+ *   yOffset?: number,
+ * }} grAbChunk
+ */
+
+registerChunk('grAb', { max: 1, notAfter: ['IDAT'] }, (/** @type {grAbChunk} */ chunk, /** @type {grAbState} */ state, warnings) => {
+  if (chunk.data.byteLength !== 8) {
+    warnings.push(`grAb chunk length ${chunk.data.byteLength} is not 8`);
+    if (chunk.data.byteLength < 8) {
       return;
     }
   }
   state.grab = chunk;
-  chunk.xOffset = chunk.data.readInt32BE(0);
-  chunk.yOffset = chunk.data.readInt32BE(4);
+  chunk.xOffset = chunk.data.getInt32(0);
+  chunk.yOffset = chunk.data.getInt32(4);
 });

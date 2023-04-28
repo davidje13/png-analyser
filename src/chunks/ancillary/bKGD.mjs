@@ -1,21 +1,34 @@
 import { registerChunk } from '../registry.mjs';
 
-registerChunk('bKGD', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (chunk, state, warnings) => {
+/**
+ * @typedef {import('../registry.mjs').State & {
+ *   ihdr?: import('../mandatory/IHDR.mjs').IHDRChunk,
+ *   bkgd?: bKGDChunk,
+ * }} bKGDState
+ * @typedef {import('../registry.mjs').Chunk & {
+ *   backgroundIndex?: number,
+ *   backgroundR?: number,
+ *   backgroundG?: number,
+ *   backgroundB?: number,
+ * }} bKGDChunk
+ */
+
+registerChunk('bKGD', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (/** @type {bKGDChunk} */ chunk, /** @type {bKGDState} */ state, warnings) => {
   if (!state.ihdr) {
     warnings.push('cannot parse tRNS data unambiguously without IHDR');
     return;
   }
   state.bkgd = chunk;
   if (state.ihdr.indexed) {
-    if (chunk.data.length !== 1) {
-      warnings.push(`bKGD length ${chunk.data.length} is not 1`);
+    if (chunk.data.byteLength !== 1) {
+      warnings.push(`bKGD length ${chunk.data.byteLength} is not 1`);
     }
-    chunk.backgroundIndex = chunk.data[0];
+    chunk.backgroundIndex = chunk.data.getUint8(0);
   } else if (state.ihdr.rgb) {
-    chunk.backgroundR = chunk.data.readUInt16BE(0);
-    chunk.backgroundG = chunk.data.readUInt16BE(2);
-    chunk.backgroundB = chunk.data.readUInt16BE(4);
+    chunk.backgroundR = chunk.data.getUint16(0);
+    chunk.backgroundG = chunk.data.getUint16(2);
+    chunk.backgroundB = chunk.data.getUint16(4);
   } else {
-    chunk.backgroundG = chunk.data.readUInt16BE(0);
+    chunk.backgroundG = chunk.data.getUint16(0);
   }
 });

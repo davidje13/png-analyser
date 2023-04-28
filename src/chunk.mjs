@@ -1,5 +1,6 @@
 import { CRC } from './crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
+import { asDataView, subViewLen } from './data_utils.mjs';
 import './chunks/index.mjs';
 
 // http://www.libpng.org/pub/png/spec/iso/index-noobject.html
@@ -8,9 +9,21 @@ import './chunks/index.mjs';
 // https://worms2d.info/Colour_map#PNG_chunk
 // https://doom.fandom.com/wiki/PNG
 
+/**
+ * @typedef {import('./chunks/registry.mjs').Chunk} Chunk
+ * @typedef {import('./chunks/registry.mjs').State} State
+ */
+
+/**
+ * @param {ArrayBuffer | ArrayBufferView} data
+ * @param {number} pos
+ * @param {string[]} warnings
+ * @return {Chunk}
+ */
 export function readChunk(data, pos, warnings) {
-  const type = data.readUInt32BE(pos + 4);
-  let name;
+  const d = asDataView(data);
+  const type = d.getUint32(pos + 4);
+  let name = '';
   let validType = true;
   for (let i = 0; i < 4; ++i) {
     const v = (type >>> (i * 8)) & 0xFF;
@@ -25,15 +38,15 @@ export function readChunk(data, pos, warnings) {
     name = printType(type);
   }
 
-  const length = data.readUInt32BE(pos);
+  const length = d.getUint32(pos);
   if (length > 0x7FFFFFFF) {
     warnings.push(`${name} size exceeds limit`);
   }
-  if (pos + length + 12 > data.length) {
+  if (pos + length + 12 > d.byteLength) {
     warnings.push(`${name} length exceeds available data (file truncated?)`);
   }
-  const calcCrc = new CRC().update(data.subarray(pos + 4, pos + 8 + length)).get();
-  const crc = data.readUInt32BE(pos + 8 + length);
+  const calcCrc = new CRC().update(subViewLen(d, pos + 4, length + 4)).get();
+  const crc = d.getUint32(pos + 8 + length);
   if (crc !== calcCrc) {
     warnings.push(`${name} reported CRC ${hex32(crc)} does not match calculated CRC ${hex32(calcCrc)} (corrupt data?)`);
   }
@@ -41,11 +54,16 @@ export function readChunk(data, pos, warnings) {
   return {
     type,
     name,
-    data: data.subarray(pos + 8, pos + 8 + length),
+    data: subViewLen(d, pos + 8, length),
     advance: 12 + length,
   };
 }
 
+/**
+ * @param {Chunk[]} chunks
+ * @param {string[]} warnings
+ * @return {State}
+ */
 export function parseChunks(chunks, warnings) {
   const types = chunks.map((chunk) => chunk.type);
 
@@ -100,7 +118,7 @@ export function parseChunks(chunks, warnings) {
 
   // TODO: fix ordering if incorrect
 
-  const state = { idats: [] };
+  /** @type {State} */ const state = {};
   for (const chunk of chunks) {
     const name = printType(chunk.type);
     const meta = getChunkInfo(chunk.type);
@@ -121,9 +139,18 @@ export function parseChunks(chunks, warnings) {
   return state;
 }
 
+/**
+ * @param {number} v
+ * @return {string}
+ */
 const hex32 = (v) => v.toString(16).padStart(8, '0');
 
-const TYPE_NAMES = new Map();
+/** @type {Map<number, string>} */ const TYPE_NAMES = new Map();
+
+/**
+ * @param {number} type
+ * @return {string}
+ */
 const printType = (type) => {
   let n = TYPE_NAMES.get(type);
   if (!n) {

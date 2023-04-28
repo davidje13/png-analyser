@@ -1,18 +1,36 @@
 import { registerChunk } from '../registry.mjs';
 
-registerChunk('IHDR', { min: 1, max: 1 }, (chunk, state, warnings) => {
+/**
+ * @typedef {import('../registry.mjs').State & {
+ *   ihdr?: IHDRChunk,
+ * }} IHDRState
+ * @typedef {import('../registry.mjs').Chunk & {
+ *   width?: number,
+ *   height?: number,
+ *   bitDepth?: number,
+ *   colourType?: number,
+ *   compressionMethod?: number,
+ *   filterMethod?: number,
+ *   interlaceMethod?: number,
+ *   indexed?: boolean,
+ *   rgb?: boolean,
+ *   alpha?: boolean,
+ * }} IHDRChunk
+ */
+
+registerChunk('IHDR', { min: 1, max: 1 }, (/** @type {IHDRChunk} */ chunk, /** @type {IHDRState} */ state, warnings) => {
   state.ihdr = chunk;
-  if (chunk.data.length !== 13) {
+  if (chunk.data.byteLength !== 13) {
     warnings.push('IHDR length should be 13');
   }
 
-  chunk.width = chunk.data.readUInt32BE(0);
-  chunk.height = chunk.data.readUInt32BE(4);
-  chunk.bitDepth = chunk.data[8];
-  chunk.colourType = chunk.data[9];
-  chunk.compressionMethod = chunk.data[10];
-  chunk.filterMethod = chunk.data[11];
-  chunk.interlaceMethod = chunk.data[12];
+  chunk.width = chunk.data.getUint32(0);
+  chunk.height = chunk.data.getUint32(4);
+  chunk.bitDepth = chunk.data.getUint8(8);
+  chunk.colourType = chunk.data.getUint8(9);
+  chunk.compressionMethod = chunk.data.getUint8(10);
+  chunk.filterMethod = chunk.data.getUint8(11);
+  chunk.interlaceMethod = chunk.data.getUint8(12);
 
   chunk.indexed = Boolean(chunk.colourType & 1);
   chunk.rgb = Boolean(chunk.colourType & 2);
@@ -21,12 +39,12 @@ registerChunk('IHDR', { min: 1, max: 1 }, (chunk, state, warnings) => {
   if (chunk.width === 0) {
     warnings.push('image width is 0');
   } else if (chunk.width > 0x7FFFFFFF) {
-    warnings.push('image width exceeds limit');
+    warnings.push(`image width ${chunk.width} exceeds limit`);
   }
   if (chunk.height === 0) {
     warnings.push('image height is 0');
   } else if (chunk.height > 0x7FFFFFFF) {
-    warnings.push('image height exceeds limit');
+    warnings.push(`image height ${chunk.height} exceeds limit`);
   }
   if (chunk.compressionMethod !== 0) {
     warnings.push(`non-standard compression method ${chunk.compressionMethod}`);

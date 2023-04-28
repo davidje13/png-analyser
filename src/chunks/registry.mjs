@@ -1,10 +1,61 @@
-const CHUNK_META = [];
-const CHUNK_META_LOOKUP = new Map();
+/**
+ * @typedef {{
+ *   type: number,
+ *   min: number,
+ *   max: number,
+ *   sequential: boolean,
+ *   notBefore: number[],
+ *   notAfter: number[],
+ *   requires: number[],
+ *   read: (chunk: Chunk,
+ *   state: State,
+ *   warnings: string[]) => void,
+ *   post: (state: State,
+ *   warnings: string[]) => void,
+ * }} ChunkMeta
+ *
+ * @typedef {{
+ *   type: number,
+ *   name: string,
+ *   data: DataView,
+ *   advance: number,
+ *   write?: () => string,
+ *   display?: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
+ * }} Chunk
+ *
+ * @typedef {{}} State
+ */
 
+/** @type {ChunkMeta[]} */ const CHUNK_META = [];
+/** @type {Map<number, ChunkMeta>} */ const CHUNK_META_LOOKUP = new Map();
+
+/**
+ * @param {number} type
+ * @return {ChunkMeta | undefined}
+ */
 export const getChunkInfo = (type) => CHUNK_META_LOOKUP.get(type);
 
+/**
+ * @return {ChunkMeta[]}
+ */
 export const getAllChunkTypes = () => CHUNK_META;
 
+/**
+ * @template {Chunk} C
+ * @template {State} S
+ * @param {string} type
+ * @param {object} options
+ * @param {number=} options.min
+ * @param {number=} options.max
+ * @param {boolean=} options.sequential
+ * @param {string[]=} options.notBefore
+ * @param {string[]=} options.notAfter
+ * @param {boolean=} options.allowBeforeIHDR
+ * @param {boolean=} options.allowAfterIEND
+ * @param {string[]=} options.requires
+ * @param {(chunk: C, state: S, warnings: string[]) => void} read
+ * @param {(state: S, warnings: string[]) => void} post
+ */
 export function registerChunk(type, {
   min = 0,
   max = Number.POSITIVE_INFINITY,
@@ -23,8 +74,8 @@ export function registerChunk(type, {
     notBefore: notBefore.map(char32),
     notAfter: notAfter.map(char32),
     requires: requires.map(char32),
-    read,
-    post,
+    read: /** @type {(chunk: Chunk, state: State, warnings: string[]) => void} */ (read),
+    post: /** @type {(state: State, warnings: string[]) => void} */ (post),
   };
   if (!allowBeforeIHDR) {
     data.notBefore.push(char32('IHDR'));
@@ -39,4 +90,8 @@ export function registerChunk(type, {
   CHUNK_META_LOOKUP.set(data.type, data);
 }
 
+/**
+ * @param {string} name
+ * @return {number}
+ */
 const char32 = (name) => (name.charCodeAt(0) << 24) | (name.charCodeAt(1) << 16) | (name.charCodeAt(2) << 8) | name.charCodeAt(3);

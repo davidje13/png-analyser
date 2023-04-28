@@ -1,0 +1,27 @@
+{
+  "name": "png-analyser",
+  "version": "1.0.0",
+  "description": "PNG analysis",
+  "private": true,
+  "bin": "./cli/index.mjs",
+  "scripts": {
+    "start": "static-server --index index.html --port 8080"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidje13/png-analyser.git"
+  },
+  "keywords": [
+    "png"
+  ],
+  "author": "David Evans",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidje13/png-analyser/issues"
+  },
+  "homepage": "https://github.com/davidje13/png-analyser#readme",
+  "devDependencies": {
+    "@types/node": "18.x",
+    "static-server": "2.x"
+  }
+}

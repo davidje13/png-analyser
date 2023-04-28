@@ -1,5 +1,7 @@
 // mkTS and mkBS contain content like:
 
+import { findIndex, getLatin1, getUTF16BE } from '../../../data_utils.mjs';
+
 // MKBv{FRCi{1}XLCi{0}LYLv{LAYv{BKGb{0}}}}
 
 // 3-char node names, 1-char node types, {}-wrapped node content
@@ -16,30 +18,45 @@
 // TID seems to reference tiles from mkBT
 // TIL combines TID tiles
 
+/**
+ * @typedef {string | number | boolean | Node[] | undefined} Value
+ *
+ * @typedef {{
+ *   name: string,
+ *   value: Value,
+ * }} Node
+ */
+
+/**
+ * @param {DataView} buf
+ * @param {string[]} warnings
+ * @return {Node}
+ */
 export function readNested(buf, warnings) {
-  const root = [];
-  const stack = [];
+  /** @type {Node[]} */ const root = [];
+  /** @type {Node[][]} */ const stack = [];
   let cur = root;
-  for (let p = 0; p < buf.length;) {
-    if (buf[p] === 0x7d) { // '}'
-      if (!stack.length) {
+  for (let p = 0; p < buf.byteLength;) {
+    if (buf.getUint8(p) === 0x7d) { // '}'
+      const c = stack.pop();
+      if (!c) {
         warnings.push('mkBS unexpected }');
       } else {
-        cur = stack.pop();
+        cur = c;
       }
       ++p;
       continue;
     }
-    const name = buf.subarray(p, p + 3).toString('latin1');
-    const type = buf[p + 3];
+    const name = getLatin1(buf, p, p + 3);
+    const type = buf.getUint8(p + 3);
     p += 4;
-    if (buf[p] !== 0x7b) { // '{'
+    if (buf.getUint8(p) !== 0x7b) { // '{'
       warnings.push(`mkBS expected { after ${name}${String.fromCharCode(type)}`);
       continue;
     }
     p++;
     const target = cur;
-    let value;
+    /** @type {Value} */ let value = undefined;
     switch (type) {
       case 0x76: // 'v' (vector)
         value = [];
@@ -47,10 +64,10 @@ export function readNested(buf, warnings) {
         cur = value;
         break;
       case 0x73: { // 's' (string)
-        const len = buf.readUInt16BE(p);
+        const len = buf.getUint16(p);
         const end = p + 2 + len * 2;
-        value = buf.subarray(p + 2, end).swap16().toString('utf16le');
-        if (buf[end] !== 0x7d) { // '}'
+        value = getUTF16BE(buf, p + 2, end);
+        if (buf.getUint8(end) !== 0x7d) { // '}'
           warnings.push(`mkBS expected } after ${name}${String.fromCharCode(type)}`);
         }
         p = end + 1;
@@ -59,15 +76,15 @@ export function readNested(buf, warnings) {
       case 0x69: // 'i' (int)
       case 0x66: // 'f' (float)
       case 0x62: { // 'b' (boolean)
-        let end = buf.indexOf(0x7d, p); // '}'
+        let end = findIndex(buf, 0x7d, p); // '}'
         if (end === -1) {
           warnings.push(`mkBS missing } for ${name}${String.fromCharCode(type)}`);
-          end = buf.length;
+          end = buf.byteLength;
         }
-        value = buf.subarray(p, end).toString('latin1');
+        value = getLatin1(buf, p, end);
         switch (type) {
           case 0x69: // 'i' (int)
-            value = Number.parseInt(value, '16');
+            value = Number.parseInt(value, 16);
             break;
           case 0x66: // 'f' (float)
             value = Number.parseFloat(value);
@@ -92,6 +109,9 @@ export function readNested(buf, warnings) {
 
 const KNOWN_KEYS = new Map();
 
+/**
+ * @param {Node} node
+ */
 const DEFAULT_READ_V = ({ value }) => {
   if (!Array.isArray(value)) {
     return value;
@@ -124,7 +144,8 @@ const listOf = (childTag) => ({
   readV: ({ name, value, findChildren }) => {
     const items = findChildren(childTag);
     if (items.length !== value.length) {
-      throw new Error(`Unexpected non-${childTag} in ${name}`);
+      const mismatch = value.map((v) => v.name).filter((name) => name !== childTag);
+      throw new Error(`Unexpected non-${childTag} in ${name}: ${mismatch.join(', ')}`);
     }
     return items.map((o) => o.value);
   },
@@ -191,7 +212,7 @@ KNOWN_KEYS.set('FGI', { // Fill Gradient Index(?)
 KNOWN_KEYS.set('FGV', sizedListOf('FNC', 'FGI')); // Fill Gradient ????
 KNOWN_KEYS.set('FG0', sizedListOf('FNC', 'FGI')); // Fill Gradient 0
 KNOWN_KEYS.set('FG1', sizedListOf('FNC', 'FGI')); // Fill Gradient 1
-KNOWN_KEYS.set('TIL', listOf('TID')); // Tile Id List of Tile Ids
+KNOWN_KEYS.set('TIL', {}); // Tile Id List of Tile Ids (can contain TID or TMC)
 KNOWN_KEYS.set('CLL', listOf('CEL')); // CeLl List (?) of CELls (?)
 KNOWN_KEYS.set('TSZ', {}); // Tile SiZe (?)
 KNOWN_KEYS.set('WPX', {}); // Width PiXels
@@ -223,6 +244,10 @@ KNOWN_KEYS.set('LCK', {}); // LoCKed
 KNOWN_KEYS.set('FON', {}); // FONt
 KNOWN_KEYS.set('TRN', {}); // ??? (text content)
 
+/**
+ * @param {Node} doc
+ * @return {Node}
+ */
 export function simplifyNested(doc) {
   const meta = KNOWN_KEYS.get(doc.name);
   if (Array.isArray(doc.value)) {
@@ -250,8 +275,12 @@ export function simplifyNested(doc) {
   return doc;
 }
 
+/**
+ * @param {Map<string, unknown>} m
+ * @return {Record<string, unknown>}
+ */
 function mapToDict(m) {
-  const r = {};
+  /** @type {Record<string, unknown>} */ const r = {};
   for (const [k, v] of m.entries()) {
     Object.defineProperty(r, k, { value: v, enumerable: true });
   }

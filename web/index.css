@@ -1,0 +1,24 @@
+body {
+  background: #EEEEEE;
+}
+
+.drop-target {
+  display: inline-block;
+  border: 2px solid black;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+.drop-target.active {
+  background: black;
+  color: white;
+}
+
+.warning {
+  color: red;
+}
+
+.output-section {
+  font: 1em monospace;
+  white-space: pre-wrap;
+}

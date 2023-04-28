@@ -1,10 +1,16 @@
-import { inflateSync } from 'node:zlib';
+import { inflate } from '../../../deflate.mjs';
 import { registerChunk } from '../../registry.mjs';
 import { readNested, simplifyNested } from './structure.mjs';
 
-registerChunk('mkTS', {}, (chunk, state, warnings) => {
+/**
+ * @typedef {import('../../registry.mjs').Chunk & {
+*   root?: import('./structure.mjs').Value,
+* }} mkTSChunk
+*/
+
+registerChunk('mkTS', {}, (/** @type {mkTSChunk} */ chunk, state, warnings) => {
   try {
-    const inflated = inflateSync(chunk.data);
+    const inflated = inflate(chunk.data);
     chunk.root = simplifyNested(readNested(inflated, warnings)).value;
     // TODO
   } catch (e) {
