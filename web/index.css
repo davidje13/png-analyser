@@ -42,3 +42,7 @@ summary {
   margin-top: 5px;
   margin-left: 20px;
 }
+
+canvas {
+  image-rendering: pixelated;
+}
