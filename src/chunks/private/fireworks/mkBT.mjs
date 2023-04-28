@@ -9,11 +9,8 @@ import { registerChunk } from '../../registry.mjs';
  * }} mkBTState
  * @typedef {import('../../registry.mjs').Chunk & {
  *   id?: number,
- *   unknownFlag?: number,
- *   unknownMeta?: ArrayBufferView,
- *   img?: number[][],
- *   visibleW: number,
- *   visibleH: number,
+ *   isLuminosity?: boolean,
+ *   img?: (w?: number, h?: number) => number[][],
  * }} mkBTChunk
  */
 
@@ -32,12 +29,11 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
   }
   state.mkbts.set(chunk.id, chunk);
 
-  // sometimes chunk.data[11] is 1, otherwise this always seems to be 0s
-  chunk.unknownFlag = chunk.data.getUint32(8);
-  chunk.unknownMeta = subViewLen(chunk.data, 8, 68);
+  chunk.isLuminosity = Boolean(chunk.data.getUint8(11));
+  // 8-76 is all 0s except the grayscale flag
 
   try {
-    const inflated = inflate(subView(chunk.data, 8 + 68));
+    const inflated = inflate(subView(chunk.data, 76));
     if (inflated.byteLength !== 65536) {
       warnings.push(`mkBT uncompressed length ${inflated.byteLength} is not 64kB`);
       return;
@@ -48,51 +44,86 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
     // block is filled right/bottom with transparent white (opposed to transparent black within "active" area, though this is not 100% guaranteed)
     // big-endian ARGB for each pixel
 
-    const tw = 128;
-    const th = 128;
-
-    let maxW = 0;
-    let maxH = 0;
-    /** @type {number[][]} */ const fullImg = [];
-    for (let y = 0; y < th; ++y) {
-      const row = [];
-      for (let x = 0; x < tw; ++x) {
-        const c = inflated.getUint32((y * tw + x) * 4);
-        row.push(c);
-        if (c >>> 24) {
-          if (x >= maxW) {
-            maxW = x + 1;
+    if (chunk.isLuminosity) {
+      chunk.img = (tw = 256, th = 256) => {
+        /** @type {number[][]} */ const fullImg = [];
+        for (let y = 0; y < th; ++y) {
+          const row = [];
+          for (let x = 0; x < tw; ++x) {
+            const c = inflated.getUint8(y * tw + x);
+            row.push((c * 0x010101) | 0xFF000000);
           }
-          maxH = y + 1;
+          fullImg.push(row);
         }
-      }
-      fullImg.push(row);
+        return fullImg;
+      };
+    } else {
+      chunk.img = (tw = 128, th = 128) => {
+        /** @type {number[][]} */ const fullImg = [];
+        for (let y = 0; y < th; ++y) {
+          const row = [];
+          for (let x = 0; x < tw; ++x) {
+            const c = inflated.getUint32((y * tw + x) * 4);
+            row.push(c);
+          }
+          fullImg.push(row);
+        }
+        return fullImg;
+      };
     }
-    chunk.visibleW = maxW;
-    chunk.visibleH = maxH;
-    chunk.img = fullImg;
   } catch (e) {
     warnings.push(`mkBT compressed data is unreadable ${e}`);
   }
 
   chunk.write = () => {
     const r = [`ID=${chunk.id?.toString(16).padStart(8, '0')}\n`];
-    if (chunk.unknownFlag) {
-      r.push(`meta ${printNice(chunk.unknownMeta)}\n`);
-    }
     if (chunk.img) {
-      r.push(printImage(chunk.img.slice(0, chunk.visibleH).map((v) => v.slice(0, chunk.visibleW)), 0xFF808080));
+      r.push(printImage(cropImage(chunk.img()), 0xFF808080));
     } else {
       r.push('(failed to read texture data)\n');
     }
     return r.join('');
   };
   chunk.display = (summary, content) => {
-    summary.append(`ID=${chunk.id?.toString(16).padStart(8, '0')}`);
+    summary.append(`ID=${chunk.id?.toString(16).padStart(8, '0')}, ${chunk.isLuminosity ? 'luminosity' : 'rgba'}`);
     if (chunk.img) {
-      content.append(asCanvas(chunk.img, true));
+      content.append(asCanvas(chunk.img(), true));
     } else {
       content.append('(failed to read texture data)');
     }
   };
 });
+
+/**
+ * @param {number[][]} image
+ * @return {number[][]}
+ */
+function cropImage(image) {
+  if (!image.length) {
+    return image;
+  }
+  let maxX = 0;
+  let maxY = 0;
+  let minX = image[0].length;
+  let minY = image.length;
+  for (let y = 0; y < image.length; ++y) {
+    for (let x = 0; x < image[0].length; ++x) {
+      if (image[y][x] >>> 24) {
+        if (x >= maxX) {
+          maxX = x + 1;
+        }
+        if (x < minX) {
+          minX = x;
+        }
+        if (y < minY) {
+          minY = y;
+        }
+        maxY = y + 1;
+      }
+    }
+  }
+  if (minY >= maxY) {
+    return [];
+  }
+  return image.slice(minY, maxY).map((v) => v.slice(minX, maxX));
+}
