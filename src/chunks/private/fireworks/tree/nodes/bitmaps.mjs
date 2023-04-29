@@ -10,7 +10,7 @@ registerNode('TID', 'i', { // Tile ID
     target.mkbt = mkbt;
     target.toString = () => mkbt?.toString() ?? value.toString(16).padStart(8, '0');
     target.display = (summary, content) => {
-      summary.append(target.name, ': ');
+      summary.append('Tile: ');
       mkbt?.display(summary, content);
     };
   },
@@ -28,7 +28,7 @@ registerNode('IMG', 'v', { // IMaGe
     const tileSize = getBasicValue(value, 'TSZ', 'i') ?? 0;
     const tiles = getBasicValue(value, 'TIL', 'v') ?? [];
     const tileData = extractTiles(width, height, tiles, tileSize, state.warnings);
-    target.toString = () => `${target.name}: ${width} x ${height} @${xLocation}, ${yLocation} / ${xOf}, ${yOf}${locked ? ' locked' : ''}`;
+    target.toString = () => `Image: ${width} x ${height} @${xLocation}, ${yLocation} / ${xOf}, ${yOf}${locked ? ' locked' : ''}`;
     target.display = (summary, content) => {
       summary.append(target.toString());
       content.append(tilesAsCanvas(tileData));
@@ -43,7 +43,7 @@ registerNode('MSK', 'v', { // MaSK
     const tileSize = getBasicValue(value, 'TSZ', 'i') ?? 0;
     const tiles = getBasicValue(value, 'TIL', 'v') ?? [];
     const tileData = extractTiles(width, height, tiles, tileSize, state.warnings);
-    target.toString = () => `${target.name}: ${width} x ${height}`;
+    target.toString = () => `Mask: ${width} x ${height}`;
     target.display = (summary, content) => {
       summary.append(target.toString());
       content.append(tilesAsCanvas(tileData));

@@ -134,6 +134,12 @@ export function asCanvas(image, alpha) {
 }
 
 /**
+ * @param {number} c
+ * @return {string}
+ */
+export const rgba = (c) => `rgba(${(c >>> 16) & 0xFF}, ${(c >>> 8) & 0xFF}, ${c & 0xFF}, ${(c >>> 24) / 255})`;
+
+/**
  * @typedef {{
  *   width: number,
  *   height: number,
@@ -156,10 +162,35 @@ export function tilesAsCanvas({ width, height, tiles }) {
         c.ctx.putImageData(asImageData(tile.value, true), tile.x, tile.y);
         break;
       case 'c':
-        c.ctx.fillStyle = `rgba(${(tile.value >> 16) & 0xFF}, ${(tile.value >> 8) & 0xFF}, ${tile.value & 0xFF}, ${((tile.value >> 24) & 0xFF) / 255})`;
+        c.ctx.fillStyle = rgba(tile.value);
         c.ctx.fillRect(tile.x, tile.y, tile.w, tile.h);
         break;
     }
   }
   return c.canvas;
 }
+
+/**
+ * @typedef {{ position: number, colour: number }[]} Gradient
+ */
+
+const backgroundGrad = 'repeating-linear-gradient(to bottom,#FFFFFF 0px 10px,#CCCCCC 10px 20px)';
+
+/**
+ * @param {Gradient} gradient
+ * @param {boolean=} alphaToLum
+ * @return {HTMLElement}
+ */
+export function asGradientDiv(gradient, alphaToLum = false) {
+  const stops = gradient.map((stop) => `${rgba(alphaToLum ? a2l(stop.colour) : stop.colour)} ${stop.position * 100}%`);
+  const preview = document.createElement('div');
+  preview.classList.add('gradient-preview');
+  preview.style.backgroundImage = `linear-gradient(to right,${stops.join(',')}),${backgroundGrad}`;
+  return preview;
+}
+
+/**
+ * @param {number} c
+ * @return {number}
+ */
+const a2l = (c) => ((c >>> 24) * 0x010101) | 0xFF000000;

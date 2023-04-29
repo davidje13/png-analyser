@@ -72,3 +72,11 @@ li::before {
 li > details > summary {
   margin-left: -4px;
 }
+
+.gradient-preview {
+  border: 1px solid black;
+  width: 100%;
+  max-width: 200px;
+  height: 40px;
+  margin-top: 5px;
+}
