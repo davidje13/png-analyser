@@ -19,8 +19,8 @@
  *   name: string,
  *   data: DataView,
  *   advance: number,
- *   write?: () => string,
- *   display?: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
+ *   toString: () => string,
+ *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
  * }} Chunk
  *
  * @typedef {{}} State

@@ -28,14 +28,11 @@ registerChunk('pHYs', { max: 1, notAfter: ['IDAT'] }, (/** @type {pHYsChunk} */ 
   if (!chunk.unit) {
     warnings.push(`non-standard unit ${unit}`);
   }
-  chunk.write = () => {
+  chunk.toString = () => {
     if (unit) {
       return `x = ${chunk.ppx} pixels ${chunk.unit}, y = ${chunk.ppy} pixels ${chunk.unit}`;
     } else {
       return `aspect = ${chunk.ppx} : ${chunk.ppy}`;
     }
-  };
-  chunk.display = (summary, content) => {
-    summary.append(chunk.write?.() ?? '');
   };
 });

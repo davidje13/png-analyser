@@ -23,6 +23,6 @@ registerChunk('tEXt', {}, (
   chunk.keyword = getLatin1(chunk.data, 0, sep);
   chunk.value = getLatin1(chunk.data, sep + 1);
 
-  chunk.write = () => textWrite(chunk);
+  chunk.toString = () => textWrite(chunk);
   chunk.display = (summary, content) => textDisplay(chunk, summary, content);
 });

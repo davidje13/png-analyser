@@ -1,6 +1,7 @@
 import { CRC } from './crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
 import { asDataView, subViewLen } from './data_utils.mjs';
+import { printNice } from './pretty.mjs';
 import './chunks/index.mjs';
 
 // http://www.libpng.org/pub/png/spec/iso/index-noobject.html
@@ -56,6 +57,16 @@ export function readChunk(data, pos, warnings) {
     name,
     data: subViewLen(d, pos + 8, length),
     advance: 12 + length,
+    toString() {
+      const { name, type, data, advance, display, ...rest } = this;
+      return printNice(rest);
+    },
+    display(summary, content) {
+      const v = this.toString();
+      if (v && v !== '{}') {
+        content.append(v);
+      }
+    },
   };
 }
 

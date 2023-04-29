@@ -34,6 +34,6 @@ registerChunk('zTXt', {}, (
     }
   }
 
-  chunk.write = () => textWrite(chunk);
+  chunk.toString = () => textWrite(chunk);
   chunk.display = (summary, content) => textDisplay(chunk, summary, content);
 });

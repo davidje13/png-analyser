@@ -1,6 +1,6 @@
-import { subView, subViewLen } from '../../../data_utils.mjs';
+import { subView } from '../../../data_utils.mjs';
 import { inflate } from '../../../deflate.mjs';
-import { asCanvas, printImage, printNice } from '../../../pretty.mjs';
+import { asCanvas, printImage } from '../../../pretty.mjs';
 import { registerChunk } from '../../registry.mjs';
 
 /**
@@ -55,6 +55,7 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
           }
           fullImg.push(row);
         }
+        chunk.img = () => fullImg;
         return fullImg;
       };
     } else {
@@ -68,6 +69,7 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
           }
           fullImg.push(row);
         }
+        chunk.img = () => fullImg;
         return fullImg;
       };
     }
@@ -75,8 +77,8 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
     warnings.push(`mkBT compressed data is unreadable ${e}`);
   }
 
-  chunk.write = () => {
-    const r = [`ID=${chunk.id?.toString(16).padStart(8, '0')}\n`];
+  chunk.toString = () => {
+    const r = [`ID=${chunk.id?.toString(16).padStart(8, '0')}, ${chunk.isLuminosity ? 'luminosity' : 'rgba'}\n`];
     if (chunk.img) {
       r.push(printImage(cropImage(chunk.img()), 0xFF808080));
     } else {

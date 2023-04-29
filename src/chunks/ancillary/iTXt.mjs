@@ -50,6 +50,6 @@ registerChunk('iTXt', {}, (
   }
   chunk.value = getUTF8(uncompressedValue);
 
-  chunk.write = () => textWrite(chunk);
+  chunk.toString = () => textWrite(chunk);
   chunk.display = (summary, content) => textDisplay(chunk, summary, content);
 });

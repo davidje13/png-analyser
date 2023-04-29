@@ -31,20 +31,14 @@ for (const path of paths) {
  * @param {unknown} data.state
  */
 function displayData({ warnings, chunks, state }) {
-  for (const { name, type, data, advance, write, display, ...parsed } of chunks) {
-    if (filterOut.includes(name)) {
+  for (const chunk of chunks) {
+    if (filterOut.includes(chunk.name)) {
       continue;
     }
-    if (filterIn.length && !filterIn.includes(name)) {
+    if (filterIn.length && !filterIn.includes(chunk.name)) {
       continue;
     }
-    process.stdout.write(`${name} [${data.byteLength}]: `);
-    if (write) {
-      process.stdout.write(write());
-    } else {
-      process.stdout.write(printNice(parsed));
-    }
-    process.stdout.write('\n');
+    process.stdout.write(`${chunk.name} [${chunk.data.byteLength}]: ${chunk}\n`);
   }
 
   for (const warning of warnings) {

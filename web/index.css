@@ -46,3 +46,29 @@ summary {
 canvas {
   image-rendering: pixelated;
 }
+
+ul {
+  margin: 0;
+  padding: 0 0 0 16px;
+  border-left: 1px solid #BBBBBB;
+  list-style: none;
+}
+
+li {
+  margin-top: 5px;
+  position: relative;
+}
+
+li::before {
+  content: "";
+  position: absolute;
+  top: 0.5em;
+  left: -16px;
+  width: 10px;
+  height: 1px;
+  background: #BBBBBB;
+}
+
+li > details > summary {
+  margin-left: -4px;
+}

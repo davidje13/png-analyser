@@ -54,7 +54,7 @@ registerChunk('prVW', { max: 1 }, (/** @type {prVWChunk} */ chunk, /** @type {pr
     }
     chunk.image = image;
 
-    chunk.write = () => {
+    chunk.toString = () => {
       const r = ['\npalette:\n'];
       for (let i = 0; i < palette.length; ++i) {
         const c = palette[i];

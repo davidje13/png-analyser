@@ -25,23 +25,15 @@ async function process(data) {
     output.append(oDetails);
   }
 
-  for (const { name, type, data, advance, write, display, ...parsed } of png.chunks) {
+  for (const chunk of png.chunks) {
     const oSummaryExtra = document.createElement('span');
     const oData = document.createElement('div');
     oData.classList.add('chunk-value');
-    let anyContent = false;
-    if (display) {
-      display(oSummaryExtra, oData);
-      anyContent = oData.childNodes.length > 0;
-    } else {
-      const content = printNice(parsed);
-      oData.append(content);
-      anyContent = content !== '{}';
-    }
+    chunk.display(oSummaryExtra, oData);
     const oHeader = document.createElement('span');
     oHeader.classList.add('chunk-header');
-    oHeader.append(`${name} [${data.byteLength}]`);
-    if (anyContent) {
+    oHeader.append(`${chunk.name} [${chunk.data.byteLength}]`);
+    if (oData.childNodes.length > 0) {
       const oDetails = document.createElement('details');
       oDetails.setAttribute('open', 'open');
       oDetails.classList.add('chunk');

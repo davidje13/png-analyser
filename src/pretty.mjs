@@ -22,6 +22,18 @@ function niceBuffer(k, v) {
   return v;
 }
 
+const NEWLINE = /\n/g;
+
+/**
+ * @param {string} s
+ * @param {string} prefix
+ * @param {string=} firstPrefix
+ * @return {string}
+ */
+export function indent(s, prefix, firstPrefix = prefix) {
+  return firstPrefix + s.replace(NEWLINE, '\n' + prefix);
+}
+
 /**
  * @param {number} top
  * @param {number} bottom
@@ -69,26 +81,15 @@ export function printImage(image, background = -1) {
 /**
  * @param {number[][]} image
  * @param {boolean} alpha
- * @return {Node}
+ * @return {ImageData}
  */
-export function asCanvas(image, alpha) {
+export function asImageData(image, alpha) {
   if (!image.length || !image[0].length) {
-    const info = document.createElement('span');
-    info.innerText = `invalid image size (${image[0]?.length ?? 0}x${image.length})`;
-    return info;
+    return new ImageData(0, 0);
   }
   const w = image[0]?.length ?? 0;
   const h = image.length;
-  const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
-  const ctx = c.getContext('2d');
-  if (!ctx) {
-    const info = document.createElement('span');
-    info.innerText = 'getContext failed';
-    return info;
-  }
-  const dat = ctx.createImageData(w, h);
+  const dat = new ImageData(w, h);
   for (let y = 0; y < h; ++y) {
     for (let x = 0; x < w; ++x) {
       const c = image[y][x];
@@ -99,6 +100,66 @@ export function asCanvas(image, alpha) {
       dat.data[p+3] = alpha ? c >>> 24 : 255;
     }
   }
-  ctx.putImageData(dat, 0, 0);
-  return c;
+  return dat;
+}
+
+/**
+ * @param {number} w
+ * @param {number} h
+ * @return {{ canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }}
+ */
+export function makeCanvas(w, h) {
+  if (w < 0 || h < 0) {
+    throw new Error(`Invalid canvas size ${w} x ${h}`);
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('Failed to get 2D context');
+  }
+  return { canvas, ctx };
+}
+
+/**
+ * @param {number[][]} image
+ * @param {boolean} alpha
+ * @return {HTMLCanvasElement}
+ */
+export function asCanvas(image, alpha) {
+  const c = makeCanvas(image[0]?.length ?? 0, image.length);
+  c.ctx.putImageData(asImageData(image, alpha), 0, 0);
+  return c.canvas;
+}
+
+/**
+ * @typedef {{
+ *   width: number,
+ *   height: number,
+ *   tiles: (
+ *     { type: 'c', x: number, y: number, value: number, w: number, h: number } |
+ *     { type: 'i', x: number, y: number, value: number[][] }
+ *   )[],
+ * }} TileData
+ */
+
+/**
+ * @param {TileData} tileData
+ * @return {HTMLCanvasElement}
+ */
+export function tilesAsCanvas({ width, height, tiles }) {
+  const c = makeCanvas(width, height);
+  for (const tile of tiles) {
+    switch (tile.type) {
+      case 'i':
+        c.ctx.putImageData(asImageData(tile.value, true), tile.x, tile.y);
+        break;
+      case 'c':
+        c.ctx.fillStyle = `rgba(${(tile.value >> 16) & 0xFF}, ${(tile.value >> 8) & 0xFF}, ${tile.value & 0xFF}, ${((tile.value >> 24) & 0xFF) / 255})`;
+        c.ctx.fillRect(tile.x, tile.y, tile.w, tile.h);
+        break;
+    }
+  }
+  return c.canvas;
 }
