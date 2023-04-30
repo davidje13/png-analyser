@@ -11,19 +11,40 @@ registerType('i', {
 registerType('v', {
   read: (target, value) => {
     target.value = value;
-    target.toString = () => {
-      if (!value.length) {
-        return `${target.name}: []`;
+    Object.assign(target, outputNodes(target.name, value));
+  },
+});
+
+registerType(null, {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `${target.name}: ${JSON.stringify(value)}`;
+  },
+});
+
+/**
+ * @param {string} name
+ * @param {import('../node_registry.mjs').ProcessedNode[]} nodes
+ * @return {{
+ *   toString: () => string,
+ *   display: (summary: HTMLElement, content: HTMLElement) => void,
+ * }}
+ */
+export function outputNodes(name, nodes) {
+  return {
+    toString: () => {
+      if (!nodes.length) {
+        return `${name}: []`;
       }
-      return `${target.name}:\n${value.map((n) => indent(n.toString(), '  ', '- ')).join('\n')}`;
-    };
-    target.display = (summary, content) => {
-      if (!value.length) {
-        summary.append(`${target.name}: []`);
+      return `${name}:\n${nodes.map((n) => indent(n.toString(), '  ', '- ')).join('\n')}`;
+    },
+    display: (summary, content) => {
+      if (!nodes.length) {
+        summary.append(`${name}: []`);
         return;
       }
       const ul = document.createElement('ul');
-      for (const n of value) {
+      for (const n of nodes) {
         const li = document.createElement('li');
         const s = document.createElement('div');
         const c = document.createElement('div');
@@ -34,16 +55,9 @@ registerType('v', {
       const det = document.createElement('details');
       det.setAttribute('open', 'open');
       const sum = document.createElement('summary');
-      sum.append(target.name);
+      sum.append(name);
       det.append(sum, ul);
       content.append(det);
-    };
-  },
-});
-
-registerType(null, {
-  read: (target, value) => {
-    target.value = value;
-    target.toString = () => `${target.name}: ${JSON.stringify(value)}`;
-  },
-});
+    },
+  };
+}
