@@ -2,7 +2,6 @@
 
 import { readFileSync } from 'node:fs';
 import { readPNG } from '../src/png.mjs';
-import { printNice } from '../src/pretty.mjs';
 
 /** @type {string[]} */ const filterIn = [];
 /** @type {string[]} */ const filterOut = [];
@@ -31,6 +30,7 @@ for (const path of paths) {
  * @param {unknown} data.state
  */
 function displayData({ warnings, chunks, state }) {
+  /** @type {Set<string>} */ const seen = new Set();
   for (const chunk of chunks) {
     if (filterOut.includes(chunk.name)) {
       continue;
@@ -38,7 +38,14 @@ function displayData({ warnings, chunks, state }) {
     if (filterIn.length && !filterIn.includes(chunk.name)) {
       continue;
     }
-    process.stdout.write(`${chunk.name} [${chunk.data.byteLength}]: ${chunk}\n`);
+    if (chunk.aggregate) {
+      if (!seen.has(chunk.name)) {
+        seen.add(chunk.name);
+        process.stdout.write(`${chunk.name} [${chunk.data.byteLength}]: ${chunk.aggregate()}\n`);
+      }
+    } else {
+      process.stdout.write(`${chunk.name} [${chunk.data.byteLength}]: ${chunk}\n`);
+    }
   }
 
   for (const warning of warnings) {

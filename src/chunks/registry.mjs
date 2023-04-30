@@ -15,12 +15,18 @@
  * }} ChunkMeta
  *
  * @typedef {{
+ *   toString: () => string,
+ *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
+ * }} ChunkAggregate
+ *
+ * @typedef {{
  *   type: number,
  *   name: string,
  *   data: DataView,
  *   advance: number,
  *   toString: () => string,
  *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
+ *   aggregate?: () => ChunkAggregate,
  * }} Chunk
  *
  * @typedef {{}} State

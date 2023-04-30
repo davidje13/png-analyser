@@ -140,6 +140,12 @@ export function asCanvas(image, alpha) {
 export const rgba = (c) => `rgba(${(c >>> 16) & 0xFF}, ${(c >>> 8) & 0xFF}, ${c & 0xFF}, ${(c >>> 24) / 255})`;
 
 /**
+ * @param {number} c
+ * @return {string}
+ */
+export const rgb = (c) => `rgb(${(c >>> 16) & 0xFF}, ${(c >>> 8) & 0xFF}, ${c & 0xFF})`;
+
+/**
  * @typedef {{
  *   width: number,
  *   height: number,

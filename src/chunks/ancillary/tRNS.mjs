@@ -1,3 +1,4 @@
+import { rgb, termCol, termReset } from '../../pretty.mjs';
 import { registerChunk } from '../registry.mjs';
 
 /**
@@ -31,6 +32,19 @@ registerChunk('tRNS', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (/** 
     for (let i = 0; i < chunk.data.byteLength; ++i) {
       chunk.indexedAlpha.push(chunk.data.getUint8(i));
     }
+
+    chunk.toString = () => (chunk.indexedAlpha ?? []).map((c) => `${termCol(c)} ${c.toString(16).padStart(2, '0')} ${termReset}`).join('\n');
+
+    chunk.display = (summary, content) => {
+      summary.append('Indexed transparency');
+      for (const entry of chunk.indexedAlpha ?? []) {
+        const o = document.createElement('div');
+        o.classList.add('colour-preview');
+        o.style.backgroundColor = rgb(entry * 0x010101);
+        o.append(entry.toString(16).padStart(2, '0'));
+        content.append(o);
+      }
+    };
   } else if (state.ihdr.rgb) {
     chunk.sampleR = chunk.data.getUint16(0);
     chunk.sampleG = chunk.data.getUint16(2);

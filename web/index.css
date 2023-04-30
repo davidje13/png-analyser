@@ -73,6 +73,15 @@ li > details > summary {
   margin-left: -4px;
 }
 
+.colour-preview {
+  display: inline-block;
+  border: 1px solid black;
+  padding: 5px;
+  min-width: 10px;
+  min-height: 10px;
+  margin: 2px;
+}
+
 .gradient-preview {
   border: 1px solid black;
   width: 100%;

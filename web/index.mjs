@@ -25,30 +25,57 @@ async function process(data) {
     output.append(oDetails);
   }
 
+  /** @type {Set<string>} */ const seen = new Set();
   for (const chunk of png.chunks) {
-    const oSummaryExtra = document.createElement('span');
-    const oData = document.createElement('div');
-    oData.classList.add('chunk-value');
-    chunk.display(oSummaryExtra, oData);
+    const oSummary = document.createElement('span');
     const oHeader = document.createElement('span');
     oHeader.classList.add('chunk-header');
-    oHeader.append(`${chunk.name} [${chunk.data.byteLength}]`);
-    if (oData.childNodes.length > 0) {
-      const oDetails = document.createElement('details');
-      oDetails.setAttribute('open', 'open');
-      oDetails.classList.add('chunk');
-      const oSummary = document.createElement('summary');
-      oSummary.append(oHeader, ' ', oSummaryExtra);
-      oDetails.append(oSummary, oData);
-      output.append(oDetails);
+    oHeader.append(`${chunk.name}`);
+    const oData = document.createElement('div');
+    oData.classList.add('chunk-value');
+
+    /** @type {HTMLElement} */ let section;
+    if (chunk.aggregate) {
+      if (seen.has(chunk.name)) {
+        continue;
+      }
+      seen.add(chunk.name);
+      const agg = chunk.aggregate();
+      const parts = png.chunks.filter((c) => c.name === chunk.name);
+
+      agg.display(oSummary, oData);
+      oSummary.prepend(oHeader, ` [${parts.map((c) => c.data.byteLength).join(' & ')}] `);
     } else {
-      const oItem = document.createElement('div');
-      oItem.classList.add('chunk');
-      oItem.append(oHeader, ' ', oSummaryExtra);
-      output.append(oItem);
+      chunk.display(oSummary, oData);
+      oSummary.prepend(oHeader, ` [${chunk.data.byteLength}] `);
     }
+    section = makeDetails(oSummary, oData, true);
+    section.classList.add('chunk');
+    output.append(section);
   }
   out.append(output);
+}
+
+/**
+ * @param {HTMLElement} summary
+ * @param {HTMLElement} content
+ * @param {boolean} open
+ * @return {HTMLElement}
+ */
+function makeDetails(summary, content, open) {
+  if (!content.childNodes.length) {
+    const oItem = document.createElement('div');
+    oItem.append(summary);
+    return oItem;
+  }
+  const oDetails = document.createElement('details');
+  if (open) {
+    oDetails.setAttribute('open', 'open');
+  }
+  const oSummary = document.createElement('summary');
+  oSummary.append(summary);
+  oDetails.append(oSummary, content);
+  return oDetails;
 }
 
 const out = document.createElement('div');
@@ -81,7 +108,14 @@ drop.addEventListener('drop', (e) => {
         .getAsFile()
         ?.arrayBuffer()
         .then((d) => process(d))
-        .catch((e) => console.error(e));
+        .catch((e) => {
+          if (typeof e === 'object' && e.message) {
+            out.append(e.message);
+          } else {
+            out.append(String(e));
+          }
+          console.error(e);
+        });
     }
   }
 });
