@@ -132,3 +132,18 @@ export function getBasicValue(list, name, type) {
   }
   return values[0];
 }
+
+/**
+ * @template {keyof NodeTypes} T
+ * @param {ProcessedNode[]} list
+ * @param {string} name
+ * @param {T} type
+ * @return {ProcessedNode | undefined}
+ */
+export function getChild(list, name, type) {
+  const values = getChildren(list, name, type);
+  if (values.length > 1) {
+    throw new Error(`multiple values for ${name}${type}`);
+  }
+  return values[0];
+}

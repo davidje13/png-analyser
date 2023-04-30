@@ -7,7 +7,7 @@ registerNode('BPL', 'v', { // Brush ???
     const RDO = getBasicValue(value, 'RDO', 'b');
     const BAN = getBasicValue(value, 'BAN', 'i');
     const BAS = getBasicValue(value, 'BAS', 'i');
-    const BDI = getBasicValue(value, 'BDI', 'i');
+    const diameter = getBasicValue(value, 'BDI', 'i');
     const BMM = getBasicValue(value, 'BMM', 'i');
     const BMS = getBasicValue(value, 'BMS', 'i');
     const BSE = getBasicValue(value, 'BSE', 'i'); // 0 = "hard", 500 = "soft", 1000 = "air brush"
@@ -36,6 +36,8 @@ registerNode('BPL', 'v', { // Brush ???
     const DF2 = getBasicValue(value, 'DF2', 'i');
     const DF3 = getBasicValue(value, 'DF3', 'i');
 
+    target.diameter = diameter ?? 1;
+
     target.toString = () => [
       `${JSON.stringify(category)} / ${JSON.stringify(name)}`
     ].join('');
@@ -46,7 +48,7 @@ registerNode('BPL', 'v', { // Brush ???
         `RDO: ${RDO}`,
         `BAN: ${BAN}`,
         `BAS: ${BAS}`,
-        `BDI: ${BDI}`,
+        `diameter: ${diameter}`,
         `BMM: ${BMM}`,
         `BMS: ${BMS}`,
         `BSE: ${BSE}`,

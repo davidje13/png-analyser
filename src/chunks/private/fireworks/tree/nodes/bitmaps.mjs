@@ -28,6 +28,10 @@ registerNode('IMG', 'v', { // IMaGe
     const tileSize = getBasicValue(value, 'TSZ', 'i') ?? 0;
     const tiles = getBasicValue(value, 'TIL', 'v') ?? [];
     const tileData = extractTiles(width, height, tiles, tileSize, state.warnings);
+    target.xLocation = xLocation;
+    target.yLocation = yLocation;
+    target.width = width;
+    target.height = height;
     target.toString = () => `Image: ${width} x ${height} @${xLocation}, ${yLocation} / ${xOf}, ${yOf}${locked ? ' locked' : ''}`;
     target.display = (summary, content) => {
       summary.append(target.toString());

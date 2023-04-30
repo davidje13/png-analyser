@@ -1,5 +1,5 @@
 import { rgba } from '../../../../../pretty.mjs';
-import { getBasicValue, nodeBasicValue, registerNode } from '../node_registry.mjs';
+import { getBasicValue, getChild, nodeBasicValue, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
 const EXCLUDE = ['FONs', 'PTSf', 'BOLb', 'ITLb', 'UNDb', 'LEDf', 'FOTb', /*'HSCf', 'KRNf', 'RKNf', 'BLSf', 'LDMi', 'JSTi', 'PINf', 'PSBf', 'PSAf',*/ 'TFSv'];
@@ -12,13 +12,15 @@ registerNode('TXT', 'v', { // TeXT
     const bottom = getBasicValue(value, 'BOT', 'f') ?? 0;
 
     const pattern = getBasicValue(value, 'PAT', 'v') ?? [];
+    const transform = /** @type {number[] | undefined} */ (getChild(value, 'MTX', 'v')?.matrix);
+    const img = getChild(value, 'IMG', 'v');
+    const brush = getChild(pattern, 'BPL', 'v');
 
     const fontState = {
       fillColour: getBasicValue(pattern, 'FCL', 'i'),
       lineColour: getBasicValue(pattern, 'BCL', 'i'),
-      outlined: getBasicValue(value, 'FOT', 'b') ?? false,
-      lineWidth: 1,
-      fillOverStroke: true,
+      lineWidth: /** @type {number} */ (brush?.diameter ?? 0),
+      fillOverStroke: getBasicValue(value, 'FOT', 'b') ?? false,
       font: getBasicValue(value, 'FON', 's'),
       pointSize: getBasicValue(value, 'PTS', 'f'),
       bold: getBasicValue(value, 'BOL', 'b'),
@@ -41,7 +43,7 @@ registerNode('TXT', 'v', { // TeXT
     for (const part of parts) {
       switch (part.name) {
         case 'FCLi': fontState.fillColour = nodeBasicValue(part, 'FCL', 'i'); break;
-        //case 'FOTb': fontState.outlined = nodeBasicValue(part, 'FOT', 'b') ?? false; break;
+        //case 'FOTb': fontState.fillOverStroke = nodeBasicValue(part, 'FOT', 'b') ?? false; break;
         case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
         case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
         case 'PTSf': fontState.pointSize = nodeBasicValue(part, 'PTS', 'f'); break;
@@ -82,8 +84,8 @@ registerNode('TXT', 'v', { // TeXT
           const oFrag = document.createElement('span');
           oFrag.style.color = rgba(frag.fillColour ?? 0);
           // TODO: this is an approximation of the stroke, as it does not use the chosen brush
-          if (frag.outlined && frag.lineWidth) {
-            const w = frag.lineWidth;
+          if (frag.lineWidth) {
+            const w = frag.lineWidth / 2;
             const col = rgba(frag.lineColour ?? 0);
             if (frag.fillOverStroke) {
               const w2 = Math.SQRT1_2 * w;
@@ -98,7 +100,7 @@ registerNode('TXT', 'v', { // TeXT
                 `${-w2}px ${w2}px ${col}`,
               ].join(',');
             } else {
-              oFrag.style.webkitTextStroke = `${w}px ${col}`;
+              oFrag.style.webkitTextStroke = `${w * 2}px ${col}`;
             }
           }
           oFrag.style.fontFamily = frag.font ?? '';
@@ -110,7 +112,28 @@ registerNode('TXT', 'v', { // TeXT
           oFrag.append(frag.text);
           oStr.append(oFrag);
         }
-        content.append(oStr);
+        if (transform) {
+          const imgX = img?.xLocation ?? 0;
+          const imgY = img?.yLocation ?? 0;
+          const imgW = img?.width ?? 0;
+          const imgH = img?.height ?? 0;
+          const hold = document.createElement('div');
+          hold.style.width = `${imgW}px`;
+          hold.style.height = `${imgH}px`;
+          const cssMat = [
+            transform[0], transform[1], 0, transform[2],
+            transform[3], transform[4], 0, transform[5],
+            0, 0, 1, 0,
+            transform[6], transform[7], 0, transform[8],
+          ];
+          oStr.style.transform = `translate(${-imgX}px, ${-imgY}px) translate(${left}px, ${top}px) matrix3d(${cssMat.join(',')})`;
+          oStr.style.transformOrigin = `${-left}px ${-top}px`;
+          oStr.style.boxShadow = '0 0 0 1px black';
+          hold.append(oStr);
+          content.append(hold);
+        } else {
+          content.append(oStr);
+        }
       },
     });
 
