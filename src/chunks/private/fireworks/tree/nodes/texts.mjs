@@ -2,7 +2,7 @@ import { rgba } from '../../../../../pretty.mjs';
 import { getBasicValue, getChild, nodeBasicValue, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
-const EXCLUDE = ['FONs', 'PTSf', 'BOLb', 'ITLb', 'UNDb', 'LEDf', 'FOTb', /*'HSCf', 'KRNf', 'RKNf', 'BLSf', 'LDMi', 'JSTi', 'PINf', 'PSBf', 'PSAf',*/ 'TFSv'];
+const EXCLUDE = ['FONs', 'PTSf', 'BOLb', 'ITLb', 'UNDb', 'LEDf', 'FOTb', 'HSCf', 'RKNf', /*'KRNf', 'BLSf', 'LDMi', 'JSTi', 'PINf', 'PSBf', 'PSAf',*/ 'TFSv'];
 
 registerNode('TXT', 'v', { // TeXT
   read: (target, value, state) => {
@@ -16,6 +16,8 @@ registerNode('TXT', 'v', { // TeXT
     const img = getChild(value, 'IMG', 'v');
     const brush = getChild(pattern, 'BPL', 'v');
 
+    const useFontStretch = false; // not supported by all fonts
+
     const fontState = {
       fillColour: getBasicValue(pattern, 'FCL', 'i'),
       lineColour: getBasicValue(pattern, 'BCL', 'i'),
@@ -26,9 +28,9 @@ registerNode('TXT', 'v', { // TeXT
       bold: getBasicValue(value, 'BOL', 'b'),
       italic: getBasicValue(value, 'ITL', 'b'),
       underline: getBasicValue(value, 'UND', 'b'),
-      HSC: getBasicValue(value, 'HSC', 'f'),
+      hScale: getBasicValue(value, 'HSC', 'f') ?? 1,
       KRN: getBasicValue(value, 'KRN', 'f'),
-      RKN: getBasicValue(value, 'RKN', 'f'),
+      kerning: getBasicValue(value, 'RKN', 'f') ?? 0,
       BLS: getBasicValue(value, 'BLS', 'f'),
       lineHeight: getBasicValue(value, 'LED', 'f') ?? 1,
       LDM: getBasicValue(value, 'LDM', 'i'),
@@ -50,9 +52,9 @@ registerNode('TXT', 'v', { // TeXT
         case 'BOLb': fontState.bold = nodeBasicValue(part, 'BOL', 'b'); break;
         case 'ITLb': fontState.italic = nodeBasicValue(part, 'ITL', 'b'); break;
         case 'UNDb': fontState.underline = nodeBasicValue(part, 'UND', 'b'); break;
-        case 'HSCf': fontState.HSC = nodeBasicValue(part, 'HSC', 'f'); break;
+        case 'HSCf': fontState.hScale = nodeBasicValue(part, 'HSC', 'f') ?? 1; break;
         //case 'KRNf': fontState.KRN = nodeBasicValue(part, 'KRN', 'f'); break;
-        case 'RKNf': fontState.RKN = nodeBasicValue(part, 'RKN', 'f'); break;
+        case 'RKNf': fontState.kerning = nodeBasicValue(part, 'RKN', 'f') ?? 0; break;
         case 'BLSf': fontState.BLS = nodeBasicValue(part, 'BLS', 'f'); break;
         case 'LEDf': fontState.lineHeight = nodeBasicValue(part, 'LED', 'f') ?? 1; break;
         case 'LDMi': fontState.LDM = nodeBasicValue(part, 'LDM', 'i'); break;
@@ -71,6 +73,15 @@ registerNode('TXT', 'v', { // TeXT
       }
     }
 
+    let approxScale = 1;
+    if (transform) {
+      approxScale = Math.pow(
+        (transform[0] * transform[0] + transform[3] * transform[3]) *
+        (transform[1] * transform[1] + transform[4] * transform[4]),
+        0.25,
+      ) / transform[8];
+    }
+
     const displayNodes = value.filter(({ name }) => !EXCLUDE.includes(name));
     displayNodes.push({
       name: 'TFSv',
@@ -84,8 +95,9 @@ registerNode('TXT', 'v', { // TeXT
           const oFrag = document.createElement('span');
           oFrag.style.color = rgba(frag.fillColour ?? 0);
           // TODO: this is an approximation of the stroke, as it does not use the chosen brush
+          // also it is applied before transforming, but Fireworks applies it AFTER any transform
           if (frag.lineWidth) {
-            const w = frag.lineWidth / 2;
+            const w = frag.lineWidth / (2 * approxScale);
             const col = rgba(frag.lineColour ?? 0);
             if (frag.fillOverStroke) {
               const w2 = Math.SQRT1_2 * w;
@@ -103,9 +115,21 @@ registerNode('TXT', 'v', { // TeXT
               oFrag.style.webkitTextStroke = `${w * 2}px ${col}`;
             }
           }
+          const sz = frag.pointSize ?? 12;
           oFrag.style.fontFamily = frag.font ?? '';
-          oFrag.style.fontSize = `${frag.pointSize ?? 12}px`;
-          oFrag.style.lineHeight = frag.lineHeight.toString();
+          if (frag.hScale === 1 || useFontStretch) {
+            oFrag.style.fontSize = `${sz}px`;
+            oFrag.style.fontStretch = frag.hScale.toString();
+          } else {
+            oFrag.style.fontSize = `${sz * frag.hScale}px`;
+            oFrag.style.transform = `scaleY(${1 / frag.hScale})`;
+            oFrag.style.display = 'inline-block'; // required for transform
+          }
+          oFrag.style.lineHeight = `${sz * frag.lineHeight}px`;
+          // this scale factor comes from trial-and-error
+          // fireworks uses its own kerning algorithm, so it isn't possible to match the results exactly anyway
+          oFrag.style.letterSpacing = `${Math.floor(frag.kerning * sz * 0.32) * 0.25}px`;
+
           oFrag.style.fontWeight = frag.bold ? 'bold' : 'normal';
           oFrag.style.fontStyle = frag.italic ? 'italic' : 'normal';
           oFrag.style.textDecoration = frag.underline ? 'underline' : 'none';
