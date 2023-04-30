@@ -1,7 +1,7 @@
 import { CRC } from './crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
-import { asDataView, subViewLen } from './data_utils.mjs';
-import { printNice } from './pretty.mjs';
+import { asBytes, asDataView, subViewLen } from './data_utils.mjs';
+import { debugWrite, printNice } from './pretty.mjs';
 import './chunks/index.mjs';
 
 // http://www.libpng.org/pub/png/spec/iso/index-noobject.html
@@ -139,6 +139,7 @@ export function parseChunks(chunks, warnings) {
       } else {
         warnings.push(`unknown critical chunk ${name}`);
       }
+      chunk.toString = () => debugWrite(asBytes(chunk.data));
     } else {
       meta.read(chunk, state, warnings);
     }

@@ -1,5 +1,5 @@
 import { inflate, inflateRaw } from '../../deflate.mjs';
-import { asBytes, concat, subView, subViewLen } from '../../data_utils.mjs';
+import { asBytes, concat, subViewLen } from '../../data_utils.mjs';
 import { registerChunk } from '../registry.mjs';
 import { asCanvas, printImage } from '../../pretty.mjs';
 
@@ -187,14 +187,14 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
         for (let i = 0; i < pixelStepBytes; ++i) {
           c = (c << 8) | unfiltered[x * pixelStepBytes + i];
         }
-        row.push(lookup(c));
+        row.push(lookup(c) >>> 0);
       }
     } else {
       const mask = 0xFF >>> (8 - pixelStepBits);
       for (let x = 0; x < w; ++x) {
         const pp = x * pixelStepBits;
         const v = (unfiltered[(pp >>> 3)] >>> (8 - pixelStepBits - (pp & 7))) & mask;
-        row.push(lookup(v));
+        row.push(lookup(v) >>> 0);
       }
     }
     p += step;

@@ -5,4 +5,5 @@ import './apng/index.mjs';
 import './private/apple/index.mjs';
 import './private/doom/index.mjs';
 import './private/fireworks/index.mjs';
+import './private/gldpng/index.mjs';
 import './private/worms/index.mjs';

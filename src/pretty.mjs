@@ -22,6 +22,29 @@ function niceBuffer(k, v) {
   return v;
 }
 
+/**
+ * @param {Uint8Array} bytes
+ * @return {string}
+ */
+export function debugWrite(bytes) {
+  const all = [''];
+  for (let i = 0; i < bytes.byteLength; i += 16) {
+    const rowN = [];
+    const rowC = [];
+    for (let j = 0; j < 16 && i + j < bytes.byteLength; ++j) {
+      const c = bytes[i + j];
+      rowN.push(c.toString(16).padStart(2, '0'));
+      if (c >= 0x20 && c < 0x7F) {
+        rowC.push(String.fromCharCode(c));
+      } else {
+        rowC.push('.');
+      }
+    }
+    all.push(rowN.join(' ') + '   ' + rowC.join(''));
+  }
+  return all.join('\n') + '\n';
+}
+
 const NEWLINE = /\n/g;
 
 /**

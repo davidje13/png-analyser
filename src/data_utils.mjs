@@ -120,27 +120,3 @@ export function concat(datas) {
   }
   return new DataView(out.buffer);
 }
-
-/**
- * @param {ArrayBuffer | ArrayBufferView} data
- * @return {string}
- */
-export function debugWrite(data) {
-  const bytes = asBytes(data);
-  const all = [''];
-  for (let i = 0; i < bytes.byteLength; i += 16) {
-    const rowN = [];
-    const rowC = [];
-    for (let j = 0; j < 16 && i + j < bytes.byteLength; ++j) {
-      const c = bytes[i + j];
-      rowN.push(c.toString(16).padStart(2, '0'));
-      if (c >= 0x20 && c < 0x7F) {
-        rowC.push(String.fromCharCode(c));
-      } else {
-        rowC.push('.');
-      }
-    }
-    all.push(rowN.join(' ') + '   ' + rowC.join(''));
-  }
-  return all.join('\n') + '\n';
-}
