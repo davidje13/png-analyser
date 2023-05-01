@@ -1,13 +1,28 @@
-import { registerNode, getBasicValue } from '../node_registry.mjs';
+import { registerNode, getBasicValue, getChildren } from '../node_registry.mjs';
 
 registerNode('DCE', 'v', { // ??? Entity
   read: (target, value) => {
     const key = getBasicValue(value, 'DCK', 's');
     const val = getBasicValue(value, 'DCV', 's');
+    target.key = key;
+    target.val = val;
 
     target.toString = () => `${JSON.stringify(key)} = ${JSON.stringify(val)}`;
   },
 });
+
+/**
+ * @param {import('../node_registry.mjs').ProcessedNode[]} list
+ * @param {string} key
+ * @return {string | undefined}
+ */
+export function getEntityValue(list, key) {
+  const values = getChildren(list, 'DCE', 'v').filter((n) => n.key === key);
+  if (values.length > 1) {
+    throw new Error(`multiple values for ${key}`);
+  }
+  return /** @type {string | undefined} */ (values[0]?.val);
+}
 
 registerNode('MTX', 'v', { // MaTriX
   read: (target, value) => {
