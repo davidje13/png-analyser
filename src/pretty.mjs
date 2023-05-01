@@ -62,7 +62,7 @@ export function indent(s, prefix, firstPrefix = prefix) {
  * @param {number} bottom
  * @return {number}
  */
-export const mixColour = (top, bottom) => {
+export const overlayColour = (top, bottom) => {
   const aT = top >>> 24;
   const rT = (top >>> 16) & 0xFF;
   const gT = (top >>> 8) & 0xFF;
@@ -96,7 +96,7 @@ export function printImage(image, background = -1) {
     if (c < 0) {
       return `${termReset}!`;
     }
-    const mixed = background < 0 ? c : mixColour(c, background);
+    const mixed = background < 0 ? c : overlayColour(c, background);
     return `${termCol(mixed)} `;
   }).join('') + `${termReset}\n`).join('');
 }

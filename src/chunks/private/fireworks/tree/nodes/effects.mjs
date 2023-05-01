@@ -515,6 +515,16 @@ KNOWN_EFFECTS.set('{d810e821-f86b-11d0-7371473173676544}', {
   },
 });
 
+KNOWN_EFFECTS.set('{8eeadf50-9efe-11da-a7460800200c9a66}', {
+  name: 'Photoshop Live Effects Special Fill',
+  read: (target, value, state) => {
+    // TODO
+
+    return (element) => {
+    };
+  },
+});
+
 /**
  * @param {string | undefined} c
  * @return {number | undefined}

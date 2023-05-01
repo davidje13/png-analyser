@@ -1,5 +1,5 @@
 import { asGradientDiv } from '../../../../../pretty.mjs';
-import { getBasicValue, getBasicValues, registerNode } from '../node_registry.mjs';
+import { getBasicValue, getBasicValues, getChild, registerNode } from '../node_registry.mjs';
 
 registerNode('FGV', 'v', { // Fill Gradient ???
   read: (target, value, state) => {
@@ -14,7 +14,7 @@ registerNode('FGV', 'v', { // Fill Gradient ???
   },
 });
 
-registerNode('FG0', 'v', { // Fill Gradient 0
+registerNode('FG0', 'v', { // Fill Gradient 0 (RGB)
   read: (target, value, state) => {
     const stops = extractGradient(value, state.warnings);
 
@@ -24,6 +24,7 @@ registerNode('FG0', 'v', { // Fill Gradient 0
         state.warnings.push('Non-pure RGB gradient');
       }
     }
+    target.stops = stops;
 
     target.display = (summary, content) => {
       summary.append(`${stops.length}-stop FG0 (RGB) gradient`);
@@ -32,7 +33,7 @@ registerNode('FG0', 'v', { // Fill Gradient 0
   },
 });
 
-registerNode('FG1', 'v', { // Fill Gradient 1
+registerNode('FG1', 'v', { // Fill Gradient 1 (Alpha)
   read: (target, value, state) => {
     const stops = extractGradient(value, state.warnings);
     for (const stop of stops) {
@@ -40,6 +41,7 @@ registerNode('FG1', 'v', { // Fill Gradient 1
         state.warnings.push('Non-pure alpha gradient');
       }
     }
+    target.stops = stops;
 
     target.toString = () => `${stops.length}-stop FG1 (alpha) gradient`;
 
@@ -50,10 +52,37 @@ registerNode('FG1', 'v', { // Fill Gradient 1
   },
 });
 
+registerNode('FGY', 'v', { // Fill Gradient ??? (RGB + Alpha gradient)
+  read: (target, value, state) => {
+    const rgb = /** @type {Gradient | undefined} */ (getChild(value, 'FG0', 'v')?.stops);
+    const alpha = /** @type {Gradient | undefined} */ (getChild(value, 'FG1', 'v')?.stops);
+    if (!rgb) {
+      state.warnings.push('Missing FG0v for FGYv');
+      return;
+    }
+    if (!alpha) {
+      state.warnings.push('Missing FG1v for FGYv');
+      return;
+    }
+    const stops = combineGrad(rgb, alpha);
+
+    target.toString = () => `${stops.length}-stop FGY (RGB + alpha) gradient`;
+
+    target.display = (summary, content) => {
+      summary.append(`${stops.length}-stop FGY (RGB + alpha) gradient`);
+      content.append(asGradientDiv(stops));
+    };
+  },
+});
+
+/**
+ * @typedef {import('../../../../../pretty.mjs').Gradient} Gradient
+ */
+
 /**
  * @param {import('../node_registry.mjs').ProcessedNode[]} nodes
  * @param {string[]} warnings
- * @return {import('../../../../../pretty.mjs').Gradient}
+ * @return {Gradient}
  */
 function extractGradient(nodes, warnings) {
   const count = getBasicValue(nodes, 'FNC', 'i') ?? 0;
@@ -66,3 +95,67 @@ function extractGradient(nodes, warnings) {
     colour: getBasicValue(stop, 'FGC', 'i') ?? 0,
   }));
 }
+
+/**
+ * @param {Gradient} m
+ * @param {number} p
+ * @return {number}
+ */
+function gradientAt(m, p) {
+  if (!m.length) {
+    return 0;
+  }
+  for (let i = 0; i < m.length; ++i) {
+    if (m[i].position >= p) {
+      if (i === 0) {
+        return m[0].colour;
+      }
+      const prev = m[i - 1];
+      const next = m[i];
+      const frac = (p - prev.position) / (next.position - prev.position);
+      return mixColour(prev.colour, next.colour, frac);
+    }
+  }
+  return m[m.length - 1].colour;
+}
+
+/**
+ * @param {Gradient} rgb
+ * @param {Gradient} alpha
+ * @return {Gradient}
+ */
+function combineGrad(rgb, alpha) {
+  return [...new Set([...rgb, ...alpha].map((v) => v.position))]
+    .sort((a, b) => a - b)
+    .map((position) => ({
+      position,
+      colour: (
+        (gradientAt(alpha, position) & 0xFF000000) |
+        (gradientAt(rgb, position) & 0x00FFFFFF)
+      ) >>> 0,
+    }));
+}
+
+/**
+ * @param {number} c1
+ * @param {number} c2
+ * @param {number} f
+ * @return {number}
+ */
+const mixColour = (c1, c2, f) => {
+  const a1 = c1 >>> 24;
+  const r1 = (c1 >>> 16) & 0xFF;
+  const g1 = (c1 >>> 8) & 0xFF;
+  const b1 = c1 & 0xFF;
+
+  const a2 = c2 >>> 24;
+  const r2 = (c2 >>> 16) & 0xFF;
+  const g2 = (c2 >>> 8) & 0xFF;
+  const b2 = c2 & 0xFF;
+
+  const a = Math.round((1 - f) * a1 + f * a2);
+  const r = Math.round((1 - f) * r1 + f * r2);
+  const g = Math.round((1 - f) * g1 + f * g2);
+  const b = Math.round((1 - f) * b1 + f * b2);
+  return ((a << 24) | (r << 16) | (g << 8) | b) >>> 0;
+};
