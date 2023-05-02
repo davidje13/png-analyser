@@ -91,7 +91,29 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
   const alpha = state.ihdr.alpha ?? true;
   const gamma = displayGamma / (state.gama?.gamma ?? displayGamma);
 
-  const channels = indexed ? 1 : ((rgb ? 3 : 1) + (alpha ? 1 : 0));
+  const colChannels = rgb ? 3 : 1;
+  const channels = indexed ? 1 : (colChannels + (alpha ? 1 : 0));
+
+  /** @type {number[][]} */ const lookupTables = [];
+  for (let i = 0; i < colChannels + 1; ++i) {
+    const colBits = indexed ? 8 : bits;
+    const max = (1 << colBits) - 1;
+    const originalMax = (1 << (state.sbit?.originalBits?.[i] ?? colBits)) - 1;
+    const isAlpha = i === colChannels;
+    /** @type {number[]} */ const table = [];
+    for (let j = 0; j < (1 << colBits); ++j) {
+      let v = j;
+      v = (v * originalMax / max + 0.5)|0; // scale to original bit depth (and round)
+      // scale to display bit depth and apply gamma correction
+      if (!isAlpha && gamma !== 1) {
+        v = Math.pow(v / originalMax, gamma) * displayMax;
+      } else {
+        v *= displayMax / originalMax;
+      }
+      table[j] = (v + 0.5)|0; // round
+    }
+    lookupTables.push(table);
+  }
 
   /** @type {(c: number[]) => number} */ let lookup;
 
@@ -102,81 +124,67 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       return;
     }
     const paletteRGB = state.plte.entries;
-    // TODO: apply gamma to palette entries
     const paletteA = state.trns?.indexedAlpha ?? [];
-    lookup = ([i]) => ((paletteA[i] ?? 0xFF) << 24) | paletteRGB[i];
-  } else {
-    const lim = 1 << bits;
-    const mask = lim - 1;
-    /** @type {number[][]} */ const lookupTables = [];
-    for (let i = 0; i < channels; ++i) {
-      const originalMax = (1 << (state.sbit?.originalBits?.[i] ?? bits)) - 1;
-      const mult1 = originalMax / mask;
-      const mult2 = displayMax / originalMax;
-      const isAlpha = alpha && i === channels - 1;
-      /** @type {number[]} */ const table = [];
-      for (let j = 0; j < lim; ++j) {
-        let v = j;
-        v = (v * mult1 + 0.5)|0; // scale to original bit depth (and round)
-        v = v * mult2; // scale to display bit depth (no rounding until after gamma correction)
-        if (!isAlpha && gamma !== 1) { // apply gamma correction
-          v = Math.pow(v / displayMax, gamma) * displayMax;
-        }
-        v = (v + 0.5)|0; // round
-        table[j] = v;
-      }
-      lookupTables.push(table);
+    /** @type {number[]} */ const lookupPalette = [];
+    for (let i = 0; i < paletteRGB.length; ++i) {
+      const c = paletteRGB[i];
+      lookupPalette.push(
+        (lookupTables[3][paletteA[i] ?? 0xFF] << 24) |
+        (lookupTables[0][c >>> 16] << 16) |
+        (lookupTables[1][(c >>> 8) & 0xFF] << 8) |
+        lookupTables[2][c & 0xFF]
+      );
     }
-
-    if (rgb && alpha) {
-      if (state.isApple) { // RGBA is flipped to BGRA and premultiplied by alpha
-        lookup = ([b, g, r, a]) => {
-          if (!a) {
-            return 0;
-          }
-          const m = mask / a;
-          return (
-            (lookupTables[3][a] << 24) |
-            ((lookupTables[0][(r * m)|0]) << 16) |
-            ((lookupTables[1][(g * m)|0]) << 8) |
-            lookupTables[2][(b * m)|0]
-          );
-        };
-      } else {
-        lookup = ([r, g, b, a]) => (
+    lookup = ([i]) => lookupPalette[i];
+  } else if (rgb && alpha) {
+    if (state.isApple) { // RGBA is flipped to BGRA and premultiplied by alpha
+      const max = (1 << bits) - 1;
+      lookup = ([b, g, r, a]) => {
+        if (!a) {
+          return 0;
+        }
+        const m = max / a;
+        return (
           (lookupTables[3][a] << 24) |
-          (lookupTables[0][r] << 16) |
-          (lookupTables[1][g] << 8) |
-          lookupTables[2][b]
+          (lookupTables[0][(r * m)|0] << 16) |
+          (lookupTables[1][(g * m)|0] << 8) |
+          lookupTables[2][(b * m)|0]
         );
-      }
-    } else if (rgb) {
-      let transR = -1;
-      let transG = -1;
-      let transB = -1;
-      if (state.trns) {
-        transR = state.trns.sampleRed ?? 0;
-        transG = state.trns.sampleGreen ?? 0;
-        transB = state.trns.sampleBlue ?? 0;
-      }
-      lookup = ([r, g, b]) => (r === transR && g === transG && b === transB) ? 0 : (
-        0xFF000000 |
+      };
+    } else {
+      lookup = ([r, g, b, a]) => (
+        (lookupTables[3][a] << 24) |
         (lookupTables[0][r] << 16) |
         (lookupTables[1][g] << 8) |
         lookupTables[2][b]
       );
-    } else if (alpha) {
-      lookup = ([l, a]) => (
-        (lookupTables[1][a] << 24) |
-        (lookupTables[0][l] * 0x010101)
-      );
-    } else {
-      const trans = state.trns?.sampleGray ?? -1;
-      lookup = ([l]) => l === trans ? 0 : (
-        0xFF000000 |
-        (lookupTables[0][l] * 0x010101)
-      );
     }
+  } else if (rgb) {
+    let transR = -1;
+    let transG = -1;
+    let transB = -1;
+    if (state.trns) {
+      transR = state.trns.sampleRed ?? 0;
+      transG = state.trns.sampleGreen ?? 0;
+      transB = state.trns.sampleBlue ?? 0;
+    }
+    lookup = ([r, g, b]) => (r === transR && g === transG && b === transB) ? 0 : (
+      0xFF000000 |
+      (lookupTables[0][r] << 16) |
+      (lookupTables[1][g] << 8) |
+      lookupTables[2][b]
+    );
+  } else if (alpha) {
+    lookup = ([l, a]) => (
+      (lookupTables[1][a] << 24) |
+      (lookupTables[0][l] * 0x010101)
+    );
+  } else {
+    const trans = state.trns?.sampleGray ?? -1;
+    lookup = ([l]) => l === trans ? 0 : (
+      0xFF000000 |
+      (lookupTables[0][l] * 0x010101)
+    );
   }
 
   if (filterMethod !== 0) {
