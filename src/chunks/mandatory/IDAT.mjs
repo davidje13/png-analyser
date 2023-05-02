@@ -39,7 +39,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       }
       return [
         `Inflated bytes: ${state.idat.raw.byteLength}`,
-        `Interlace levels and row filters:\n${state.idat.levels.map((l) => `  ${imageSize(l.image)} ${l.filters.join('')}`).join('\n')}`,
+        `Interlace levels and row filters:\n${state.idat.levels.map((l) => `  ${imageSize(l.image)} ${l.filters.join(' ')}`).join('\n')}`,
         `${printImage(state.idat.image, 0xFF808080)}`,
       ].join('\n');
     },
@@ -53,7 +53,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       summary.append(imageSize(state.idat.image));
       content.append(
         `Inflated bytes: ${state.idat.raw.byteLength}\n`,
-        `Interlace levels and row filters:\n${state.idat.levels.map((l) => `  ${imageSize(l.image)} ${l.filters.join('')}`).join('\n')}\n`,
+        `Interlace levels and row filters:\n${state.idat.levels.map((l) => `  ${imageSize(l.image)} ${l.filters.join(' ')}`).join('\n')}\n`,
         c,
       );
     },
