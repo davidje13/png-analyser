@@ -5,10 +5,18 @@ import { readChunk, parseChunks } from './chunk.mjs';
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
+ * @return {{
+ *   warnings: string[],
+ *   chunks: import('./chunk.mjs').Chunk[],
+ *   state: import('./chunk.mjs').State,
+ * }}
  */
 export function readPNG(data) {
   /** @type {string[]} */ const warnings = [];
   const begin = checkHeader(data, warnings);
+  if (warnings.length) {
+    return { warnings, chunks: [], state: {} };
+  }
   const chunks = [];
   for (let p = begin; p < data.byteLength;) {
     const chunk = readChunk(data, p, warnings);

@@ -4,13 +4,15 @@ import { registerChunk } from '../registry.mjs';
 import { asCanvas, printImage } from '../../pretty.mjs';
 
 /**
+ * @typedef {{ image: number[][], filters: number[] }} SubImage
+ *
  * @typedef {import('../registry.mjs').State & import('../apng/shared_state.mjs').apngState & {
  *   ihdr?: import('./IHDR.mjs').IHDRChunk,
  *   plte?: import('./PLTE.mjs').PLTEChunk,
  *   trns?: import('../ancillary/tRNS.mjs').tRNSChunk,
  *   sbit?: import('../ancillary/sBIT.mjs').sBITChunk,
  *   gama?: import('../ancillary/gAMA.mjs').gAMAChunk,
- *   idat?: { raw: ArrayBufferView, filters: number[], image: number[][] },
+ *   idat?: { raw: ArrayBufferView, image: number[][], levels: SubImage[] },
  *   idats?: ArrayBufferView[],
  *   isApple?: boolean,
  * }} IDATState
@@ -37,7 +39,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       }
       return [
         `Inflated bytes: ${state.idat.raw.byteLength}`,
-        `Row filters: ${state.idat.filters.join(', ')}`,
+        `Interlace levels and row filters:\n${state.idat.levels.map((l) => `  ${imageSize(l.image)} ${l.filters.join('')}`).join('\n')}`,
         `${printImage(state.idat.image, 0xFF808080)}`,
       ].join('\n');
     },
@@ -48,9 +50,10 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       }
       const c = asCanvas(state.idat.image, true);
       c.style.minWidth = '200px';
+      summary.append(imageSize(state.idat.image));
       content.append(
         `Inflated bytes: ${state.idat.raw.byteLength}\n`,
-        `Row filters: ${state.idat.filters.join(', ')}\n`,
+        `Interlace levels and row filters:\n${state.idat.levels.map((l) => `  ${imageSize(l.image)} ${l.filters.join('')}`).join('\n')}\n`,
         c,
       );
     },
@@ -74,15 +77,12 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     warnings.push(`idat compressed data is unreadable ${e}`);
   }
 
-  /** @type {number[]} */ const filters = [];
-  /** @type {number[][]} */ const image = [];
-  state.idat = { raw, filters, image };
-
   if (!state.ihdr) {
+    state.idat = { raw, image: [], levels: [] };
     return;
   }
-  const w = state.ihdr.width ?? 0;
-  const h = state.ihdr.height ?? 0;
+  const width = state.ihdr.width ?? 0;
+  const height = state.ihdr.height ?? 0;
   const bits = state.ihdr.bitDepth ?? 8;
   const filterMethod = state.ihdr.filterMethod ?? 0;
   const interlaceMethod = state.ihdr.interlaceMethod ?? 0;
@@ -98,6 +98,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
   if (indexed) {
     if (!state.plte?.entries) {
       warnings.push('Missing PLTE for indexed image');
+      state.idat = { raw, image: [], levels: [] };
       return;
     }
     const paletteRGB = state.plte.entries;
@@ -180,78 +181,159 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
 
   if (filterMethod !== 0) {
     warnings.push(`Filter method ${filterMethod} is not supported`);
+    state.idat = { raw, image: [], levels: [] };
     return;
   }
-  if (interlaceMethod !== 0) {
-    warnings.push('Interlaced images are not yet supported'); // TODO
-    return;
-  }
-
 
   let p = 0;
-  const step = (w * channels * bits + 7) >>> 3;
-  const leftShift = (channels * bits + 7) >>> 3;
-  let unfiltered = new Uint8Array(step);
-  let prevUnfiltered = new Uint8Array(step); // begin as 0s
-  for (let y = 0; y < h; ++y) {
-    const filter = raw[p];
-    ++p;
-    if (filter === 0) {
-      unfiltered.set(asBytes(subViewLen(raw, p, step)), 0);
-    } else {
-      for (let i = 0; i < step; ++i) {
-        const above = prevUnfiltered[i];
-        const aboveLeft = prevUnfiltered[i - leftShift] ?? 0;
-        const left = unfiltered[i - leftShift] ?? 0;
-        const value = raw[p + i];
-        let ref = 0;
-        switch (filter) {
-          case 1: ref = left; break;
-          case 2: ref = above; break;
-          case 3: ref = (left + above) >>> 1; break;
-          case 4: // Paeth
-            const base = left + above - aboveLeft;
-            const dL = Math.abs(left - base);
-            const dA = Math.abs(above - base);
-            const dD = Math.abs(aboveLeft - base);
-            ref = (dL <= dA && dL <= dD) ? left : (dA <= dD) ? above : aboveLeft;
-            break;
-        }
-        unfiltered[i] = (ref + value) & 0xFF;
-      }
+
+  /**
+   * @param {number} w
+   * @param {number} h
+   * @return {SubImage}
+   */
+  const readImagePart = (w, h) => {
+    /** @type {number[]} */ const filters = [];
+    /** @type {number[][]} */ const image = [];
+    if (!w || !h) {
+      return { image, filters };
     }
-    /** @type {number[]} */ const row = [];
-    if (bits >= 8) {
-      // PNG avoids any bit sizes > 8 which are not multiples of 8
-      const bytes = bits >>> 3;
-      for (let x = 0; x < w; ++x) {
-        const v = [];
-        for (let c = 0; c < channels; ++c) {
-          let vc = 0;
-          for (let i = 0; i < bytes; ++i) {
-            vc = (vc << 8) | unfiltered[(x * channels + c) * bytes + i];
+    const step = (w * channels * bits + 7) >>> 3;
+    const leftShift = (channels * bits + 7) >>> 3;
+    let unfiltered = new Uint8Array(step);
+    let prevUnfiltered = new Uint8Array(step); // begin as 0s
+    for (let y = 0; y < h; ++y) {
+      const filter = raw[p];
+      ++p;
+      if (filter === 0) {
+        unfiltered.set(asBytes(subViewLen(raw, p, step)), 0);
+      } else {
+        for (let i = 0; i < step; ++i) {
+          const above = prevUnfiltered[i];
+          const aboveLeft = prevUnfiltered[i - leftShift] ?? 0;
+          const left = unfiltered[i - leftShift] ?? 0;
+          const value = raw[p + i];
+          let ref = 0;
+          switch (filter) {
+            case 1: ref = left; break;
+            case 2: ref = above; break;
+            case 3: ref = (left + above) >>> 1; break;
+            case 4: // Paeth
+              const base = left + above - aboveLeft;
+              const dL = Math.abs(left - base);
+              const dA = Math.abs(above - base);
+              const dD = Math.abs(aboveLeft - base);
+              ref = (dL <= dA && dL <= dD) ? left : (dA <= dD) ? above : aboveLeft;
+              break;
           }
-          v.push(vc);
+          unfiltered[i] = (ref + value) & 0xFF;
         }
-        row.push(lookup(v) >>> 0);
       }
-    } else {
-      const mask = (1 << bits) - 1;
-      for (let x = 0; x < w; ++x) {
-        const v = [];
-        for (let c = 0; c < channels; ++c) {
-          const pp = (x * channels + c) * bits;
-          v.push((unfiltered[(pp >>> 3)] >>> (8 - bits - (pp & 7))) & mask);
+      /** @type {number[]} */ const row = [];
+      if (bits >= 8) {
+        // PNG avoids any bit sizes > 8 which are not multiples of 8
+        const bytes = bits >>> 3;
+        for (let x = 0; x < w; ++x) {
+          const v = [];
+          for (let c = 0; c < channels; ++c) {
+            let vc = 0;
+            for (let i = 0; i < bytes; ++i) {
+              vc = (vc << 8) | unfiltered[(x * channels + c) * bytes + i];
+            }
+            v.push(vc);
+          }
+          row.push(lookup(v) >>> 0);
         }
-        row.push(lookup(v) >>> 0);
+      } else {
+        const mask = (1 << bits) - 1;
+        for (let x = 0; x < w; ++x) {
+          const v = [];
+          for (let c = 0; c < channels; ++c) {
+            const pp = (x * channels + c) * bits;
+            v.push((unfiltered[(pp >>> 3)] >>> (8 - bits - (pp & 7))) & mask);
+          }
+          row.push(lookup(v) >>> 0);
+        }
       }
+      p += step;
+      filters.push(filter);
+      image.push(row);
+      [unfiltered, prevUnfiltered] = [prevUnfiltered, unfiltered];
     }
-    p += step;
-    filters.push(filter);
-    image.push(row);
-    [unfiltered, prevUnfiltered] = [prevUnfiltered, unfiltered];
+    return { image, filters };
+  };
+
+  switch (interlaceMethod) {
+    case 0: // null
+      const level = readImagePart(width, height);
+      state.idat = { raw, image: level.image, levels: [level] };
+      break;
+    case 1: // Adam7
+      const levels = ADAM_LEVELS.map(([ox, oy, sx, sy]) => readImagePart(
+        (width + (1 << sx) - ox - 1) >>> sx,
+        (height + (1 << sy) - oy - 1) >>> sy,
+      ));
+      const combinedImage = adam7(width, height, levels.map((i) => i.image));
+      state.idat = { raw, image: combinedImage, levels };
+      break;
+    default:
+      warnings.push(`Unsupported interlace method ${interlaceMethod}`);
+      state.idat = { raw, image: [], levels: [] };
+      return;
   }
+
   if (p !== raw.byteLength) {
     warnings.push(`Expected ${p} uncompressed bytes, got ${raw.byteLength}`);
   }
 });
+
+const ADAM_LOOKUP = [
+  0, 5, 3, 5, 1, 5, 3, 5,
+  6, 6, 6, 6, 6, 6, 6, 6,
+  4, 5, 4, 5, 4, 5, 4, 5,
+  6, 6, 6, 6, 6, 6, 6, 6,
+  2, 5, 3, 5, 2, 5, 3, 5,
+  6, 6, 6, 6, 6, 6, 6, 6,
+  4, 5, 4, 5, 4, 5, 4, 5,
+  6, 6, 6, 6, 6, 6, 6, 6,
+];
+const ADAM_LEVELS = [
+  [0, 0, 3, 3],
+  [4, 0, 3, 3],
+  [0, 4, 2, 3],
+  [2, 0, 2, 2],
+  [0, 2, 1, 2],
+  [1, 0, 1, 1],
+  [0, 1, 0, 1],
+];
+
+/**
+ * @param {number} w
+ * @param {number} h
+ * @param {number[][][]} levels
+ * @return {number[][]}
+ */
+function adam7(w, h, levels) {
+  /** @type {number[][]} */ const image = [];
+  for (let y = 0; y < h; ++y) {
+    /** @type {number[]} */ const row = [];
+    for (let x = 0; x < w; ++x) {
+      const l = ADAM_LOOKUP[(y & 7) * 8 + (x & 7)];
+      const [ox, oy, sx, sy] = ADAM_LEVELS[l];
+      row.push(levels[l][(y - oy) >>> sy][(x - ox) >>> sx]);
+    }
+    image.push(row);
+  }
+  return image;
+}
+
+/**
+ * @param {number[][]} img
+ * @return {string}
+ */
+const imageSize = (img) => {
+  if (!img.length) {
+    return '0x0';
+  }
+  return `${img[0].length}x${img.length}`;
+};
