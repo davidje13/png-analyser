@@ -93,13 +93,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
 
   const channels = indexed ? 1 : ((rgb ? 3 : 1) + (alpha ? 1 : 0));
 
-  if (bits > 8) {
-    warnings.push('16-bit images are not yet supported'); // TODO
-    return;
-  }
-
-  let pixelStepBits = 0;
-  /** @type {(c: number) => number} */ let lookup;
+  /** @type {(c: number[]) => number} */ let lookup;
 
   if (indexed) {
     if (!state.plte?.entries) {
@@ -109,11 +103,8 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     const paletteRGB = state.plte.entries;
     // TODO: apply gamma to palette entries
     const paletteA = state.trns?.indexedAlpha ?? [];
-    pixelStepBits = bits;
-    lookup = (i) => ((paletteA[i] ?? 0xFF) << 24) | paletteRGB[i];
+    lookup = ([i]) => ((paletteA[i] ?? 0xFF) << 24) | paletteRGB[i];
   } else {
-    pixelStepBits = channels * bits;
-
     const lim = 1 << bits;
     const mask = lim - 1;
     /** @type {number[][]} */ const lookupTables = [];
@@ -137,53 +128,52 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     }
 
     if (rgb && alpha) {
-      if (state.isApple) { // ARGB is flipped to BGRA and premultiplied by alpha
-        lookup = (c) => {
-          const a = lookupTables[3][c & mask];
+      if (state.isApple) { // RGBA is flipped to BGRA and premultiplied by alpha
+        lookup = ([b, g, r, a]) => {
           if (!a) {
             return 0;
           }
-          const m = 255 / a;
+          const m = mask / a;
           return (
-            (a << 24) |
-            ((lookupTables[0][(c >>> bits) & mask] * m) << 16) |
-            ((lookupTables[1][(c >>> (bits * 2)) & mask] * m) << 8) |
-            (lookupTables[2][(c >>> (bits * 3)) & mask] * m)
+            (lookupTables[3][a] << 24) |
+            ((lookupTables[0][(r * m)|0]) << 16) |
+            ((lookupTables[1][(g * m)|0]) << 8) |
+            lookupTables[2][(b * m)|0]
           );
         };
       } else {
-        lookup = (c) => (
-          (lookupTables[3][c & mask] << 24) |
-          (lookupTables[0][c >>> (bits * 3)] << 16) |
-          (lookupTables[1][(c >>> (bits * 2)) & mask] << 8) |
-          (lookupTables[2][(c >>> bits) & mask])
+        lookup = ([r, g, b, a]) => (
+          (lookupTables[3][a] << 24) |
+          (lookupTables[0][r] << 16) |
+          (lookupTables[1][g] << 8) |
+          lookupTables[2][b]
         );
       }
     } else if (rgb) {
-      let trans = -1;
+      let transR = -1;
+      let transG = -1;
+      let transB = -1;
       if (state.trns) {
-        trans = (
-          ((state.trns.sampleRed ?? 0) << (bits * 2)) |
-          ((state.trns.sampleGreen ?? 0) << bits) |
-          ((state.trns.sampleBlue ?? 0))
-        );
+        transR = state.trns.sampleRed ?? 0;
+        transG = state.trns.sampleGreen ?? 0;
+        transB = state.trns.sampleBlue ?? 0;
       }
-      lookup = (c) => c === trans ? 0 : (
+      lookup = ([r, g, b]) => (r === transR && g === transG && b === transB) ? 0 : (
         0xFF000000 |
-        (lookupTables[0][c >>> (bits * 2)] << 16) |
-        (lookupTables[1][(c >>> bits) & mask] << 8) |
-        (lookupTables[2][c & mask])
+        (lookupTables[0][r] << 16) |
+        (lookupTables[1][g] << 8) |
+        lookupTables[2][b]
       );
     } else if (alpha) {
-      lookup = (c) => (
-        (lookupTables[1][c & mask] << 24) |
-        (lookupTables[0][c >>> bits] * 0x010101)
+      lookup = ([l, a]) => (
+        (lookupTables[1][a] << 24) |
+        (lookupTables[0][l] * 0x010101)
       );
     } else {
       const trans = state.trns?.sampleGray ?? -1;
-      lookup = (c) => c === trans ? 0 : (
+      lookup = ([l]) => l === trans ? 0 : (
         0xFF000000 |
-        (lookupTables[0][c] * 0x010101)
+        (lookupTables[0][l] * 0x010101)
       );
     }
   }
@@ -199,8 +189,8 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
 
 
   let p = 0;
-  const step = (w * pixelStepBits + 7) >>> 3;
-  const leftShift = (pixelStepBits + 7) >>> 3;
+  const step = (w * channels * bits + 7) >>> 3;
+  const leftShift = (channels * bits + 7) >>> 3;
   let unfiltered = new Uint8Array(step);
   let prevUnfiltered = new Uint8Array(step); // begin as 0s
   for (let y = 0; y < h; ++y) {
@@ -231,21 +221,28 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       }
     }
     /** @type {number[]} */ const row = [];
-    if (pixelStepBits >= 8) {
+    if (bits >= 8) {
       // PNG avoids any bit sizes > 8 which are not multiples of 8
-      const pixelStepBytes = pixelStepBits >>> 3;
+      const bytes = bits >>> 3;
       for (let x = 0; x < w; ++x) {
-        let c = 0;
-        for (let i = 0; i < pixelStepBytes; ++i) {
-          c = (c << 8) | unfiltered[x * pixelStepBytes + i];
+        const v = [];
+        for (let c = 0; c < channels; ++c) {
+          let vc = 0;
+          for (let i = 0; i < bytes; ++i) {
+            vc = (vc << 8) | unfiltered[(x * channels + c) * bytes + i];
+          }
+          v.push(vc);
         }
-        row.push(lookup(c) >>> 0);
+        row.push(lookup(v) >>> 0);
       }
     } else {
-      const mask = 0xFF >>> (8 - pixelStepBits);
+      const mask = (1 << bits) - 1;
       for (let x = 0; x < w; ++x) {
-        const pp = x * pixelStepBits;
-        const v = (unfiltered[(pp >>> 3)] >>> (8 - pixelStepBits - (pp & 7))) & mask;
+        const v = [];
+        for (let c = 0; c < channels; ++c) {
+          const pp = (x * channels + c) * bits;
+          v.push((unfiltered[(pp >>> 3)] >>> (8 - bits - (pp & 7))) & mask);
+        }
         row.push(lookup(v) >>> 0);
       }
     }
