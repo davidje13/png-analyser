@@ -65,3 +65,5 @@ registerChunk('sPLT', { notAfter: ['IDAT'] }, (/** @type {sPLTChunk} */ chunk, /
   }
   state.splt.push(chunk);
 });
+
+// spAL: beta version of sPLT

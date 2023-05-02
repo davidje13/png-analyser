@@ -8,11 +8,16 @@ import { asCanvas, printImage } from '../../pretty.mjs';
  *   ihdr?: import('./IHDR.mjs').IHDRChunk,
  *   plte?: import('./PLTE.mjs').PLTEChunk,
  *   trns?: import('../ancillary/tRNS.mjs').tRNSChunk,
+ *   sbit?: import('../ancillary/sBIT.mjs').sBITChunk,
+ *   gama?: import('../ancillary/gAMA.mjs').gAMAChunk,
  *   idat?: { raw: ArrayBufferView, filters: number[], image: number[][] },
  *   idats?: ArrayBufferView[],
  *   isApple?: boolean,
  * }} IDATState
  */
+
+const displayGamma = 1 / 2.2;
+const displayMax = 255;
 
 registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState} */ state, warnings) => {
   state.idats ||= [];
@@ -84,6 +89,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
   const indexed = state.ihdr.indexed ?? false;
   const rgb = state.ihdr.rgb ?? true;
   const alpha = state.ihdr.alpha ?? true;
+  const gamma = displayGamma / (state.gama?.gamma ?? displayGamma);
 
   const channels = indexed ? 1 : ((rgb ? 3 : 1) + (alpha ? 1 : 0));
 
@@ -101,38 +107,84 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       return;
     }
     const paletteRGB = state.plte.entries;
+    // TODO: apply gamma to palette entries
     const paletteA = state.trns?.indexedAlpha ?? [];
     pixelStepBits = bits;
     lookup = (i) => ((paletteA[i] ?? 0xFF) << 24) | paletteRGB[i];
   } else {
     pixelStepBits = channels * bits;
-    if (bits === 8) {
-      if (rgb && alpha) {
-        if (state.isApple) { // ARGB is flipped to BGRA and premultiplied by alpha
-          lookup = (c) => {
-            const a = c & 0xFF;
-            if (!a) {
-              return 0;
-            }
-            const m = 255 / a;
-            const b = (c >>> 24) & 0xFF;
-            const g = (c >>> 16) & 0xFF;
-            const r = (c >>> 8) & 0xFF;
-            return (a << 24) | ((r * m) << 16) | ((g * m) << 8) | (b * m);
-          };
-        } else { // stored as RGBA
-          lookup = (c) => (c >>> 8) | ((c & 0xFF) << 24);
+
+    const lim = 1 << bits;
+    const mask = lim - 1;
+    /** @type {number[][]} */ const lookupTables = [];
+    for (let i = 0; i < channels; ++i) {
+      const originalMax = (1 << (state.sbit?.originalBits?.[i] ?? bits)) - 1;
+      const mult1 = originalMax / mask;
+      const mult2 = displayMax / originalMax;
+      const isAlpha = alpha && i === channels - 1;
+      /** @type {number[]} */ const table = [];
+      for (let j = 0; j < lim; ++j) {
+        let v = j;
+        v = (v * mult1 + 0.5)|0; // scale to original bit depth (and round)
+        v = v * mult2; // scale to display bit depth (no rounding until after gamma correction)
+        if (!isAlpha && gamma !== 1) { // apply gamma correction
+          v = Math.pow(v / displayMax, gamma) * displayMax;
         }
-      } else if (rgb) {
-        lookup = (c) => c | 0xFF000000;
-      } else if (alpha) {
-        lookup = (c) => ((c & 0xFF) << 24) | ((c >>> 8) * 0x010101);
-      } else {
-        lookup = (c) => 0xFF000000 | ((c & 0xFF) * 0x010101);
+        v = (v + 0.5)|0; // round
+        table[j] = v;
       }
+      lookupTables.push(table);
+    }
+
+    if (rgb && alpha) {
+      if (state.isApple) { // ARGB is flipped to BGRA and premultiplied by alpha
+        lookup = (c) => {
+          const a = lookupTables[3][c & mask];
+          if (!a) {
+            return 0;
+          }
+          const m = 255 / a;
+          return (
+            (a << 24) |
+            ((lookupTables[0][(c >>> bits) & mask] * m) << 16) |
+            ((lookupTables[1][(c >>> (bits * 2)) & mask] * m) << 8) |
+            (lookupTables[2][(c >>> (bits * 3)) & mask] * m)
+          );
+        };
+      } else {
+        lookup = (c) => (
+          (lookupTables[3][c & mask] << 24) |
+          (lookupTables[0][c >>> (bits * 3)] << 16) |
+          (lookupTables[1][(c >>> (bits * 2)) & mask] << 8) |
+          (lookupTables[2][(c >>> bits) & mask])
+        );
+      }
+    } else if (rgb) {
+      let trans = -1;
+      if (state.trns) {
+        trans = (
+          ((state.trns.sampleRed ?? 0) << (bits * 2)) |
+          ((state.trns.sampleGreen ?? 0) << bits) |
+          ((state.trns.sampleBlue ?? 0))
+        );
+      }
+      lookup = (c) => c === trans ? 0 : (
+        0xFF000000 |
+        (lookupTables[0][c >>> (bits * 2)] << 16) |
+        (lookupTables[1][(c >>> bits) & mask] << 8) |
+        (lookupTables[2][c & mask])
+      );
+    } else if (alpha) {
+      lookup = (c) => (
+        (lookupTables[1][c & mask] << 24) |
+        (lookupTables[0][c >>> bits] * 0x010101)
+      );
     } else {
-      warnings.push('non-8-bit unindexed images are not yet supported');
-      return;
+      const trans = state.trns?.sampleGray ?? -1;
+      lookup = (c) => c === trans ? 0 : (
+        0xFF000000 |
+        (lookupTables[0][c] * 0x010101)
+      );
     }
   }
 

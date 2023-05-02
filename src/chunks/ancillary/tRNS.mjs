@@ -8,9 +8,10 @@ import { registerChunk } from '../registry.mjs';
  * }} tRNSState
  * @typedef {import('../registry.mjs').Chunk & {
  *   indexedAlpha?: number[],
- *   sampleR?: number,
- *   sampleG?: number,
- *   sampleB?: number,
+ *   sampleRed?: number,
+ *   sampleGreen?: number,
+ *   sampleBlue?: number,
+ *   sampleGray?: number,
  * }} tRNSChunk
  */
 
@@ -46,10 +47,10 @@ registerChunk('tRNS', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (/** 
       }
     };
   } else if (state.ihdr.rgb) {
-    chunk.sampleR = chunk.data.getUint16(0);
-    chunk.sampleG = chunk.data.getUint16(2);
-    chunk.sampleB = chunk.data.getUint16(4);
+    chunk.sampleRed = chunk.data.getUint16(0);
+    chunk.sampleGreen = chunk.data.getUint16(2);
+    chunk.sampleBlue = chunk.data.getUint16(4);
   } else {
-    chunk.sampleG = chunk.data.getUint16(0);
+    chunk.sampleGray = chunk.data.getUint16(0);
   }
 });

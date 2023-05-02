@@ -108,7 +108,7 @@ export function printImage(image, background = -1) {
  */
 export function asImageData(image, alpha) {
   if (!image.length || !image[0].length) {
-    return new ImageData(0, 0);
+    return new ImageData(1, 1);
   }
   const w = image[0]?.length ?? 0;
   const h = image.length;

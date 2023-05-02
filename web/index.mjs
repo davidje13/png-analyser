@@ -1,57 +1,69 @@
 import { readPNG } from '../src/png.mjs';
-import { printNice } from '../src/pretty.mjs';
 
 /**
  * @param {ArrayBuffer} data
+ * @param {string} name
  */
-async function process(data) {
-  const png = readPNG(data);
-
+async function process(data, name) {
   const output = document.createElement('section');
   output.classList.add('output');
+  const header = document.createElement('h2');
+  header.append(name);
+  output.append(header);
 
-  if (png.warnings.length > 0) {
-    const oDetails = document.createElement('details');
-    oDetails.setAttribute('open', 'open');
-    const oSummary = document.createElement('summary');
-    oSummary.append('Warnings');
-    oDetails.append(oSummary);
-    for (const warning of png.warnings) {
-      const owarn = document.createElement('div');
-      owarn.classList.add('warning');
-      owarn.append(warning);
-      oDetails.append(owarn);
-    }
-    output.append(oDetails);
-  }
+  try {
+    const png = readPNG(data);
 
-  /** @type {Set<string>} */ const seen = new Set();
-  for (const chunk of png.chunks) {
-    const oSummary = document.createElement('span');
-    const oHeader = document.createElement('span');
-    oHeader.classList.add('chunk-header');
-    oHeader.append(`${chunk.name}`);
-    const oData = document.createElement('div');
-    oData.classList.add('chunk-value');
-
-    /** @type {HTMLElement} */ let section;
-    if (chunk.aggregate) {
-      if (seen.has(chunk.name)) {
-        continue;
+    if (png.warnings.length > 0) {
+      const oDetails = document.createElement('details');
+      oDetails.setAttribute('open', 'open');
+      const oSummary = document.createElement('summary');
+      oSummary.append('Warnings');
+      oDetails.append(oSummary);
+      for (const warning of png.warnings) {
+        const owarn = document.createElement('div');
+        owarn.classList.add('warning');
+        owarn.append(warning);
+        oDetails.append(owarn);
       }
-      seen.add(chunk.name);
-      const agg = chunk.aggregate();
-      const parts = png.chunks.filter((c) => c.name === chunk.name);
-
-      agg.display(oSummary, oData);
-      oSummary.prepend(oHeader, ` [${parts.map((c) => c.data.byteLength).join(' & ')}] `);
-    } else {
-      chunk.display(oSummary, oData);
-      oSummary.prepend(oHeader, ` [${chunk.data.byteLength}] `);
+      output.append(oDetails);
     }
-    section = makeDetails(oSummary, oData, true);
-    section.classList.add('chunk');
-    output.append(section);
+
+    /** @type {Set<string>} */ const seen = new Set();
+    for (const chunk of png.chunks) {
+      const oSummary = document.createElement('span');
+      const oHeader = document.createElement('span');
+      oHeader.classList.add('chunk-header');
+      oHeader.append(`${chunk.name}`);
+      const oData = document.createElement('div');
+      oData.classList.add('chunk-value');
+
+      /** @type {HTMLElement} */ let section;
+      if (chunk.aggregate) {
+        if (seen.has(chunk.name)) {
+          continue;
+        }
+        seen.add(chunk.name);
+        const agg = chunk.aggregate();
+        const parts = png.chunks.filter((c) => c.name === chunk.name);
+
+        agg.display(oSummary, oData);
+        oSummary.prepend(oHeader, ` [${parts.map((c) => c.data.byteLength).join(' & ')}] `);
+      } else {
+        chunk.display(oSummary, oData);
+        oSummary.prepend(oHeader, ` [${chunk.data.byteLength}] `);
+      }
+      section = makeDetails(oSummary, oData, true);
+      section.classList.add('chunk');
+      output.append(section);
+    }
+  } catch (e) {
+    if (e && typeof e === 'object' && /** @type {any} */ (e).message) {
+      output.append(/** @type {any} */ (e).message);
+    } else {
+      output.append(String(e));
+    }
+    console.error(e);
   }
   out.append(output);
 }
@@ -104,18 +116,8 @@ drop.addEventListener('drop', (e) => {
 
   if (e.dataTransfer?.items) {
     for (let i = 0; i < e.dataTransfer.items.length; ++i) {
-      e.dataTransfer.items[i]
-        .getAsFile()
-        ?.arrayBuffer()
-        .then((d) => process(d))
-        .catch((e) => {
-          if (typeof e === 'object' && e.message) {
-            out.append(e.message);
-          } else {
-            out.append(String(e));
-          }
-          console.error(e);
-        });
+      const file = e.dataTransfer.items[i].getAsFile();
+      file?.arrayBuffer().then((d) => process(d, file.name));
     }
   }
 });
