@@ -120,3 +120,5 @@ export function concat(datas) {
   }
   return new DataView(out.buffer);
 }
+
+export const VOID = new DataView(new Uint8Array(0).buffer);

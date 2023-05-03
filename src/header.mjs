@@ -1,23 +1,38 @@
-import { asBytes, findIndex, toLatin1 } from './data_utils.mjs';
+import { VOID, asBytes, asDataView, findIndex, subView, toLatin1 } from './data_utils.mjs';
 
-const PNG_HEADER = [137, 80, 78, 71, 13, 10, 26, 10];
+const PNG_HEADER            = [137, 80, 78, 71, 13, 10, 26, 10];
+const PNG_HEADER_LF_TO_CRLF = [137, 80, 78, 71, 13, 13, 10, 26, 13, 10];
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
  * @param {string[]} warnings
- * @returns {number}
+ * @returns {DataView}
  */
 export function checkHeader(data, warnings) {
   const bytes = asBytes(data);
-  let exactMatch = true;
-  for (let i = 0; i < PNG_HEADER.length; ++i) {
-    if (bytes[i] !== PNG_HEADER[i]) {
-      exactMatch = false;
-      break;
-    }
+  if (checkMatch(bytes, PNG_HEADER)) {
+    return subView(data, PNG_HEADER.length);
   }
-  if (exactMatch) {
-    return PNG_HEADER.length;
+  if (checkMatch(bytes, PNG_HEADER_LF_TO_CRLF)) {
+    warnings.push('Malformed header (transfer error: LF converted to CR-LF) - auto-patching');
+    const headLength = PNG_HEADER_LF_TO_CRLF.length;
+    // this corruption is reversible
+    let count = 0;
+    for (let i = headLength; i < bytes.byteLength - 1; ++i) {
+      if (bytes[i] === 13 && bytes[i + 1] === 10) {
+        ++count;
+      }
+    }
+    const patched = new Uint8Array(bytes.byteLength - headLength - count);
+    for (let i = headLength, j = 0; i < bytes.byteLength; ++i, ++j) {
+      if (bytes[i] === 13 && bytes[i + 1] === 10) {
+        patched[j] = 10;
+        ++i;
+      } else {
+        patched[j] = bytes[i];
+      }
+    }
+    return asDataView(patched);
   }
 
   const begin = findIndex(bytes, toLatin1('IHDR'));
@@ -25,14 +40,15 @@ export function checkHeader(data, warnings) {
 
   if (begin === 0) {
     warnings.push('Malformed header (missing)');
-    return 0;
+    return asDataView(data);
   }
 
   if (bytes[0] !== 137) {
     if (bytes[0] === (137 & 0x7F)) {
       warnings.push('Malformed header (possibly sent via 7-bit channel)');
     } else {
-      throw new Error('Not a PNG file!');
+      warnings.push('Not a PNG file!');
+      return VOID;
     }
   }
   if (bytes[1] !== 80 || bytes[2] !== 78 || bytes[3] !== 71) {
@@ -58,18 +74,27 @@ export function checkHeader(data, warnings) {
   }
   let p = escPos;
   if (bytes[escPos + 1] === 13) {
-    if (bytes[escPos + 2] === 10) {
-      warnings.push('Malformed header (transfer error: LF converted to CR-LF)');
-      p += 2;
-    } else {
-      warnings.push('Malformed header (transfer error: LF converted to CR)');
-      p += 1;
-    }
+    warnings.push('Malformed header (transfer error: LF converted to CR)');
+    p += 1;
   } else if (bytes[escPos + 1] !== 10) {
     warnings.push('Malformed header (transfer error: LF removed)');
   }
   if (begin > PNG_HEADER.length && begin !== p) {
     warnings.push('Malformed header (extra data before chunks, or incorrect chunk order)');
   }
-  return begin;
+  return VOID;
+}
+
+/**
+ * @param {Uint8Array} bytes
+ * @param {number[]} compare
+ * @returns {boolean}
+ */
+function checkMatch(bytes, compare) {
+  for (let i = 0; i < compare.length; ++i) {
+    if (bytes[i] !== compare[i]) {
+      return false;
+    }
+  }
+  return true;
 }

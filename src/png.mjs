@@ -13,13 +13,13 @@ import { readChunk, parseChunks } from './chunk.mjs';
  */
 export function readPNG(data) {
   /** @type {string[]} */ const warnings = [];
-  const begin = checkHeader(data, warnings);
-  if (warnings.length) {
+  const body = checkHeader(data, warnings);
+  if (!body.byteLength) {
     return { warnings, chunks: [], state: {} };
   }
   const chunks = [];
-  for (let p = begin; p < data.byteLength;) {
-    const chunk = readChunk(data, p, warnings);
+  for (let p = 0; p < body.byteLength;) {
+    const chunk = readChunk(body, p, warnings);
     chunks.push(chunk);
     p += chunk.advance;
   }
