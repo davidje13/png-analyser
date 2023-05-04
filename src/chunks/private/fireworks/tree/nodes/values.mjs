@@ -1,13 +1,38 @@
 import { registerNode, getBasicValue, getChildren } from '../node_registry.mjs';
+import { outputNodes } from './generic.mjs';
 
 registerNode('DCE', 'v', { // ??? Entity
   read: (target, value) => {
     const key = getBasicValue(value, 'DCK', 's');
-    const val = getBasicValue(value, 'DCV', 's');
     target.key = key;
-    target.val = val;
 
-    target.toString = () => `${JSON.stringify(key)} = ${JSON.stringify(val)}`;
+    const val1 = getBasicValue(value, 'DCV', 's');
+    const val2 = getBasicValue(value, 'GPL', 'v');
+    const val3 = getBasicValue(value, 'GDT', 'v');
+
+    if (val1) {
+      target.val = val1;
+      target.toString = () => `${JSON.stringify(key)} = ${JSON.stringify(val1)}`;
+    } else if (val2) {
+      target.val = val2;
+      Object.assign(target, outputNodes(JSON.stringify(key), val2));
+    } else if (val3) {
+      target.val = val3;
+      Object.assign(target, outputNodes(JSON.stringify(key), val3));
+    } else {
+      target.val = undefined;
+      target.toString = () => `${JSON.stringify(key)} = -`;
+    }
+  },
+});
+
+registerNode('GPT', 'v', {
+  read: (target, value) => {
+    const x = getBasicValue(value, 'XLC', 'f') ?? 0;
+    const y = getBasicValue(value, 'YLC', 'f') ?? 0;
+    target.x = x;
+    target.y = y;
+    target.toString = () => `${x}, ${y}`;
   },
 });
 
@@ -75,5 +100,145 @@ registerNode('OPA', 'i', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `opacity ${(value * 0.1).toFixed(1)}%`;
+  },
+});
+
+registerNode('BCL', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `brush colour: ${value.toString(16).padStart(8, '0')}`;
+  },
+});
+
+registerNode('FCL', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill colour: ${value.toString(16).padStart(8, '0')}`;
+  },
+});
+
+registerNode('FOT', 'b', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill on top: ${value}`;
+  },
+});
+
+registerNode('BRP', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `brush placement: ${value}`;
+  },
+});
+
+registerNode('TOX', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `texture offset X: ${value}`;
+  },
+});
+
+registerNode('TOY', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `texture offset Y: ${value}`;
+  },
+});
+
+registerNode('PSX', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill handle 1 (S) X: ${value}`;
+  },
+});
+
+registerNode('PSY', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill handle 1 (S) Y: ${value}`;
+  },
+});
+
+registerNode('PEX', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill handle 2 (E) X: ${value}`;
+  },
+});
+
+registerNode('PEY', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill handle 2 (E) Y: ${value}`;
+  },
+});
+
+registerNode('PFX', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill handle 3 (F) X: ${value}`;
+  },
+});
+
+registerNode('PFY', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill handle 3 (F) Y: ${value}`;
+  },
+});
+
+registerNode('RND', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `random seed: ${value.toString(16).padStart(6, '0')}`;
+  },
+});
+
+registerNode('LEF', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `left: ${value}`;
+  },
+});
+
+registerNode('TOP', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `top: ${value}`;
+  },
+});
+
+registerNode('RIT', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `right: ${value}`;
+  },
+});
+
+registerNode('BOT', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `bottom: ${value}`;
+  },
+});
+
+registerNode('ORI', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `orientation: ${value}`;
+  },
+});
+
+registerNode('FRC', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `frame count: ${value}`;
+  },
+});
+
+registerNode('JSS', 's', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `script:\n${value}`;
   },
 });

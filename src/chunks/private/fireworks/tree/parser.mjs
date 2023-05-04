@@ -3,6 +3,7 @@
 // (e.g. EffectMoaID values)
 
 import { getTypeMeta } from './node_registry.mjs';
+import { outputNodes } from './nodes/generic.mjs';
 import './nodes/index.mjs';
 
 /**
@@ -17,52 +18,36 @@ export function parse(nodeToken, state) {
 
   /** @type {ProcessedNode} */ const processedNode = {
     name: nodeToken.name + nodeToken.type,
+    visited: false,
     toString: () => `${processedNode.name}: ???`,
     display: (summary, content) => content.append(processedNode.toString()),
   };
+  const fallbackDisplay = processedNode.display;
 
   if (nodeToken.type === 'v') {
-    meta.read(processedNode, nodeToken.value.map((child) => parse(child, state)), state);
+    const value = nodeToken.value.map((child) => parse(child, state));
+    meta.read(processedNode, value, state);
+    const unvisited = value.filter((n) => !n.visited);
+    if (unvisited.length) {
+      const ts = processedNode.toString.bind(processedNode);
+      const ds = processedNode.display;
+      const dsb = ds.bind(processedNode);
+      const out = outputNodes('Additional child nodes', unvisited);
+      processedNode.toString = () => ts() + '\n' + out.toString();
+      processedNode.display = (summary, content) => {
+        if (ds === fallbackDisplay) {
+          content.append(ts());
+        } else {
+          dsb(summary, content);
+        }
+        out.display(summary, content);
+      };
+    }
   } else {
     meta.read(processedNode, nodeToken.value, state);
   }
   return processedNode;
 }
-
-//const listOf = (childTag) => ({
-//  readV: ({ name, value, findChildren }) => {
-//    const items = findChildren(childTag);
-//    if (items.length !== value.length) {
-//      const mismatch = value.map((v) => v.name).filter((name) => name !== childTag);
-//      throw new Error(`Unexpected non-${childTag} in ${name}: ${mismatch.join(', ')}`);
-//    }
-//    return items.map((o) => o.value);
-//  },
-//});
-
-//const sizedListOf = (lengthTag, childTag) => ({
-//  readV: ({ name, value, findChild, findChildren }) => {
-//    const count = findChild(lengthTag);
-//    const items = findChildren(childTag);
-//    if (!count) {
-//      throw new Error(`Missing ${lengthTag} in ${name}`);
-//    }
-//    if (items.length + 1 !== value.length) {
-//      throw new Error(`Unexpected non-${childTag} in ${name}`);
-//    }
-//    if (count.value !== items.length) {
-//      throw new Error(`${name} length in ${lengthTag} does not match count of ${childTag}`);
-//    }
-//    return items.map((o) => o.value);
-//  },
-//});
-
-//KNOWN_KEYS.set('GRD', {}); // GRiD
-//KNOWN_KEYS.set('GOX', {}); // Grid Offset X
-//KNOWN_KEYS.set('GOY', {}); // Grid Offset Y
-//KNOWN_KEYS.set('GSX', {}); // Grid Size X
-//KNOWN_KEYS.set('GSY', {}); // Grid Size Y
-//KNOWN_KEYS.set('GCL', {}); // Grid CoLour
 
 //KNOWN_KEYS.set('WID', {}); // WIDth
 //KNOWN_KEYS.set('HIT', {}); // HeIghT
@@ -76,15 +61,6 @@ export function parse(nodeToken, state) {
 //KNOWN_KEYS.set('LNM', {}); // Layer NaMe
 //KNOWN_KEYS.set('DIS', {}); // DISplay
 
-//KNOWN_KEYS.set('GRP', {}); // GRouP
-
-//KNOWN_KEYS.set('PTH', {}); // PaTH
-//KNOWN_KEYS.set('PBL', listOf('PBP')); // Path Boundary(?) List of Path Boundary(?) ??
-//KNOWN_KEYS.set('PBT', {}); // Path Boundary(?) Point
-//KNOWN_KEYS.set('PCL', {}); // ???
-////KNOWN_KEYS.set('PBP', sizedListOf('PPC', 'PBP', ['ISC', 'BSL'])); // ???
-////KNOWN_KEYS.set('PPL', sizedListOf('PPC', 'PPT', ['ISC'])); // Path Point List
-//KNOWN_KEYS.set('PPT', {}); // Path PoinT
 //KNOWN_KEYS.set('XLC', {}); // X LoCation
 //KNOWN_KEYS.set('YLC', {}); // Y LoCation
 //KNOWN_KEYS.set('PRS', {}); // PReSsure
@@ -98,13 +74,8 @@ export function parse(nodeToken, state) {
 //    colour: findChild('FGC')?.value, // Fill Gradient Colour
 //  }),
 //});
-//KNOWN_KEYS.set('FGV', sizedListOf('FNC', 'FGI')); // Fill Gradient ????
-//KNOWN_KEYS.set('FG0', sizedListOf('FNC', 'FGI')); // Fill Gradient 0
-//KNOWN_KEYS.set('FG1', sizedListOf('FNC', 'FGI')); // Fill Gradient 1
 //KNOWN_KEYS.set('CLL', listOf('CEL')); // CeLl List (?) of CELls (?)
 //KNOWN_KEYS.set('PAT', {}); // PATtern
-//KNOWN_KEYS.set('BCL', {}); // Background CoLour
-//KNOWN_KEYS.set('FCL', {}); // Foreground CoLour
 //KNOWN_KEYS.set('FPL', {}); // ??
 //KNOWN_KEYS.set('TXB', {}); // TeXture Background (?)
 //KNOWN_KEYS.set('TXF', {}); // TeXture Foreground (?)
@@ -121,6 +92,4 @@ export function parse(nodeToken, state) {
 //KNOWN_KEYS.set('BOA', {}); // ???
 //KNOWN_KEYS.set('TFT', {}); // ???
 //KNOWN_KEYS.set('FOA', {}); // ???
-//KNOWN_KEYS.set('LCK', {}); // LoCKed
 //KNOWN_KEYS.set('FON', {}); // FONt
-//KNOWN_KEYS.set('TRN', {}); // ??? (text content)

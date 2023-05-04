@@ -51,7 +51,7 @@ const BEVEL_TYPES = new Map([
   ['1', { name: 'Outer Bevel' }],
   ['2', { name: 'Raise Emboss' }],
   ['3', { name: 'Inset Emboss' }],
-  ['4', { name: 'Glow' }],
+  ['4', { name: 'Glow Effect' }],
 ]);
 const BEVEL_SLOPE_TYPES = new Map([
   ['0', { name: 'flat', fn: (/** @type {number} */ v) => v }],
@@ -61,6 +61,12 @@ const BEVEL_SLOPE_TYPES = new Map([
   ['4', { name: 'zigzag 2', fn: (/** @type {number} */ v) => v }], // TODO: equation
   ['5', { name: 'ring', fn: (/** @type {number} */ v) => Math.sin(v * Math.PI) }], // TODO: check eq
   ['6', { name: 'ruffle', fn: (/** @type {number} */ v) => v }], // TODO: equation
+]);
+const BUTTON_STATES = new Map([
+  ['0', 'Up'],
+  ['1', 'Over'],
+  ['2', 'Down'],
+  ['3', 'Hit'],
 ]);
 
 KNOWN_EFFECTS.set('{7fe61102-6ce2-11d1-8c76000502701850}', {
@@ -91,7 +97,8 @@ KNOWN_EFFECTS.set('{7fe61102-6ce2-11d1-8c76000502701850}', {
     const shadowCol = parseCol(getEntityValue(value, 'ShadowColor'));
     const embossFaceCol = parseCol(getEntityValue(value, 'EmbossFaceColor'));
     const showObject = getEntityValue(value, 'ShowObject') === 'true';
-    const buttonState = getEntityValue(value, 'ButtonState');
+    const buttonStateId = getEntityValue(value, 'ButtonState');
+    const buttonState = BUTTON_STATES.get(buttonStateId ?? '');
     const glowStartDist = Number.parseFloat(getEntityValue(value, 'GlowStartDistance') ?? '0');
     const glowWidth = Number.parseFloat(getEntityValue(value, 'GlowWidth') ?? '0');
 
@@ -104,7 +111,7 @@ KNOWN_EFFECTS.set('{7fe61102-6ce2-11d1-8c76000502701850}', {
 KNOWN_EFFECTS.set('{a7944db8-6ce2-11d1-8c76000502701850}', {
   name: 'Drop Shadow',
   read: (target, value, state) => {
-    const type = getEntityValue(value, 'ShadowType'); // always 0?
+    const knockout = getEntityValue(value, 'ShadowType') === '1';
     const blur = Number.parseFloat(getEntityValue(value, 'ShadowBlur') ?? '0');
     const dist = Number.parseFloat(getEntityValue(value, 'ShadowDistance') ?? '0');
     const angle = Number.parseFloat(getEntityValue(value, 'ShadowAngle') ?? '0');

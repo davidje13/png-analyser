@@ -11,6 +11,7 @@
  *   name: string,
  *   toString: () => string,
  *   display: (summary: HTMLElement, content: HTMLElement) => void,
+ *   visited: boolean,
  * }} ProcessedNode
  *
  * @typedef {{
@@ -90,7 +91,11 @@ export function getTypeMeta(name, type) {
  */
 export function getChildren(list, name, type) {
   const lookup = name + type;
-  return list.filter((n) => n.name === lookup);
+  const results = list.filter((n) => n.name === lookup);
+  for (const node of results) {
+    node.visited = true;
+  }
+  return results;
 }
 
 /**

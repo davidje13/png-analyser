@@ -32,9 +32,10 @@ registerNode('IMG', 'v', { // IMaGe
     target.yLocation = yLocation;
     target.width = width;
     target.height = height;
-    target.toString = () => `Image: ${width} x ${height} @${xLocation}, ${yLocation} / ${xOf}, ${yOf}${locked ? ' locked' : ''}`;
+    const toString = () => `Image: ${width} x ${height} @${xLocation}, ${yLocation} / ${xOf}, ${yOf}${locked ? ' locked' : ''}`;
+    target.toString = toString;
     target.display = (summary, content) => {
-      summary.append(target.toString());
+      summary.append(toString());
       content.append(tilesAsCanvas(tileData));
     };
   },

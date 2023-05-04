@@ -30,8 +30,8 @@ registerNode('PBT', 'v', { // Path Bezier poinT
     const yC1 = getBasicValue(value, 'YPC', 'f') ?? y;
     const xC2 = getBasicValue(value, 'XSC', 'f') ?? x;
     const yC2 = getBasicValue(value, 'YSC', 'f') ?? y;
-    const CRV = getBasicValue(value, 'CRV', 'b') ?? false;
-    const RND = getBasicValue(value, 'RND', 'i');
+    const isCurve = getBasicValue(value, 'CRV', 'b') ?? false;
+    const randomSeed = getBasicValue(value, 'RND', 'i');
     const NSD = getBasicValue(value, 'NSD', 'f');
     const BZL = getBasicValue(value, 'BZL', 'v'); // TODO: maybe this holds attributes like pressure / velocity? Seems to have BZCi (count?) and BAZv (item array?)
 
@@ -41,12 +41,12 @@ registerNode('PBT', 'v', { // Path Bezier poinT
     target.yC1 = yC1;
     target.xC2 = xC2;
     target.yC2 = yC2;
-    target.CRV = CRV;
-    target.RND = RND;
+    target.isCurve = isCurve; // control points are forced colinear
+    target.randomSeed = randomSeed;
     target.NSD = NSD;
     target.BZL = BZL;
 
-    target.toString = () => `(${x}, ${y}) (${xC1}, ${yC1}) (${xC2}, ${yC2})\nRND = ${RND}, NSD = ${NSD}, BZL = ${BZL}`;
+    target.toString = () => `(${x}, ${y}) (${xC1}, ${yC1}) (${xC2}, ${yC2})\nrandom seed = ${randomSeed}, NSD = ${NSD}, BZL = ${BZL}`;
   },
 });
 
@@ -159,23 +159,23 @@ registerNode('PPT', 'v', { // Path PoinT
     const y = getBasicValue(value, 'YLC', 'f');
     const pressure = getBasicValue(value, 'PRS', 'f');
     const velocity = getBasicValue(value, 'VEL', 'f');
-    const DUR = getBasicValue(value, 'DUR', 'i');
-    const RND = getBasicValue(value, 'RND', 'i');
+    const duration = getBasicValue(value, 'DUR', 'i');
+    const randomSeed = getBasicValue(value, 'RND', 'i');
     const onControlPoint = getBasicValue(value, 'ONC', 'b') ?? false;
 
     target.x = x;
     target.y = y;
     target.pressure = pressure;
     target.velocity = velocity;
-    target.DUR = DUR;
-    target.RND = RND;
+    target.duration = duration;
+    target.randomSeed = randomSeed;
     target.onControlPoint = onControlPoint;
 
-    target.toString = () => `(${x}, ${y})${onControlPoint ? '' : ' (Interpolated)'}\npressure = ${pressure}, velocity = ${velocity}, ${DUR} = ${DUR}, RND = ${RND}`;
+    target.toString = () => `(${x}, ${y})${onControlPoint ? '' : ' (Interpolated)'}\npressure = ${pressure}, velocity = ${velocity}, duration = ${duration}, random seed = ${randomSeed}`;
 
     target.display = (summary, content) => {
       summary.append(`(${x}, ${y})${onControlPoint ? '' : ' (Interpolated)'}`);
-      content.append(`pressure = ${pressure}, velocity = ${velocity}, ${DUR} = ${DUR}, RND = ${RND}`);
+      content.append(`pressure = ${pressure}, velocity = ${velocity}, duration = ${duration}, random seed = ${randomSeed}`);
     };
   },
 });
@@ -231,7 +231,7 @@ registerNode('PPL', 'v', { // Path Point List
   },
 });
 
-registerNode('PCL', 'v', { // Path Contour(?) List
+registerNode('PCL', 'v', { // Path Contour List
   read: (target, value, state) => {
     const contours = /** @type {PPLNode[]} */ (getChildren(value, 'PPL', 'v'));
 

@@ -31,6 +31,9 @@ registerType(null, {
  * }}
  */
 export function outputNodes(name, nodes) {
+  for (const node of nodes) {
+    node.visited = true;
+  }
   return {
     toString: () => {
       if (!nodes.length) {

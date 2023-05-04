@@ -22,7 +22,7 @@ registerNode('TXT', 'v', { // TeXT
       fillColour: getBasicValue(pattern, 'FCL', 'i'),
       lineColour: getBasicValue(pattern, 'BCL', 'i'),
       lineWidth: /** @type {number} */ (brush?.diameter ?? 0),
-      fillOverStroke: getBasicValue(value, 'FOT', 'b') ?? false,
+      fillOnTop: getBasicValue(value, 'FOT', 'b') ?? false,
       font: getBasicValue(value, 'FON', 's'),
       pointSize: getBasicValue(value, 'PTS', 'f'),
       bold: getBasicValue(value, 'BOL', 'b'),
@@ -45,7 +45,7 @@ registerNode('TXT', 'v', { // TeXT
     for (const part of parts) {
       switch (part.name) {
         case 'FCLi': fontState.fillColour = nodeBasicValue(part, 'FCL', 'i'); break;
-        //case 'FOTb': fontState.fillOverStroke = nodeBasicValue(part, 'FOT', 'b') ?? false; break;
+        //case 'FOTb': fontState.fillOnTop = nodeBasicValue(part, 'FOT', 'b') ?? false; break;
         case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
         case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
         case 'PTSf': fontState.pointSize = nodeBasicValue(part, 'PTS', 'f'); break;
@@ -85,6 +85,7 @@ registerNode('TXT', 'v', { // TeXT
     const displayNodes = value.filter(({ name }) => !EXCLUDE.includes(name));
     displayNodes.push({
       name: 'TFSv',
+      visited: true,
       toString: () => JSON.stringify(strings.map((s) => s.text).join('')),
       display: (summary, content) => {
         const oStr = document.createElement('div');
@@ -99,7 +100,7 @@ registerNode('TXT', 'v', { // TeXT
           if (frag.lineWidth) {
             const w = frag.lineWidth / (2 * approxScale);
             const col = rgba(frag.lineColour ?? 0);
-            if (frag.fillOverStroke) {
+            if (frag.fillOnTop) {
               const w2 = Math.SQRT1_2 * w;
               oFrag.style.textShadow = [
                 `0 ${w}px ${col}`,
