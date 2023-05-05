@@ -5,6 +5,7 @@ import './fills.mjs';
 import './grid.mjs';
 import './groups.mjs';
 import './paths.mjs';
+import './patterns.mjs';
 import './slices.mjs';
 import './texts.mjs';
 import './values.mjs';

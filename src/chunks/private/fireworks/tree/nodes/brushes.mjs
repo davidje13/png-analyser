@@ -79,7 +79,7 @@ registerNode('BPL', 'v', { // Brush ???
       state.warnings.push(`unknown brush feedback (BFB): ${feedbackId}`);
     }
     const flowRate = (getBasicValue(value, 'BFR', 'i') ?? 0) * 0.1;
-    const tipCount = getBasicValue(value, 'BNT', 'i');
+    const tipCount = getBasicValue(value, 'BNT', 'i') ?? 1;
     const spacing = (getBasicValue(value, 'BSP', 'i') ?? 0) * 0.1;
     const tipSpacing = (getBasicValue(value, 'BTS', 'i') ?? 0) * 0.1;
     const textureBlend = (getBasicValue(value, 'BTB', 'i') ?? 0) * 0.1;
@@ -95,8 +95,10 @@ registerNode('BPL', 'v', { // Brush ???
       state.warnings.push(`unknown tip colouring mode (BCM): ${tipColouringModeId}`);
     }
 
-    const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
-    const BBL = getBasicValue(value, 'BBL', 'i'); // always 0?
+    //const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
+    //const BBL = getBasicValue(value, 'BBL', 'i'); // always 0?
+
+    target.usesTexture = textureBlend > 0 || textureEdge > 0;
 
     // TODO
     const sensitivity = {
@@ -163,42 +165,76 @@ registerNode('BPL', 'v', { // Brush ???
 
     target.diameter = diameter ?? 1;
 
-    target.toString = () => [
-      `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`
-    ].join('');
+    let anySens = false;
+    const sensTargets = Object.keys(sensitivity.hdir);
+    const headers = [''.padEnd(10, ' ')];
+    for (const trigger in sensitivity) {
+      headers.push(trigger.padStart(8, ' '));
+    }
+    const sensTable = [headers];
+    for (const target of sensTargets) {
+      const row = [target.padEnd(10, ' ')];
+      for (const trigger in sensitivity) {
+        const value = /** @type {any} */ (sensitivity)[trigger][target];
+        anySens = value !== 0;
+        row.push(value.toFixed(1).padStart(8, ' '));
+      }
+      sensTable.push(row);
+    }
 
-    const dash = [dashOn1, dashOff1, dashOn2, dashOff2, dashOn3, dashOff3].slice(0, dashCount * 2);
-
-    target.display = (summary, content) => {
-      summary.append(`Brush: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
-      content.append([
+    const details = [
+      `shape: ${shape}`,
+      `diameter: ${diameter}`,
+      `antialiased: ${isAntialiased}`,
+      `maxCount: ${maxCount}`,
+      `minSize: ${minSize}`,
+      `softness: ${softness}%`,
+      `soften mode: ${softenMode}`,
+      `blackness: ${blackness}%`,
+      `concentration: ${concentration}%`,
+      `alpha remap: ${effect}`,
+      `type: ${brushType}`,
+      `feedback: ${feedback}`,
+      `flowRate: ${flowRate}%`,
+      `spacing: ${spacing}%`,
+    ];
+    if (shape !== 'circle' || aspect !== 100 || anySens) {
+      details.push(
         `angle: ${angle}`,
         `aspect: ${aspect}%`,
-        `diameter: ${diameter}`,
-        `maxCount: ${maxCount}`,
-        `minSize: ${minSize}`,
-        `softness: ${softness}%`,
-        `soften mode: ${softenMode}`,
-        `shape: ${shape}`,
-        `blackness: ${blackness}%`,
-        `concentration: ${concentration}%`,
-        `alpha remap: ${effect}`,
-        `type: ${brushType}`,
-        `feedback: ${feedback}`,
-        `flowRate: ${flowRate}%`,
-        `tipCount: ${tipCount}`,
-        `spacing: ${spacing}%`,
+      );
+    }
+    if (textureBlend > 0 || textureEdge > 0) {
+      details.push(
         `textureBlend: ${textureBlend}%`,
         `textureEdge: ${textureEdge}%`,
+      );
+    }
+    if (tipCount > 1) {
+      details.push(
+        `tipCount: ${tipCount}`,
         `tipSpacing: ${tipSpacing}%`,
         `tipSpacingMode: ${tipSpacingMode}`,
         `tipColouring: ${tipColouringMode}`,
-        `antialiased: ${isAntialiased}`,
-        `dash: ${dash.join(' ') || 'none'}`,
-        `sensitivity: ${JSON.stringify(sensitivity)}`,
-        `RDO: ${RDO}`,
-        `BBL: ${BBL}`,
-      ].join(', '));
+      );
+    }
+    if (dashCount > 0) {
+      const dash = [dashOn1, dashOff1, dashOn2, dashOff2, dashOn3, dashOff3].slice(0, dashCount * 2);
+      details.push(`dash: ${dash.join(' ') || 'none'}`);
+    }
+
+    target.toString = () => [
+      `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`,
+      ...details,
+      anySens ? sensTable.map((r) => r.join(' ')).join('\n') : '',
+    ].join('\n');
+
+    target.display = (summary, content) => {
+      summary.append(`Brush: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
+      content.append(details.join(', '));
+      if (anySens) {
+        content.append('\n' + sensTable.map((r) => r.join(' ')).join('\n'));
+      }
     };
   },
 });

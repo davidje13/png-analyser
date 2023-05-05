@@ -11,7 +11,7 @@ registerNode('FGL', 'v', { // Fill Gradient ???
 
     Object.assign(target, outputNodes(
       `Gradient ${JSON.stringify(category)} / ${JSON.stringify(name)}`,
-      [grad, grad2],
+      [grad2 ?? grad],
     ));
   },
 });
@@ -123,7 +123,7 @@ registerNode('FPL', 'v', { // Fill Pattern (?) ??
     const name = getBasicValue(value, 'INM', 's');
     const friendlyName = getBasicValue(value, 'UNM', 's');
     const textureBlend = (getBasicValue(value, 'FTB', 'i') ?? 0) * 0.1;
-    const feather = getBasicValue(value, 'FEF', 'i');
+    const feather = getBasicValue(value, 'FEF', 'i') ?? 0;
     const stampingModeId = getBasicValue(value, 'FSM', 'i');
     const stampingMode = STAMPING_MODES[stampingModeId ?? -1];
     if (!stampingMode) {
@@ -146,24 +146,35 @@ registerNode('FPL', 'v', { // Fill Pattern (?) ??
     ];
     const ditherTrans = getBasicValue(value, 'FDT', 'b');
 
+    target.usesTexture = textureBlend > 0;
+
+    const details = [
+      `shape: ${shape}`,
+      `stampingMode: ${stampingMode}`,
+      `edge: ${hardEdge ? 'hard' : 'anti-aliased'}`,
+    ];
+    if (feather > 0 && !hardEdge) {
+      details.push(`feather: ${feather}px`);
+    }
+    if (textureBlend) {
+      details.push(`texture opacity: ${textureBlend}%`);
+    }
+    if (shape === 'web dither') {
+      details.push(`dither: ${ditherCols.map((c) => rgba(c)).join(' & ')}${ditherTrans ? ' [transparent]' : ''}`);
+    }
+
     //const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
     //const FET = getBasicValue(value, 'FET', 'i'); // always 1?
     //const FRR = getBasicValue(value, 'FRR', 'i'); // always 0?
 
     target.toString = () => [
-      `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`
-    ].join('');
+      `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`,
+      ...details,
+    ].join('\n');
 
     target.display = (summary, content) => {
       summary.append(`Fill: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
-      content.append([
-        `texture opacity: ${textureBlend}%`,
-        `feather: ${feather}px`,
-        `stampingMode: ${stampingMode}`,
-        `edge: ${hardEdge ? 'hard' : 'anti-aliased'}`,
-        `shape: ${shape}`,
-        `dither: ${ditherCols.map((c) => rgba(c)).join(' & ')}${ditherTrans ? ' [transparent]' : ''}`,
-      ].join(', '));
+      content.append(details.join(', '));
     };
   },
 });
