@@ -2,51 +2,156 @@ import { getBasicValue, registerNode } from '../node_registry.mjs';
 
 const FEEDBACK = ['none', 'brush', 'background'];
 
+const EFFECTS = [
+  'none',
+  'white neon',
+  'harsh wet',
+  'smooth neon',
+  'wavy gravy',
+  'white neon edge',
+];
+
+const COLOURING_MODES = [
+  'random',
+  'uniform',
+  'complementary',
+  'hue',
+  'shadow',
+];
+
+const SPACING_MODES = [
+  'random',
+  'diagonal',
+  'circular',
+];
+
+const SHAPES = [
+  'square',
+  'circle',
+];
+
+const SOFTEN_MODES = [
+  'bell curve',
+  'linear',
+];
+
+const BRUSH_TYPES = [
+  'natural',
+  'simple',
+];
+
 registerNode('BPL', 'v', { // Brush ???
-  read: (target, value) => {
+  read: (target, value, state) => {
     const category = getBasicValue(value, 'CAT', 's');
     const name = getBasicValue(value, 'INM', 's');
     const friendlyName = getBasicValue(value, 'UNM', 's');
-    const RDO = getBasicValue(value, 'RDO', 'b');
-    const angle = getBasicValue(value, 'BAN', 'i');
-    const aspect = getBasicValue(value, 'BAS', 'i');
+    const angle = getBasicValue(value, 'BAN', 'i') ?? 0;
+    const aspect = (getBasicValue(value, 'BAS', 'i') ?? 0) * 0.1;
     const diameter = getBasicValue(value, 'BDI', 'i');
-    const BMM = getBasicValue(value, 'BMM', 'i');
-    const BMS = getBasicValue(value, 'BMS', 'i');
+    const maxCount = getBasicValue(value, 'BMM', 'i');
+    const minSize = (getBasicValue(value, 'BMS', 'i') ?? 0) * 0.1;
     const softness = (getBasicValue(value, 'BSE', 'i') ?? 0) * 0.1;
-    const BSF = getBasicValue(value, 'BSF', 'i');
-    const BSH = getBasicValue(value, 'BSH', 'i'); // 1 = "rounded"
-    const BBL = getBasicValue(value, 'BBL', 'i');
-    const BBK = getBasicValue(value, 'BBK', 'i');
-    const concentration = getBasicValue(value, 'BCN', 'i');
-    const BEF = getBasicValue(value, 'BEF', 'i');
-    const BRT = getBasicValue(value, 'BRT', 'i');
-    const feedback = getBasicValue(value, 'BFB', 'i');
-    const flowRate = getBasicValue(value, 'BFR', 'i');
+    const softenModeId = getBasicValue(value, 'BSF', 'i');
+    const softenMode = SOFTEN_MODES[softenModeId ?? -1];
+    if (!softenMode) {
+      state.warnings.push(`unknown brush soften mode (BSF): ${softenModeId}`);
+    }
+    const shapeId = getBasicValue(value, 'BSH', 'i');
+    const shape = SHAPES[shapeId ?? -1];
+    if (!shape) {
+      state.warnings.push(`unknown brush shape (BSH): ${shapeId}`);
+    }
+    const blackness = (getBasicValue(value, 'BBK', 'i') ?? 0) * 0.1;
+    const concentration = (getBasicValue(value, 'BCN', 'i') ?? 0) * 0.1;
+    const effectId = getBasicValue(value, 'BEF', 'i');
+    const effect = EFFECTS[effectId ?? -1];
+    if (!effect) {
+      state.warnings.push(`unknown brush effect (BEF): ${effectId}`);
+    }
+    const brushTypeId = getBasicValue(value, 'BRT', 'i');
+    const brushType = BRUSH_TYPES[brushTypeId ?? -1];
+    if (!brushType) {
+      state.warnings.push(`unknown brush brush type (BRT): ${brushTypeId}`);
+    }
+    const feedbackId = getBasicValue(value, 'BFB', 'i');
+    const feedback = FEEDBACK[feedbackId ?? -1];
+    if (!feedback) {
+      state.warnings.push(`unknown brush feedback (BFB): ${feedbackId}`);
+    }
+    const flowRate = (getBasicValue(value, 'BFR', 'i') ?? 0) * 0.1;
     const tipCount = getBasicValue(value, 'BNT', 'i');
-    const BSP = getBasicValue(value, 'BSP', 'i');
-    const BTB = getBasicValue(value, 'BTB', 'i');
-    const BTE = getBasicValue(value, 'BTE', 'i');
-    const BTS = getBasicValue(value, 'BTS', 'i');
-    const BSM = getBasicValue(value, 'BSM', 'i');
-    const BCM = getBasicValue(value, 'BCM', 'i');
-    const SPH = getBasicValue(value, 'SPH', 'i');
-    const SPZ = getBasicValue(value, 'SPZ', 'i');
-    const SPO = getBasicValue(value, 'SPO', 'i');
-    const SPB = getBasicValue(value, 'SPB', 'i');
-    const SPR = getBasicValue(value, 'SPR', 'i');
-    const SSH = getBasicValue(value, 'SSH', 'i');
-    const SSZ = getBasicValue(value, 'SSZ', 'i');
-    const SSO = getBasicValue(value, 'SSO', 'i');
-    const SSB = getBasicValue(value, 'SSB', 'i');
-    const SSR = getBasicValue(value, 'SSR', 'i');
-    const SRA = getBasicValue(value, 'SRA', 'i');
-    const SRS = getBasicValue(value, 'SRS', 'i');
-    const SRB = getBasicValue(value, 'SRB', 'i');
-    const SRR = getBasicValue(value, 'SRR', 'i');
-    const SRH = getBasicValue(value, 'SRH', 'i');
-    const SRZ = getBasicValue(value, 'SRZ', 'i');
-    const SRO = getBasicValue(value, 'SRO', 'i');
+    const spacing = (getBasicValue(value, 'BSP', 'i') ?? 0) * 0.1;
+    const tipSpacing = (getBasicValue(value, 'BTS', 'i') ?? 0) * 0.1;
+    const textureBlend = (getBasicValue(value, 'BTB', 'i') ?? 0) * 0.1;
+    const textureEdge = (getBasicValue(value, 'BTE', 'i') ?? 0) * 0.1;
+    const tipSpacingModeId = getBasicValue(value, 'BSM', 'i');
+    const tipSpacingMode = SPACING_MODES[tipSpacingModeId ?? -1];
+    if (!tipSpacingMode) {
+      state.warnings.push(`unknown tip spacing mode (BSM): ${tipSpacingModeId}`);
+    }
+    const tipColouringModeId = getBasicValue(value, 'BCM', 'i');
+    const tipColouringMode = COLOURING_MODES[tipColouringModeId ?? -1];
+    if (!tipColouringMode) {
+      state.warnings.push(`unknown tip colouring mode (BCM): ${tipColouringModeId}`);
+    }
+
+    const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
+    const BBL = getBasicValue(value, 'BBL', 'i'); // always 0?
+
+    // TODO
+    const sensitivity = {
+      hdir: {
+        angle: (getBasicValue(value, 'SHA', 'i') ?? 0) * 0.1,
+        blackness: (getBasicValue(value, 'SHB', 'i') ?? 0) * 0.1,
+        hue: (getBasicValue(value, 'SHH', 'i') ?? 0) * 0.1,
+        lightness: (getBasicValue(value, 'SHZ', 'i') ?? 0) * 0.1,
+        opacity: (getBasicValue(value, 'SHO', 'i') ?? 0) * 0.1,
+        saturation: (getBasicValue(value, 'SHS', 'i') ?? 0) * 0.1,
+        scatter: 0,
+        size: (getBasicValue(value, 'SHR', 'i') ?? 0) * 0.1,
+      },
+      vdir: {
+        angle: (getBasicValue(value, 'SVA', 'i') ?? 0) * 0.1,
+        blackness: (getBasicValue(value, 'SVB', 'i') ?? 0) * 0.1,
+        hue: (getBasicValue(value, 'SVH', 'i') ?? 0) * 0.1,
+        lightness: (getBasicValue(value, 'SVZ', 'i') ?? 0) * 0.1,
+        opacity: (getBasicValue(value, 'SVO', 'i') ?? 0) * 0.1,
+        saturation: (getBasicValue(value, 'SVS', 'i') ?? 0) * 0.1,
+        scatter: 0,
+        size: (getBasicValue(value, 'SVR', 'i') ?? 0) * 0.1,
+      },
+      pressure: {
+        angle: (getBasicValue(value, 'SPA', 'i') ?? 0) * 0.1,
+        blackness: (getBasicValue(value, 'SPB', 'i') ?? 0) * 0.1,
+        hue: (getBasicValue(value, 'SPH', 'i') ?? 0) * 0.1,
+        lightness: (getBasicValue(value, 'SPZ', 'i') ?? 0) * 0.1,
+        opacity: (getBasicValue(value, 'SPO', 'i') ?? 0) * 0.1,
+        saturation: (getBasicValue(value, 'SPS', 'i') ?? 0) * 0.1,
+        scatter: 0,
+        size: (getBasicValue(value, 'SPR', 'i') ?? 0) * 0.1,
+      },
+      speed: {
+        angle: (getBasicValue(value, 'SSA', 'i') ?? 0) * 0.1,
+        blackness: (getBasicValue(value, 'SSB', 'i') ?? 0) * 0.1,
+        hue: (getBasicValue(value, 'SSH', 'i') ?? 0) * 0.1,
+        lightness: (getBasicValue(value, 'SSZ', 'i') ?? 0) * 0.1,
+        opacity: (getBasicValue(value, 'SSO', 'i') ?? 0) * 0.1,
+        saturation: (getBasicValue(value, 'SSS', 'i') ?? 0) * 0.1,
+        scatter: 0,
+        size: (getBasicValue(value, 'SSR', 'i') ?? 0) * 0.1,
+      },
+      random: {
+        angle: (getBasicValue(value, 'SRA', 'i') ?? 0) * 0.1,
+        blackness: (getBasicValue(value, 'SRB', 'i') ?? 0) * 0.1,
+        hue: (getBasicValue(value, 'SRH', 'i') ?? 0) * 0.1,
+        lightness: (getBasicValue(value, 'SRZ', 'i') ?? 0) * 0.1,
+        opacity: (getBasicValue(value, 'SRO', 'i') ?? 0) * 0.1,
+        saturation: (getBasicValue(value, 'SRS', 'i') ?? 0) * 0.1,
+        scatter: 0,
+        size: (getBasicValue(value, 'SRR', 'i') ?? 0) * 0.1,
+      },
+    };
+
     const isAntialiased = getBasicValue(value, 'BIA', 'b');
     const dashCount = getBasicValue(value, 'NDI', 'i') ?? 0;
     const dashOn1 = getBasicValue(value, 'DO1', 'i');
@@ -67,48 +172,32 @@ registerNode('BPL', 'v', { // Brush ???
     target.display = (summary, content) => {
       summary.append(`Brush: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
       content.append([
-        `RDO: ${RDO}`,
         `angle: ${angle}`,
-        `aspect: ${aspect}`,
+        `aspect: ${aspect}%`,
         `diameter: ${diameter}`,
-        `BMM: ${BMM}`,
-        `BMS: ${BMS}`,
-        `softness: ${softness}`,
-        `BSF: ${BSF}`,
-        `BSH: ${BSH}`,
-        `BBL: ${BBL}`,
-        `BBK: ${BBK}`,
-        `concentration: ${concentration}`,
-        `BEF: ${BEF}`,
-        `BRT: ${BRT}`,
-        `feedback: ${FEEDBACK[feedback ?? -1] ?? '?'}`,
-        `flowRate: ${flowRate}`,
+        `maxCount: ${maxCount}`,
+        `minSize: ${minSize}`,
+        `softness: ${softness}%`,
+        `soften mode: ${softenMode}`,
+        `shape: ${shape}`,
+        `blackness: ${blackness}%`,
+        `concentration: ${concentration}%`,
+        `alpha remap: ${effect}`,
+        `type: ${brushType}`,
+        `feedback: ${feedback}`,
+        `flowRate: ${flowRate}%`,
         `tipCount: ${tipCount}`,
-        `BSP: ${BSP}`,
-        `BTB: ${BTB}`,
-        `BTE: ${BTE}`,
-        `BTS: ${BTS}`,
-        `BSM: ${BSM}`,
-        `BCM: ${BCM}`,
-        `SPH: ${SPH}`,
-        `SPZ: ${SPZ}`,
-        `SPO: ${SPO}`,
-        `SPB: ${SPB}`,
-        `SPR: ${SPR}`,
-        `SSH: ${SSH}`,
-        `SSZ: ${SSZ}`,
-        `SSO: ${SSO}`,
-        `SSB: ${SSB}`,
-        `SSR: ${SSR}`,
-        `SRA: ${SRA}`,
-        `SRS: ${SRS}`,
-        `SRB: ${SRB}`,
-        `SRR: ${SRR}`,
-        `SRH: ${SRH}`,
-        `SRZ: ${SRZ}`,
-        `SRO: ${SRO}`,
+        `spacing: ${spacing}%`,
+        `textureBlend: ${textureBlend}%`,
+        `textureEdge: ${textureEdge}%`,
+        `tipSpacing: ${tipSpacing}%`,
+        `tipSpacingMode: ${tipSpacingMode}`,
+        `tipColouring: ${tipColouringMode}`,
         `antialiased: ${isAntialiased}`,
         `dash: ${dash.join(' ') || 'none'}`,
+        `sensitivity: ${JSON.stringify(sensitivity)}`,
+        `RDO: ${RDO}`,
+        `BBL: ${BBL}`,
       ].join(', '));
     };
   },
