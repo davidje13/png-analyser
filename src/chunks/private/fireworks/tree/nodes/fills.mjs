@@ -1,5 +1,20 @@
-import { asGradientDiv } from '../../../../../pretty.mjs';
+import { asGradientDiv, rgba } from '../../../../../pretty.mjs';
 import { getBasicValue, getBasicValues, getChild, registerNode } from '../node_registry.mjs';
+import { outputNodes } from './generic.mjs';
+
+registerNode('FGL', 'v', { // Fill Gradient ???
+  read: (target, value, state) => {
+    const category = getBasicValue(value, 'CAT', 's');
+    const name = getBasicValue(value, 'INM', 's');
+    const grad = getChild(value, 'FGV', 'v');
+    const grad2 = getChild(value, 'FGY', 'v');
+
+    Object.assign(target, outputNodes(
+      `Gradient ${JSON.stringify(category)} / ${JSON.stringify(name)}`,
+      [grad, grad2],
+    ));
+  },
+});
 
 registerNode('FGV', 'v', { // Fill Gradient ???
   read: (target, value, state) => {
@@ -71,6 +86,84 @@ registerNode('FGY', 'v', { // Fill Gradient ??? (RGB + Alpha gradient)
     target.display = (summary, content) => {
       summary.append(`${stops.length}-stop FGY (RGB + alpha) gradient`);
       content.append(asGradientDiv(stops));
+    };
+  },
+});
+
+const STAMPING_MODES = [
+  null,
+  'blend',
+  'blend opaque',
+];
+
+const SHAPES = [
+  'solid',
+  null,
+  'linear',
+  'radial', // also contour grad ?
+  'conical',
+  'satin',
+  null,
+  'pinch',
+  'folds',
+  'elliptical',
+  'rectangular',
+  null,
+  'bars',
+  'ripple',
+  'waves',
+  'pattern',
+  'web dither',
+  'contour grad',
+];
+
+registerNode('FPL', 'v', { // Fill Pattern (?) ??
+  read: (target, value, state) => {
+    const category = getBasicValue(value, 'CAT', 's');
+    const name = getBasicValue(value, 'INM', 's');
+    const friendlyName = getBasicValue(value, 'UNM', 's');
+    const textureBlend = (getBasicValue(value, 'FTB', 'i') ?? 0) * 0.1;
+    const feather = getBasicValue(value, 'FEF', 'i');
+    const stampingModeId = getBasicValue(value, 'FSM', 'i');
+    const stampingMode = STAMPING_MODES[stampingModeId ?? -1];
+    if (!stampingMode) {
+      state.warnings.push(`unknown fill stamping mode (FSM): ${stampingModeId}`);
+    }
+    const hardEdge = getBasicValue(value, 'FRD', 'b');
+    const fallbackShapeId = getBasicValue(value, 'FSH', 'i');
+    const shapeId = getBasicValue(value, 'FSX', 'i') ?? fallbackShapeId;
+    const shape = SHAPES[shapeId ?? -1];
+    if (!shape) {
+      state.warnings.push(`unknown fill shape (FSH): ${shapeId}`);
+    }
+
+    // only used by web dither
+    const ditherCols = [
+      getBasicValue(value, 'FD1', 'i') ?? 0,
+      getBasicValue(value, 'FD2', 'i') ?? 0,
+      getBasicValue(value, 'FD3', 'i') ?? 0,
+      getBasicValue(value, 'FD4', 'i') ?? 0,
+    ];
+    const ditherTrans = getBasicValue(value, 'FDT', 'b');
+
+    //const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
+    //const FET = getBasicValue(value, 'FET', 'i'); // always 1?
+    //const FRR = getBasicValue(value, 'FRR', 'i'); // always 0?
+
+    target.toString = () => [
+      `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`
+    ].join('');
+
+    target.display = (summary, content) => {
+      summary.append(`Fill: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
+      content.append([
+        `texture opacity: ${textureBlend}%`,
+        `feather: ${feather}px`,
+        `stampingMode: ${stampingMode}`,
+        `edge: ${hardEdge ? 'hard' : 'anti-aliased'}`,
+        `shape: ${shape}`,
+        `dither: ${ditherCols.map((c) => rgba(c)).join(' & ')}${ditherTrans ? ' [transparent]' : ''}`,
+      ].join(', '));
     };
   },
 });

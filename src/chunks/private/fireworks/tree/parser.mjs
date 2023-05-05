@@ -76,20 +76,6 @@ export function parse(nodeToken, state) {
 //});
 //KNOWN_KEYS.set('CLL', listOf('CEL')); // CeLl List (?) of CELls (?)
 //KNOWN_KEYS.set('PAT', {}); // PATtern
-//KNOWN_KEYS.set('FPL', {}); // ??
 //KNOWN_KEYS.set('TXB', {}); // TeXture Background (?)
 //KNOWN_KEYS.set('TXF', {}); // TeXture Foreground (?)
-//KNOWN_KEYS.set('INM', {}); // ???
-//KNOWN_KEYS.set('LFT', {}); // LeFT
-//KNOWN_KEYS.set('TOP', {}); // TOP
-//KNOWN_KEYS.set('RIT', {}); // RIghT
-//KNOWN_KEYS.set('BOT', {}); // BOTtom
-//KNOWN_KEYS.set('XLC', {}); // X ???
-//KNOWN_KEYS.set('YLC', {}); // Y ???
-//KNOWN_KEYS.set('LFA', {}); // ???
-//KNOWN_KEYS.set('TOA', {}); // ???
-//KNOWN_KEYS.set('RIA', {}); // ???
-//KNOWN_KEYS.set('BOA', {}); // ???
-//KNOWN_KEYS.set('TFT', {}); // ???
-//KNOWN_KEYS.set('FOA', {}); // ???
 //KNOWN_KEYS.set('FON', {}); // FONt

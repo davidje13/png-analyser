@@ -23,31 +23,34 @@ registerType(null, {
 });
 
 /**
+ * @typedef {import('../node_registry.mjs').ProcessedNode} ProcessedNode
+ *
  * @param {string} name
- * @param {import('../node_registry.mjs').ProcessedNode[]} nodes
+ * @param {(ProcessedNode | undefined)[]} nodes
  * @return {{
  *   toString: () => string,
  *   display: (summary: HTMLElement, content: HTMLElement) => void,
  * }}
  */
 export function outputNodes(name, nodes) {
-  for (const node of nodes) {
+  const actualNodes = /** @type {ProcessedNode[]} */ (nodes.filter((n) => n));
+  for (const node of actualNodes) {
     node.visited = true;
   }
   return {
     toString: () => {
-      if (!nodes.length) {
+      if (!actualNodes.length) {
         return `${name}: []`;
       }
-      return `${name}:\n${nodes.map((n) => indent(n.toString(), '  ', '- ')).join('\n')}`;
+      return `${name}:\n${actualNodes.map((n) => indent(n.toString(), '  ', '- ')).join('\n')}`;
     },
     display: (summary, content) => {
-      if (!nodes.length) {
+      if (!actualNodes.length) {
         summary.append(`${name}: []`);
         return;
       }
       const ul = document.createElement('ul');
-      for (const n of nodes) {
+      for (const n of actualNodes) {
         const li = document.createElement('li');
         const s = document.createElement('div');
         const c = document.createElement('div');
