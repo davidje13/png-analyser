@@ -203,7 +203,8 @@ export function tilesAsCanvas({ width, height, tiles }) {
  * @typedef {{ position: number, colour: number }[]} Gradient
  */
 
-const backgroundGrad = 'repeating-linear-gradient(to bottom,#FFFFFF 0px 10px,#CCCCCC 10px 20px)';
+const backgroundImage = 'linear-gradient(white,white),repeating-linear-gradient(to right,#333333 0px 8px,#000000 8px 16px),repeating-linear-gradient(to bottom,#333333 0px 8px,#000000 8px 16px)';
+const backgroundBlend = 'difference,difference,normal';
 
 /**
  * @param {Gradient} gradient
@@ -214,7 +215,32 @@ export function asGradientDiv(gradient, alphaToLum = false) {
   const stops = gradient.map((stop) => `${rgba(alphaToLum ? a2l(stop.colour) : stop.colour)} ${stop.position * 100}%`);
   const preview = document.createElement('div');
   preview.classList.add('gradient-preview');
-  preview.style.backgroundImage = `linear-gradient(to right,${stops.join(',')}),${backgroundGrad}`;
+  preview.style.backgroundImage = `linear-gradient(to right,${stops.join(',')}),${backgroundImage}`;
+  preview.style.backgroundBlendMode = `normal,${backgroundBlend}`;
+  return preview;
+}
+
+/**
+ * @param {number} col
+ * @param {boolean=} alpha
+ * @param {string=} label
+ * @return {HTMLElement}
+ */
+export function asColourDiv(col, alpha = false, label) {
+  const preview = document.createElement('div');
+  preview.classList.add('colour-preview');
+  if (alpha) {
+    if ((col >>> 24) !== 255) {
+      const c = rgba(col);
+      preview.style.backgroundImage = `linear-gradient(${c},${c}),${backgroundImage}`;
+      preview.style.backgroundBlendMode = `normal,${backgroundBlend}`;
+    } else {
+      preview.style.backgroundColor = rgb(col);
+    }
+  } else {
+    preview.style.backgroundColor = rgb(col);
+  }
+  preview.append(label ?? col.toString(16).padStart(alpha ? 8 : 6, '0'));
   return preview;
 }
 

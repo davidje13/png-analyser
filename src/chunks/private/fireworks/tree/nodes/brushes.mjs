@@ -40,6 +40,25 @@ const BRUSH_TYPES = [
   'simple',
 ];
 
+/** @type {Record<string, string>} */ const SENSITIVITY_SOURCES = {
+  hdir: 'H',
+  vdir: 'V',
+  pressure: 'P',
+  speed: 'S',
+  random: 'R',
+};
+
+/** @type {Record<string, string>} */ const SENSITIVITY_TARGETS = {
+  angle: 'A',
+  blackness: 'B',
+  hue: 'H',
+  lightness: '', // TODO
+  opacity: 'O',
+  saturation: 'S',
+  scatter: 'R',
+  size: 'Z',
+};
+
 registerNode('BPL', 'v', { // Brush ???
   read: (target, value, state) => {
     const category = getBasicValue(value, 'CAT', 's');
@@ -100,59 +119,19 @@ registerNode('BPL', 'v', { // Brush ???
 
     target.usesTexture = textureBlend > 0 || textureEdge > 0;
 
-    // TODO
-    const sensitivity = {
-      hdir: {
-        angle: (getBasicValue(value, 'SHA', 'i') ?? 0) * 0.1,
-        blackness: (getBasicValue(value, 'SHB', 'i') ?? 0) * 0.1,
-        hue: (getBasicValue(value, 'SHH', 'i') ?? 0) * 0.1,
-        lightness: (getBasicValue(value, 'SHZ', 'i') ?? 0) * 0.1,
-        opacity: (getBasicValue(value, 'SHO', 'i') ?? 0) * 0.1,
-        saturation: (getBasicValue(value, 'SHS', 'i') ?? 0) * 0.1,
-        scatter: 0,
-        size: (getBasicValue(value, 'SHR', 'i') ?? 0) * 0.1,
-      },
-      vdir: {
-        angle: (getBasicValue(value, 'SVA', 'i') ?? 0) * 0.1,
-        blackness: (getBasicValue(value, 'SVB', 'i') ?? 0) * 0.1,
-        hue: (getBasicValue(value, 'SVH', 'i') ?? 0) * 0.1,
-        lightness: (getBasicValue(value, 'SVZ', 'i') ?? 0) * 0.1,
-        opacity: (getBasicValue(value, 'SVO', 'i') ?? 0) * 0.1,
-        saturation: (getBasicValue(value, 'SVS', 'i') ?? 0) * 0.1,
-        scatter: 0,
-        size: (getBasicValue(value, 'SVR', 'i') ?? 0) * 0.1,
-      },
-      pressure: {
-        angle: (getBasicValue(value, 'SPA', 'i') ?? 0) * 0.1,
-        blackness: (getBasicValue(value, 'SPB', 'i') ?? 0) * 0.1,
-        hue: (getBasicValue(value, 'SPH', 'i') ?? 0) * 0.1,
-        lightness: (getBasicValue(value, 'SPZ', 'i') ?? 0) * 0.1,
-        opacity: (getBasicValue(value, 'SPO', 'i') ?? 0) * 0.1,
-        saturation: (getBasicValue(value, 'SPS', 'i') ?? 0) * 0.1,
-        scatter: 0,
-        size: (getBasicValue(value, 'SPR', 'i') ?? 0) * 0.1,
-      },
-      speed: {
-        angle: (getBasicValue(value, 'SSA', 'i') ?? 0) * 0.1,
-        blackness: (getBasicValue(value, 'SSB', 'i') ?? 0) * 0.1,
-        hue: (getBasicValue(value, 'SSH', 'i') ?? 0) * 0.1,
-        lightness: (getBasicValue(value, 'SSZ', 'i') ?? 0) * 0.1,
-        opacity: (getBasicValue(value, 'SSO', 'i') ?? 0) * 0.1,
-        saturation: (getBasicValue(value, 'SSS', 'i') ?? 0) * 0.1,
-        scatter: 0,
-        size: (getBasicValue(value, 'SSR', 'i') ?? 0) * 0.1,
-      },
-      random: {
-        angle: (getBasicValue(value, 'SRA', 'i') ?? 0) * 0.1,
-        blackness: (getBasicValue(value, 'SRB', 'i') ?? 0) * 0.1,
-        hue: (getBasicValue(value, 'SRH', 'i') ?? 0) * 0.1,
-        lightness: (getBasicValue(value, 'SRZ', 'i') ?? 0) * 0.1,
-        opacity: (getBasicValue(value, 'SRO', 'i') ?? 0) * 0.1,
-        saturation: (getBasicValue(value, 'SRS', 'i') ?? 0) * 0.1,
-        scatter: 0,
-        size: (getBasicValue(value, 'SRR', 'i') ?? 0) * 0.1,
-      },
-    };
+    let anySens = false;
+
+    /** @type {Record<string, Record<string, number>>} */ const sensitivity = {};
+    for (const source in SENSITIVITY_SOURCES) {
+      /** @type {Record<string, number>} */ const effects = {};
+      for (const target in SENSITIVITY_TARGETS) {
+        const key = `S${SENSITIVITY_SOURCES[source]}${SENSITIVITY_TARGETS[target]}`;
+        const v = (getBasicValue(value, key, 'i') ?? 0) * 0.1;
+        effects[target] = v;
+        anySens ||= v !== 0;
+      }
+      sensitivity[source] = effects;
+    }
 
     const isAntialiased = getBasicValue(value, 'BIA', 'b');
     const dashCount = getBasicValue(value, 'NDI', 'i') ?? 0;
@@ -164,23 +143,6 @@ registerNode('BPL', 'v', { // Brush ???
     const dashOff3 = getBasicValue(value, 'DF3', 'i');
 
     target.diameter = diameter ?? 1;
-
-    let anySens = false;
-    const sensTargets = Object.keys(sensitivity.hdir);
-    const headers = [''.padEnd(10, ' ')];
-    for (const trigger in sensitivity) {
-      headers.push(trigger.padStart(8, ' '));
-    }
-    const sensTable = [headers];
-    for (const target of sensTargets) {
-      const row = [target.padEnd(10, ' ')];
-      for (const trigger in sensitivity) {
-        const value = /** @type {any} */ (sensitivity)[trigger][target];
-        anySens = value !== 0;
-        row.push(value.toFixed(1).padStart(8, ' '));
-      }
-      sensTable.push(row);
-    }
 
     const details = [
       `shape: ${shape}`,
@@ -226,15 +188,36 @@ registerNode('BPL', 'v', { // Brush ???
     target.toString = () => [
       `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`,
       ...details,
-      anySens ? sensTable.map((r) => r.join(' ')).join('\n') : '',
+      anySens ? makeSensitivityTable(sensitivity).map((r) => r.join(' ')).join('\n') : '',
     ].join('\n');
 
     target.display = (summary, content) => {
       summary.append(`Brush: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
       content.append(details.join(', '));
       if (anySens) {
-        content.append('\n' + sensTable.map((r) => r.join(' ')).join('\n'));
+        content.append('\n' + makeSensitivityTable(sensitivity).map((r) => r.join(' ')).join('\n'));
       }
     };
   },
 });
+
+/**
+ * @param {Record<string, Record<string, number>>} sensitivity
+ * @return {string[][]}
+ */
+function makeSensitivityTable(sensitivity) {
+  const headers = [''.padEnd(10, ' ')];
+  for (const source in SENSITIVITY_SOURCES) {
+    headers.push(source.padStart(8, ' '));
+  }
+  const sensTable = [headers];
+  for (const target in SENSITIVITY_TARGETS) {
+    const row = [target.padEnd(10, ' ')];
+    for (const source in SENSITIVITY_SOURCES) {
+      const v = sensitivity[source][target];
+      row.push((v ? v.toFixed(1) : '-').padStart(8, ' '));
+    }
+    sensTable.push(row);
+  }
+  return sensTable;
+};

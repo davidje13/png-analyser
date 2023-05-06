@@ -74,12 +74,26 @@ li > details > summary {
 }
 
 .colour-preview {
+  position: relative;
   display: inline-block;
   border: 1px solid black;
   padding: 5px;
   min-width: 10px;
   min-height: 10px;
   margin: 2px;
+}
+
+.locked::after {
+  content: '\1F512';
+  position: absolute;
+  bottom: -4px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  font-size: 12px;
+  background: white;
+  border-radius: 100%;
+  text-align: center;
 }
 
 .gradient-preview {

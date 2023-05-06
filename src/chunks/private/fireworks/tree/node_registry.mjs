@@ -109,6 +109,7 @@ export function nodeBasicValue(node, name, type) {
   if (node?.name !== name + type) {
     return undefined;
   }
+  node.visited = true;
   return /** @type {any} */ (node.value);
 }
 

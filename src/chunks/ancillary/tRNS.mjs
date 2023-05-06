@@ -1,9 +1,10 @@
-import { rgb, termCol, termReset } from '../../pretty.mjs';
+import { asColourDiv, termCol, termReset } from '../../pretty.mjs';
 import { registerChunk } from '../registry.mjs';
 
 /**
  * @typedef {import('../registry.mjs').State & {
  *   ihdr?: import('../mandatory/IHDR.mjs').IHDRChunk,
+ *   plte?: import('../mandatory/PLTE.mjs').PLTEChunk,
  *   trns?: tRNSChunk,
  * }} tRNSState
  * @typedef {import('../registry.mjs').Chunk & {
@@ -33,17 +34,20 @@ registerChunk('tRNS', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (/** 
     for (let i = 0; i < chunk.data.byteLength; ++i) {
       chunk.indexedAlpha.push(chunk.data.getUint8(i));
     }
+    const a = chunk.indexedAlpha;
 
-    chunk.toString = () => (chunk.indexedAlpha ?? []).map((c) => `${termCol(c)} ${c.toString(16).padStart(2, '0')} ${termReset}`).join('\n');
+    chunk.toString = () => a.map((c) => `${termCol(c)} ${c.toString(16).padStart(2, '0')} ${termReset}`).join('\n');
 
     chunk.display = (summary, content) => {
       summary.append('Indexed transparency');
-      for (const entry of chunk.indexedAlpha ?? []) {
-        const o = document.createElement('div');
-        o.classList.add('colour-preview');
-        o.style.backgroundColor = rgb(entry * 0x010101);
-        o.append(entry.toString(16).padStart(2, '0'));
-        content.append(o);
+      for (let i = 0; i < a.length; ++i) {
+        const entry = a[i];
+        const col = state.plte?.entries?.[i];
+        if (col !== undefined) {
+          content.append(asColourDiv(((entry << 24) | col) >>> 0, true, entry.toString(16).padStart(2, '0')));
+        } else {
+          content.append(asColourDiv(entry * 0x010101, false, entry.toString(16).padStart(2, '0')));
+        }
       }
     };
   } else if (state.ihdr.rgb) {

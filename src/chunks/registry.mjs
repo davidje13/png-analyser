@@ -27,6 +27,7 @@
  *   toString: () => string,
  *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
  *   aggregate?: () => ChunkAggregate,
+ *   defaultCollapse?: boolean,
  * }} Chunk
  *
  * @typedef {{}} State

@@ -1,5 +1,5 @@
 import { asBytes } from '../../data_utils.mjs';
-import { rgb, termCol, termReset } from '../../pretty.mjs';
+import { asColourDiv, termCol, termReset } from '../../pretty.mjs';
 import { registerChunk } from '../registry.mjs';
 
 /**
@@ -44,11 +44,7 @@ registerChunk('PLTE', { max: 1, notAfter: ['IDAT'] }, (/** @type {PLTEChunk} */ 
   chunk.display = (summary, content) => {
     summary.append(`${chunk.paletteSize}-colour`);
     for (const entry of chunk.entries ?? []) {
-      const o = document.createElement('div');
-      o.classList.add('colour-preview');
-      o.style.backgroundColor = rgb(entry);
-      o.append(entry.toString(16).padStart(6, '0'));
-      content.append(o);
+      content.append(asColourDiv(entry, false));
     }
   };
 });

@@ -53,7 +53,7 @@ async function process(data, name) {
         chunk.display(oSummary, oData);
         oSummary.prepend(oHeader, ` [${chunk.data.byteLength}] `);
       }
-      section = makeDetails(oSummary, oData, true);
+      section = makeDetails(oSummary, oData, !chunk.defaultCollapse);
       section.classList.add('chunk');
       output.append(section);
     }

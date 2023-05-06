@@ -4,6 +4,7 @@ import './effects.mjs';
 import './fills.mjs';
 import './grid.mjs';
 import './groups.mjs';
+import './palettes.mjs';
 import './paths.mjs';
 import './patterns.mjs';
 import './slices.mjs';

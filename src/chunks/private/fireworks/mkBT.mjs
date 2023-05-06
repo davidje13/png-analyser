@@ -94,6 +94,7 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
       content.append('(failed to read texture data)');
     }
   };
+  chunk.defaultCollapse = true;
 });
 
 /**
