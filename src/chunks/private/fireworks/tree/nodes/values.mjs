@@ -194,7 +194,7 @@ registerNode('RND', 'i', {
   },
 });
 
-registerNode('LEF', 'f', {
+registerNode('LFT', 'f', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `left: ${value}`;
@@ -222,6 +222,13 @@ registerNode('BOT', 'f', {
   },
 });
 
+registerNode('OBN', 's', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `object name: ${value}`;
+  },
+});
+
 registerNode('ORI', 'i', {
   read: (target, value) => {
     target.value = value;
@@ -229,6 +236,7 @@ registerNode('ORI', 'i', {
   },
 });
 
+// frames seem to be stored as one CELv per frame inside CLLv blocks, with VIFv containing one VISb per frame too (both live in LAYv).
 registerNode('FRC', 'i', {
   read: (target, value) => {
     target.value = value;

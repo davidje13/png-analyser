@@ -7,6 +7,7 @@ import './groups.mjs';
 import './palettes.mjs';
 import './paths.mjs';
 import './patterns.mjs';
+import './shapes.mjs';
 import './slices.mjs';
 import './texts.mjs';
 import './values.mjs';

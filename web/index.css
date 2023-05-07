@@ -96,6 +96,19 @@ li > details > summary {
   text-align: center;
 }
 
+.clt::before {
+  content: '?';
+  position: absolute;
+  bottom: -4px;
+  left: -5px;
+  width: 15px;
+  height: 15px;
+  font-size: 12px;
+  background: white;
+  border-radius: 100%;
+  text-align: center;
+}
+
 .gradient-preview {
   border: 1px solid black;
   width: 100%;
