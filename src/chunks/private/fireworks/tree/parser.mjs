@@ -48,34 +48,3 @@ export function parse(nodeToken, state) {
   }
   return processedNode;
 }
-
-//KNOWN_KEYS.set('WID', {}); // WIDth
-//KNOWN_KEYS.set('HIT', {}); // HeIghT
-//KNOWN_KEYS.set('RES', {}); // RESolution (DPI)
-//KNOWN_KEYS.set('BGC', {}); // BackGround Colour
-
-//KNOWN_KEYS.set('PDC', {}); // Page ???
-//KNOWN_KEYS.set('PGN', {}); // PaGe Name
-
-//KNOWN_KEYS.set('LYL', listOf('LAY')); // LaYer List of LAYer
-//KNOWN_KEYS.set('LNM', {}); // Layer NaMe
-//KNOWN_KEYS.set('DIS', {}); // DISplay
-
-//KNOWN_KEYS.set('XLC', {}); // X LoCation
-//KNOWN_KEYS.set('YLC', {}); // Y LoCation
-//KNOWN_KEYS.set('PRS', {}); // PReSsure
-//KNOWN_KEYS.set('VEL', {}); // VELocity
-
-//KNOWN_KEYS.set('PLL', listOf('BPL')); // ??? List
-//KNOWN_KEYS.set('EFD', listOf('EFL')); // EFfect Definition(?) list of EFfect ???
-//KNOWN_KEYS.set('FGI', { // Fill Gradient Index(?)
-//  readV: ({ findChild }) => ({
-//    position: findChild('FGP')?.value, // Fill Gradient Position
-//    colour: findChild('FGC')?.value, // Fill Gradient Colour
-//  }),
-//});
-//KNOWN_KEYS.set('CLL', listOf('CEL')); // CeLl List (?) of CELls (?)
-//KNOWN_KEYS.set('PAT', {}); // PATtern
-//KNOWN_KEYS.set('TXB', {}); // TeXture Background (?)
-//KNOWN_KEYS.set('TXF', {}); // TeXture Foreground (?)
-//KNOWN_KEYS.set('FON', {}); // FONt

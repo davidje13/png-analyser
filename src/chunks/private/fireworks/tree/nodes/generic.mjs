@@ -27,13 +27,17 @@ registerType(null, {
  *
  * @param {string} name
  * @param {(ProcessedNode | undefined)[]} nodes
+ * @param {boolean=} onlyUnvisited
  * @return {{
  *   toString: () => string,
  *   display: (summary: HTMLElement, content: HTMLElement) => void,
  * }}
  */
-export function outputNodes(name, nodes) {
-  const actualNodes = /** @type {ProcessedNode[]} */ (nodes.filter((n) => n));
+export function outputNodes(name, nodes, onlyUnvisited = false) {
+  let actualNodes = /** @type {ProcessedNode[]} */ (nodes.filter((n) => n));
+  if (onlyUnvisited) {
+    actualNodes = actualNodes.filter((n) => !n.visited);
+  }
   for (const node of actualNodes) {
     node.visited = true;
   }

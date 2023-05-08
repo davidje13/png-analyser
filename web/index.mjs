@@ -93,23 +93,29 @@ function makeDetails(summary, content, open) {
 const out = document.createElement('div');
 
 const drop = document.createElement('div');
-drop.classList.add('drop-target');
+drop.classList.add('drop');
 drop.append('Drop a PNG file here');
+let dragc = 0;
 
-drop.addEventListener('dragover', (e) => {
+window.addEventListener('dragover', (e) => {
   e.preventDefault();
 });
-drop.addEventListener('dragenter', () => {
+window.addEventListener('dragenter', () => {
+  ++dragc;
   drop.classList.add('active');
 });
-drop.addEventListener('dragleave', () => {
+window.addEventListener('dragleave', () => {
+  if (!--dragc) {
+    drop.classList.remove('active');
+  }
+});
+window.addEventListener('dragend', () => {
+  dragc = 0;
   drop.classList.remove('active');
 });
-drop.addEventListener('dragend', () => {
-  drop.classList.remove('active');
-});
-drop.addEventListener('drop', (e) => {
+window.addEventListener('drop', (e) => {
   e.preventDefault();
+  dragc = 0;
   drop.classList.remove('active');
 
   document.title = 'PNG Analyser';
@@ -123,6 +129,9 @@ drop.addEventListener('drop', (e) => {
         document.title = `${file.name} \u2014 PNG Analyser`;
       }
     }
+    document.body.classList.add('hasoutput');
+  } else {
+    document.body.classList.remove('hasoutput');
   }
 });
 

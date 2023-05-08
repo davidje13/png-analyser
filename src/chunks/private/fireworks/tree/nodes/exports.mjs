@@ -1,4 +1,5 @@
 import { getBasicValue, registerNode } from '../node_registry.mjs';
+import { outputNodes } from './generic.mjs';
 
 const FORMATS = [
   'gif',
@@ -59,7 +60,7 @@ registerNode('EXP', 'v', { // EXPort options
       info.push(' [remove unused colours]');
     }
 
-    target.toString = () => info.join('');
+    Object.assign(target, outputNodes(info.join(''), value, true));
   },
 });
 

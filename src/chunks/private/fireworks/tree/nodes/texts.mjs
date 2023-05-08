@@ -10,7 +10,7 @@ const ANTIALIAS = [
   'smooth / none',
   'crisp',
   'strong',
-  null,
+  null, // TODO
   'custom',
 ];
 
@@ -38,6 +38,10 @@ registerNode('TXT', 'v', { // TeXT
     if (antialiasId === 4) {
       aaInfo = `custom: samples=${customAASamples} sharpness=${customAASharpness} strength=${customAAStrength}`;
     }
+
+    // TFT = 3 => text "in" path, 2 => follow path, 0 = no path
+    // TAP->PTH contains the path to follow
+    // TAP->TAM contains 0 = angle follows path / 1 = vertical / 2 = skew v / 3 = skew h
 
     const useFontStretch = false; // not supported by all fonts
 

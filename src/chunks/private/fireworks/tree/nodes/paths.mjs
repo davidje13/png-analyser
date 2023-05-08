@@ -402,9 +402,10 @@ function drawPathControls(ctx, points, { minX, minY }) {
 
   ctx.fillStyle = 'rgba(255, 0, 0)';
   ctx.beginPath();
-  for (const point of points) {
+  for (let i = 0; i < points.length; ++i) {
+    const point = points[i];
     if (point.onControlPoint) {
-      ctx.arc(point.x - minX, point.y - minY, 1, 0, Math.PI * 2);
+      ctx.arc(point.x - minX, point.y - minY, i === 0 ? 2 : 1, 0, Math.PI * 2);
       ctx.closePath();
     }
   }
@@ -470,8 +471,9 @@ function drawBezierPathControls(ctx, points, { minX, minY }) {
 
   ctx.fillStyle = 'rgba(255,0,0)';
   ctx.beginPath();
-  for (const point of points) {
-    ctx.arc(point.x - minX, point.y - minY, 2, 0, Math.PI * 2);
+  for (let i = 0; i < points.length; ++i) {
+    const point = points[i];
+    ctx.arc(point.x - minX, point.y - minY, i === 0 ? 4 : 2, 0, Math.PI * 2);
     ctx.closePath();
   }
   ctx.fill();

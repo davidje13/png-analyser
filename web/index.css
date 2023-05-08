@@ -2,16 +2,34 @@ body {
   background: #DDDDDD;
 }
 
-.drop-target {
-  display: inline-block;
+.drop {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 60px;
+  margin-left: -100px;
+  margin-top: -30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
   border: 2px solid black;
   background: white;
   padding: 10px 20px;
   border-radius: 10px;
+  pointer-events: none;
 }
-.drop-target.active {
+.drop.active {
   background: black;
   color: white;
+}
+body.hasoutput .drop {
+  display: none;
+}
+body.hasoutput .drop.active {
+  display: flex;
 }
 
 .warning {
@@ -20,6 +38,14 @@ body {
 
 .output {
   font: 1em monospace;
+}
+
+.output h2 {
+  position: sticky;
+  top: 0;
+  background: #DDDDDD;
+  padding: 5px 0;
+  z-index: 1;
 }
 
 .chunk {
