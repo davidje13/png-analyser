@@ -92,8 +92,8 @@ registerNode('FGY', 'v', { // Fill Gradient ??? (RGB + Alpha gradient)
 
 const STAMPING_MODES = [
   null,
-  'blend',
-  'blend opaque',
+  'transparent', // "blend"
+  'white', // "blend opaque"
 ];
 
 const SHAPES = [

@@ -2,7 +2,17 @@ import { rgba } from '../../../../../pretty.mjs';
 import { getBasicValue, getChild, nodeBasicValue, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
-const EXCLUDE = ['FONs', 'PTSf', 'BOLb', 'ITLb', 'UNDb', 'LEDf', 'FOTb', 'HSCf', 'RKNf', /*'KRNf', 'BLSf', 'LDMi', 'JSTi', 'PINf', 'PSBf', 'PSAf',*/ 'TFSv'];
+const EXCLUDE = ['FONs', 'PTSf', 'BOLb', 'ITLb', 'UNDb', 'LEDf', 'LDMi', 'FOTb', 'HSCf', 'RKNf', 'BLSf', 'JSTi', 'ATKb', 'TAAi', 'TA1i', 'TA2i', 'TOSi', /*'KRNf', 'PINf', 'PSBf', 'PSAf',*/ 'TFSv'];
+
+const JUSTIFICATION = ['left', 'center', 'right', 'justify'];
+
+const ANTIALIAS = [
+  'smooth / none',
+  'crisp',
+  'strong',
+  null,
+  'custom',
+];
 
 registerNode('TXT', 'v', { // TeXT
   read: (target, value, state) => {
@@ -15,6 +25,19 @@ registerNode('TXT', 'v', { // TeXT
     const transform = /** @type {number[] | undefined} */ (getChild(value, 'MTX', 'v')?.matrix);
     const img = getChild(value, 'IMG', 'v');
     const brush = getChild(pattern, 'BPL', 'v');
+    const antialiasId = getBasicValue(value, 'TAA', 'i');
+    const antialias = ANTIALIAS[antialiasId ?? 0];
+    if (!antialias) {
+      state.warnings.push(`unknown antialias ID ${antialiasId}`);
+    }
+    const customAASamples = getBasicValue(value, 'TOS', 'i');
+    const customAASharpness = getBasicValue(value, 'TA1', 'i');
+    const customAAStrength = getBasicValue(value, 'TA2', 'i');
+
+    let aaInfo = antialias;
+    if (antialiasId === 4) {
+      aaInfo = `custom: samples=${customAASamples} sharpness=${customAASharpness} strength=${customAAStrength}`;
+    }
 
     const useFontStretch = false; // not supported by all fonts
 
@@ -30,11 +53,12 @@ registerNode('TXT', 'v', { // TeXT
       underline: getBasicValue(value, 'UND', 'b'),
       hScale: getBasicValue(value, 'HSC', 'f') ?? 1,
       KRN: getBasicValue(value, 'KRN', 'f'),
+      autoKern: getBasicValue(value, 'ATK', 'b'),
       kerning: getBasicValue(value, 'RKN', 'f') ?? 0,
-      BLS: getBasicValue(value, 'BLS', 'f'),
+      baselineShift: getBasicValue(value, 'BLS', 'f'),
       lineHeight: getBasicValue(value, 'LED', 'f') ?? 1,
-      LDM: getBasicValue(value, 'LDM', 'i'),
-      JST: getBasicValue(value, 'JST', 'i'),
+      lineHeightUnit: getBasicValue(value, 'LDM', 'i'),
+      justification: getBasicValue(value, 'JST', 'i'),
       PIN: getBasicValue(value, 'PIN', 'f'),
       PSB: getBasicValue(value, 'PSB', 'f'),
       PSA: getBasicValue(value, 'PSA', 'f'),
@@ -55,10 +79,10 @@ registerNode('TXT', 'v', { // TeXT
         case 'HSCf': fontState.hScale = nodeBasicValue(part, 'HSC', 'f') ?? 1; break;
         //case 'KRNf': fontState.KRN = nodeBasicValue(part, 'KRN', 'f'); break;
         case 'RKNf': fontState.kerning = nodeBasicValue(part, 'RKN', 'f') ?? 0; break;
-        case 'BLSf': fontState.BLS = nodeBasicValue(part, 'BLS', 'f'); break;
+        case 'BLSf': fontState.baselineShift = nodeBasicValue(part, 'BLS', 'f'); break;
         case 'LEDf': fontState.lineHeight = nodeBasicValue(part, 'LED', 'f') ?? 1; break;
-        case 'LDMi': fontState.LDM = nodeBasicValue(part, 'LDM', 'i'); break;
-        case 'JSTi': fontState.JST = nodeBasicValue(part, 'JST', 'i'); break;
+        case 'LDMi': fontState.lineHeightUnit = nodeBasicValue(part, 'LDM', 'i'); break;
+        case 'JSTi': fontState.justification = nodeBasicValue(part, 'JST', 'i'); break;
         case 'PINf': fontState.PIN = nodeBasicValue(part, 'PIN', 'f'); break;
         case 'PSBf': fontState.PSB = nodeBasicValue(part, 'PSB', 'f'); break;
         case 'PSAf': fontState.PSA = nodeBasicValue(part, 'PSA', 'f'); break;
@@ -126,14 +150,23 @@ registerNode('TXT', 'v', { // TeXT
             oFrag.style.transform = `scaleY(${1 / frag.hScale})`;
             oFrag.style.display = 'inline-block'; // required for transform
           }
-          oFrag.style.lineHeight = `${sz * frag.lineHeight}px`;
+          if (frag.lineHeightUnit === 0) { // fraction of font size
+            oFrag.style.lineHeight = `${sz * frag.lineHeight}px`;
+          } else if (frag.lineHeightUnit === 1) { // pixels
+            oFrag.style.lineHeight = `${sz}px`;
+          } else { // unknown
+            state.warnings.push(`unknown line height unit ${frag.lineHeightUnit}`);
+          }
           // this scale factor comes from trial-and-error
           // fireworks uses its own kerning algorithm, so it isn't possible to match the results exactly anyway
-          oFrag.style.letterSpacing = `${Math.floor(frag.kerning * sz * 0.32) * 0.25}px`;
+          oFrag.style.letterSpacing = `${frag.kerning * sz * 0.1}px`;
 
           oFrag.style.fontWeight = frag.bold ? 'bold' : 'normal';
           oFrag.style.fontStyle = frag.italic ? 'italic' : 'normal';
           oFrag.style.textDecoration = frag.underline ? 'underline' : 'none';
+          oFrag.style.textAlign = JUSTIFICATION[frag.justification ?? 0];
+          oFrag.style.verticalAlign = `${frag.baselineShift}px`;
+          oFrag.style.fontKerning = frag.autoKern ? 'normal' : 'none';
           oFrag.append(frag.text);
           oStr.append(oFrag);
         }
@@ -163,6 +196,6 @@ registerNode('TXT', 'v', { // TeXT
     });
 
     target.value = value;
-    Object.assign(target, outputNodes(target.name, displayNodes));
+    Object.assign(target, outputNodes(`Text (antialias ${aaInfo})`, displayNodes));
   },
 });

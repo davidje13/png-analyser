@@ -24,6 +24,7 @@ registerNode('PAT', 'v', { // PATtern (?)
     const fill = getChild(value, 'FPL', 'v');
     const fillCol = getChild(value, 'FCL', 'i');
     const fillTex = getChild(value, 'TXF', 'v');
+    const fillAntialiasText = getChild(value, 'FET', 'i');
 
     const brush = getChild(value, 'BPL', 'v');
     const brushCol = getChild(value, 'BCL', 'i');
@@ -33,10 +34,11 @@ registerNode('PAT', 'v', { // PATtern (?)
 
     Object.assign(target, outputNodes('Pattern', [
       fill,
-      fillCol,
+      fill ? fillCol : undefined,
       fill?.usesTexture ? fillTex : undefined,
+      fill ? fillAntialiasText : undefined,
       brush,
-      brushCol,
+      brush ? brushCol : undefined,
       brush?.usesTexture ? brushTex : undefined,
     ]));
   },

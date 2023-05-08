@@ -52,14 +52,14 @@ const BRUSH_TYPES = [
   angle: 'A',
   blackness: 'B',
   hue: 'H',
-  lightness: '', // TODO
-  opacity: 'O',
+  lightness: 'L',
+  opacity: 'O', // "ink amount" in UI
   saturation: 'S',
   scatter: 'R',
   size: 'Z',
 };
 
-registerNode('BPL', 'v', { // Brush ???
+registerNode('BPL', 'v', { // Brush Property List (?)
   read: (target, value, state) => {
     const category = getBasicValue(value, 'CAT', 's');
     const name = getBasicValue(value, 'INM', 's');

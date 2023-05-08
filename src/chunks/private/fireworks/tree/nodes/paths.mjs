@@ -368,6 +368,9 @@ function extendBounds(bounds, padding) {
  * @param {boolean} isClosed
  */
 function tracePath(ctx, points, { minX, minY }, isClosed) {
+  if (!points.length) {
+    return;
+  }
   ctx.moveTo(points[0].x - minX, points[0].y - minY);
   for (let i = 1; i < points.length; ++i) {
     const pt = points[i];
@@ -384,6 +387,9 @@ function tracePath(ctx, points, { minX, minY }, isClosed) {
  * @param {{ minX: number, minY: number }} bounds
  */
 function drawPathControls(ctx, points, { minX, minY }) {
+  if (!points.length) {
+    return;
+  }
   ctx.fillStyle = 'rgba(0, 255, 0)';
   ctx.beginPath();
   for (const point of points) {
@@ -412,6 +418,9 @@ function drawPathControls(ctx, points, { minX, minY }) {
  * @param {boolean} isClosed
  */
 function traceBezierPath(ctx, points, { minX, minY }, isClosed) {
+  if (!points.length) {
+    return;
+  }
   ctx.moveTo(points[0].x - minX, points[0].y - minY);
   for (let i = 1; i < points.length; ++i) {
     const ptA = points[i - 1];
@@ -440,6 +449,9 @@ function traceBezierPath(ctx, points, { minX, minY }, isClosed) {
  * @param {{ minX: number, minY: number }} bounds
  */
 function drawBezierPathControls(ctx, points, { minX, minY }) {
+  if (!points.length) {
+    return;
+  }
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(0,255,0)';
   ctx.lineJoin = 'round';

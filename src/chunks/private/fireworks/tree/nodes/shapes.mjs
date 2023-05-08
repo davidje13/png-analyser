@@ -18,3 +18,12 @@ registerNode('RCT', 'v', { // ReCTangle
     target.toString = () => `Rectangle: ${left}, ${top} - ${right}, ${bottom}. Radius = ${cornerRad * 100}%`;
   },
 });
+
+registerNode('RDM', 'b', { // ???
+  read: (target, value) => {
+    // RDS always denotes a percentage, but if "px" is selected in the UI, this
+    // flag is set to true and the percentage value will be recalculated when
+    // the shape size changes to maintain the same pixel size.
+    target.toString = () => value ? 'fixed radius' : 'radius scales with shape';
+  },
+});

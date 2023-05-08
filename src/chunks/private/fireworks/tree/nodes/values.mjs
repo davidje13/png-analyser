@@ -1,3 +1,4 @@
+import { asColourDiv, termCol, termReset } from '../../../../../pretty.mjs';
 import { registerNode, getBasicValue, getChildren } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
@@ -96,6 +97,82 @@ registerNode('VIS', 'b', {
   },
 });
 
+// TODO
+const BLEND_MODES = [
+  'normal', // 0
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  'disolve',
+  '',
+  '',
+  '', // 10
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '', // 20
+  '',
+  '',
+  '',
+  '',
+  'erase',
+  '',
+  '',
+  '',
+  '',
+  'average', // 30
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '', // 40
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  'xor', // 50
+];
+
+registerNode('BLD', 'i', { // omitted = 0
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `blend mode: ${BLEND_MODES[value] || `unknown (${value})`}`;
+  },
+});
+
+registerNode('DIS', 'b', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => value ? 'not collapsed' : 'collapsed';
+  },
+});
+
+// MKBv = "master" page (contains layers shared between pages, and also a copy of page 1?)
+// -> LSMv contains "shared" layers (LSEv)
+// -> LYLv contains LSAv for referencing shared layers using UIDs
+// PDCv = page (one per page)
+
+// sub-layers appear inside ELMv (alongside elements)
+
 registerNode('OPA', 'i', {
   read: (target, value) => {
     target.value = value;
@@ -103,17 +180,35 @@ registerNode('OPA', 'i', {
   },
 });
 
-registerNode('BCL', 'i', {
+registerNode('BCL', 'i', { // Brush CoLour
   read: (target, value) => {
     target.value = value;
     target.toString = () => `brush colour: ${value.toString(16).padStart(8, '0')}`;
   },
 });
 
-registerNode('FCL', 'i', {
+registerNode('FCL', 'i', { // Fill CoLour
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill colour: ${value.toString(16).padStart(8, '0')}`;
+  },
+});
+
+registerNode('BGC', 'i', { // BackGround Colour
+  read: (target, value) => {
+    target.toString = () => `Background: ${termCol(value)} ${value.toString(16).padStart(8, '0')} ${termReset}`;
+
+    target.display = (summary, content) => {
+      summary.append('Background');
+      content.append(asColourDiv(value, true));
+    };
+  },
+});
+
+registerNode('FET', 'i', { // TODO
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill text antialiasing: ${['none', 'antialias'][value] || `unknown ${value}`}`;
   },
 });
 
@@ -124,10 +219,23 @@ registerNode('FOT', 'b', {
   },
 });
 
+registerNode('EOF', 'b', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `fill rule: ${value ? 'even-odd' : 'nonzero'}`;
+  },
+});
+
+const PLACEMENTS = [
+  'inside',
+  'middle',
+  'outside',
+];
+
 registerNode('BRP', 'i', {
   read: (target, value) => {
     target.value = value;
-    target.toString = () => `brush placement: ${value}`;
+    target.toString = () => `brush placement: ${PLACEMENTS[value] || `unknown ${value}`}`;
   },
 });
 
