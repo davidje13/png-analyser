@@ -1,6 +1,7 @@
 import './bitmaps.mjs';
 import './brushes.mjs';
 import './effects.mjs';
+import './exports.mjs';
 import './fills.mjs';
 import './grid.mjs';
 import './groups.mjs';

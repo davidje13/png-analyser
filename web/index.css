@@ -96,8 +96,8 @@ li > details > summary {
   text-align: center;
 }
 
-.clt::before {
-  content: '?';
+.transparent::before {
+  content: 't';
   position: absolute;
   bottom: -4px;
   left: -5px;

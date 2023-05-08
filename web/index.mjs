@@ -112,12 +112,16 @@ drop.addEventListener('drop', (e) => {
   e.preventDefault();
   drop.classList.remove('active');
 
+  document.title = 'PNG Analyser';
   out.innerText = '';
 
   if (e.dataTransfer?.items) {
     for (let i = 0; i < e.dataTransfer.items.length; ++i) {
       const file = e.dataTransfer.items[i].getAsFile();
       file?.arrayBuffer().then((d) => process(d, file.name));
+      if (file && e.dataTransfer.items.length === 1) {
+        document.title = `${file.name} \u2014 PNG Analyser`;
+      }
     }
   }
 });
