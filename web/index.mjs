@@ -1,4 +1,8 @@
+import { DIFFUSION_TYPES } from '../src/actions/diffusions.mjs';
+import { quantise } from '../src/actions/dither.mjs';
+import { PALETTES } from '../src/actions/palettes.mjs';
 import { readPNG } from '../src/png.mjs';
+import { asImageData, makeCanvas } from '../src/pretty.mjs';
 
 /**
  * @param {ArrayBuffer} data
@@ -56,6 +60,84 @@ async function process(data, name) {
       section = makeDetails(oSummary, oData, !chunk.defaultCollapse);
       section.classList.add('chunk');
       output.append(section);
+    }
+
+    const image = png.state.idat?.image;
+    if (image) {
+      const palette = document.createElement('select');
+      for (let i = 0; i < PALETTES.length; ++i) {
+        const opt = document.createElement('option');
+        if (!i) {
+          opt.setAttribute('selected', 'selected');
+        }
+        opt.append(`${PALETTES[i].name} (${PALETTES[i].value.length})`);
+        palette.append(opt);
+      }
+
+      const transLabel = document.createElement('label');
+      const transparent = document.createElement('input');
+      transparent.setAttribute('type', 'checkbox');
+      transparent.setAttribute('checked', 'checked');
+      transLabel.append(transparent, ' Transparent');
+
+      const matteLabel = document.createElement('label');
+      const matte = document.createElement('input');
+      matte.setAttribute('type', 'color');
+      matte.setAttribute('value', '#000000');
+      matteLabel.append(matte, ' Matte');
+
+      const amount = document.createElement('input');
+      amount.setAttribute('type', 'range');
+      amount.setAttribute('min', '0');
+      amount.setAttribute('max', '1');
+      amount.setAttribute('step', 'any');
+      amount.setAttribute('value', '1');
+
+      const diffusion = document.createElement('select');
+      for (let i = 0; i < DIFFUSION_TYPES.length; ++i) {
+        const opt = document.createElement('option');
+        if (!i) {
+          opt.setAttribute('selected', 'selected');
+        }
+        opt.append(DIFFUSION_TYPES[i].name);
+        diffusion.append(opt);
+      }
+
+      const serpLabel = document.createElement('label');
+      const serpentine = document.createElement('input');
+      serpentine.setAttribute('type', 'checkbox');
+      serpentine.setAttribute('checked', 'checked');
+      serpLabel.append(serpentine, ' Serpentine');
+
+      palette.addEventListener('change', updateDither);
+      transparent.addEventListener('change', updateDither);
+      matte.addEventListener('input', updateDither);
+      amount.addEventListener('input', updateDither);
+      diffusion.addEventListener('change', updateDither);
+      serpentine.addEventListener('change', updateDither);
+
+      const options = document.createElement('form');
+      options.setAttribute('action', '#');
+      options.classList.add('options');
+      options.append(palette, transLabel, matteLabel, amount, diffusion, serpLabel);
+      const ditherIn = image;
+      const ditherOut = makeCanvas(ditherIn[0]?.length ?? 0, ditherIn.length);
+      output.append(options, ditherOut.canvas);
+
+      function updateDither() {
+        let p = PALETTES[palette.selectedIndex].value;// ?? pickPalette(ditherIn, 8);
+        if (transparent.checked) {
+          p = [0, ...p];
+        }
+        const dithered = quantise(ditherIn, p, { dither: {
+          matte: Number.parseInt(matte.value.substring(1), 16),
+          amount: Number.parseFloat(amount.value),
+          diffusion: DIFFUSION_TYPES[diffusion.selectedIndex].value,
+          serpentine: serpentine.checked,
+        } });
+        ditherOut.ctx.putImageData(asImageData(dithered, true), 0, 0);
+      }
+      updateDither();
     }
   } catch (e) {
     if (e && typeof e === 'object' && /** @type {any} */ (e).message) {

@@ -8,7 +8,7 @@ import { readChunk, parseChunks } from './chunk.mjs';
  * @return {{
  *   warnings: string[],
  *   chunks: import('./chunk.mjs').Chunk[],
- *   state: import('./chunk.mjs').State,
+ *   state: import('./chunk.mjs').State & import('./chunks/mandatory/IDAT.mjs').IDATState,
  * }}
  */
 export function readPNG(data) {

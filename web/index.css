@@ -151,3 +151,15 @@ li > details > summary {
   border: 1px solid black;
   margin: 50px;
 }
+
+.options {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 10px 20px;
+  padding: 10px;
+}
+
+input {
+  vertical-align: middle;
+}
