@@ -130,7 +130,7 @@ async function process(data, name) {
           p = [0, ...p];
         }
         const dithered = quantise(ditherIn, p, { dither: {
-          matte: Number.parseInt(matte.value.substring(1), 16),
+          matte: transparent.checked ? -1 : Number.parseInt(matte.value.substring(1), 16),
           amount: Number.parseFloat(amount.value),
           diffusion: DIFFUSION_TYPES[diffusion.selectedIndex].value,
           serpentine: serpentine.checked,

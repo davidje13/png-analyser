@@ -1,7 +1,7 @@
 import { FLOYD_STEINBERG } from './diffusions.mjs';
 
 /**
- * @typedef {[number, number, number, number]} ARGB
+ * @typedef {[number, number, number, number, number]} ARGB
  */
 
 /**
@@ -27,7 +27,7 @@ export function quantise(image, palette, { dither } = {}) {
 
   const {
     gamma = 1.8,
-    matte = 0x000000,
+    matte = -1,
     diffusion = FLOYD_STEINBERG,
     serpentine = true,
     amount = 0,
@@ -49,7 +49,15 @@ export function quantise(image, palette, { dither } = {}) {
       const iout = paletteLookup.nearest(cin);
       resultRow[x] = palette[iout];
 
-      const diff = diffARGB(cin, paletteLookup.values[iout]);
+      const cout = paletteLookup.values[iout];
+      const m = cin[4];
+      /** @type {ARGB} */ const diff = [
+        cin[0] - cout[0],
+        (cin[1] - cout[1]) * m,
+        (cin[2] - cout[2]) * m,
+        (cin[3] - cout[3]) * m,
+        0,
+      ];
       for (const inc of incs) {
         incARGB(input[y + inc.y]?.[x + inc.x * dir], diff, inc.v);
       }
@@ -66,33 +74,40 @@ export function quantise(image, palette, { dither } = {}) {
  * @return {(c: number) => ARGB}
  */
 const readARGB = (gamma, matte) => {
+  const m = 1 / 255;
   /** @type {number[]} */ const glookup = [];
   for (let i = 0; i < 256; ++i) {
-    glookup[i] = Math.pow(i / 255, gamma) * 255;
+    glookup[i] = Math.pow(i * m, gamma);
   }
 
-  const mr = (matte >>> 16) & 0xFF;
-  const mg = (matte >>> 8) & 0xFF;
-  const mb = matte & 0xFF;
-
-  return (c) => {
-    const a = c >>> 24;
-    const ia = 255 - a;
-    return [
-      0xFF * a,
-      glookup[(c >>> 16) & 0xFF] * a + mr * ia,
-      glookup[(c >>> 8) & 0xFF] * a + mg * ia,
-      glookup[c & 0xFF] * a + mb * ia,
-    ];
+  if (matte !== -1) {
+    const mr = glookup[(matte >>> 16) & 0xFF];
+    const mg = glookup[(matte >>> 8) & 0xFF];
+    const mb = glookup[matte & 0xFF];
+    return (c) => {
+      const a = (c >>> 24) * m;
+      const ia = 1 - a;
+      return [
+        1,
+        glookup[(c >>> 16) & 0xFF] * a + mr * ia,
+        glookup[(c >>> 8) & 0xFF] * a + mg * ia,
+        glookup[c & 0xFF] * a + mb * ia,
+        1,
+      ];
+    }
+  } else {
+    return (c) => {
+      const a = (c >>> 24) * m;
+      return [
+        a,
+        glookup[(c >>> 16) & 0xFF],
+        glookup[(c >>> 8) & 0xFF],
+        glookup[c & 0xFF],
+        a,
+      ];
+    }
   }
 };
-
-/**
- * @param {ARGB} a
- * @param {ARGB} b
- * @return {ARGB}
- */
-const diffARGB = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2], a[3] - b[3]];
 
 /**
  * @param {ARGB | undefined} target
@@ -121,13 +136,14 @@ function makePaletteLookup(palette, read) {
     nearest: (col) => {
       let bestD2 = Number.POSITIVE_INFINITY;
       let best = 0;
+      const m = col[0] * col[0];
       for (let i = 0; i < values.length; ++i) {
         const p = values[i];
         const dA = p[0] - col[0];
         const dR = p[1] - col[1];
         const dG = p[2] - col[2];
         const dB = p[3] - col[3];
-        const d2 = dA * dA + dR * dR + dG * dG + dB * dB;
+        const d2 = dA * dA + (dR * dR + dG * dG + dB * dB) * m;
         if (d2 < bestD2) {
           bestD2 = d2;
           best = i;
