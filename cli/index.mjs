@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFileSync } from 'node:fs';
-import { readPNG } from '../src/png.mjs';
+import { readPNG } from '../src/image/png/png.mjs';
 
 /** @type {string[]} */ const filterIn = [];
 /** @type {string[]} */ const filterOut = [];
@@ -26,7 +26,7 @@ for (const path of paths) {
 /**
  * @param {object} data
  * @param {string[]} data.warnings
- * @param {import('../src/chunks/registry.mjs').Chunk[]} data.chunks
+ * @param {import('../src/image/png/chunks/registry.mjs').Chunk[]} data.chunks
  * @param {unknown} data.state
  */
 function displayData({ warnings, chunks, state }) {
