@@ -1,13 +1,21 @@
-import { FLOYD_STEINBERG } from './diffusions.mjs';
+import { applyGammaARGB, applyMatteARGB, pipe, readARGB8 } from './colour.mjs';
+import { NONE } from './diffusions.mjs';
+
+// TODO: ordered dithering? https://en.wikipedia.org/wiki/Ordered_dithering
+// TODO: spatial quantisation?
+//   https://web.archive.org/web/20160426135306/www.cs.berkeley.edu/~dcoetzee/downloads/scolorq/
+//   https://web.archive.org/web/20061231102533/http://www-dbv.informatik.uni-bonn.de/quant/
 
 /**
- * @typedef {[number, number, number, number, number]} ARGB
+ * @typedef {import('./colour.mjs').ARGB} ARGB
+ * @typedef {[...ARGB, number]} ARGBM
  */
 
 /**
  * @param {number[][]} image
  * @param {number[]} palette
  * @param {{
+ *   colourspaceConversion?: ((c: ARGB) => ARGB)[],
  *   dither?: {
  *     gamma?: number,
  *     matte?: number,
@@ -18,7 +26,7 @@ import { FLOYD_STEINBERG } from './diffusions.mjs';
  * }=} options
  * @return {number[][]}
  */
-export function quantise(image, palette, { dither } = {}) {
+export function quantise(image, palette, { colourspaceConversion = [], dither } = {}) {
   if (!image.length) {
     return [];
   }
@@ -28,16 +36,16 @@ export function quantise(image, palette, { dither } = {}) {
   const {
     gamma = 1.8,
     matte = -1,
-    diffusion = FLOYD_STEINBERG,
+    diffusion = NONE,
     serpentine = true,
     amount = 0,
   } = dither ?? {};
 
-  const read = readARGB(gamma, matte);
-  const paletteLookup = makePaletteLookup(palette, read);
+  const paletteLookup = makePaletteLookup(palette, read(-1, gamma, colourspaceConversion));
   const incs = diffusion.map((o) => ({ ...o, v: o.v * amount }));
 
-  const input = image.map((r) => r.map(read));
+  const reader = read(matte, gamma, colourspaceConversion);
+  const input = image.map((r) => r.map(reader).map(toARGBM));
   /** @type {number[][]} */ const result = [];
 
   for (let y = 0; y < h; ++y) {
@@ -56,10 +64,9 @@ export function quantise(image, palette, { dither } = {}) {
         (cin[1] - cout[1]) * m,
         (cin[2] - cout[2]) * m,
         (cin[3] - cout[3]) * m,
-        0,
       ];
       for (const inc of incs) {
-        incARGB(input[y + inc.y]?.[x + inc.x * dir], diff, inc.v);
+        incARGBM(input[y + inc.y]?.[x + inc.x * dir], diff, inc.v);
       }
     }
     result.push(resultRow);
@@ -69,52 +76,30 @@ export function quantise(image, palette, { dither } = {}) {
 }
 
 /**
- * @param {number} gamma
  * @param {number} matte
- * @return {(c: number) => ARGB}
+ * @param {number} gamma
+ * @param {((c: ARGB) => ARGB)[]} colourspace
+ * @return {(value: number) => ARGB}
  */
-const readARGB = (gamma, matte) => {
-  const m = 1 / 255;
-  /** @type {number[]} */ const glookup = [];
-  for (let i = 0; i < 256; ++i) {
-    glookup[i] = Math.pow(i * m, gamma);
-  }
-
-  if (matte !== -1) {
-    const mr = glookup[(matte >>> 16) & 0xFF];
-    const mg = glookup[(matte >>> 8) & 0xFF];
-    const mb = glookup[matte & 0xFF];
-    return (c) => {
-      const a = (c >>> 24) * m;
-      const ia = 1 - a;
-      return [
-        1,
-        glookup[(c >>> 16) & 0xFF] * a + mr * ia,
-        glookup[(c >>> 8) & 0xFF] * a + mg * ia,
-        glookup[c & 0xFF] * a + mb * ia,
-        1,
-      ];
-    }
-  } else {
-    return (c) => {
-      const a = (c >>> 24) * m;
-      return [
-        a,
-        glookup[(c >>> 16) & 0xFF],
-        glookup[(c >>> 8) & 0xFF],
-        glookup[c & 0xFF],
-        a,
-      ];
-    }
-  }
-};
+const read = (matte, gamma, colourspace) => pipe(
+  readARGB8,
+  matte === -1 ? null : applyMatteARGB(readARGB8(matte)),
+  gamma === 1 ? null : applyGammaARGB(gamma),
+  ...colourspace,
+);
 
 /**
- * @param {ARGB | undefined} target
- * @param {ARGB} value
+ * @param {Readonly<ARGB>} c
+ * @return {ARGBM}
+ */
+const toARGBM = (c) => [...c, c[0]];
+
+/**
+ * @param {ARGBM | undefined} target
+ * @param {Readonly<ARGB>} value
  * @param {number} mult
  */
-const incARGB = (target, value, mult) => {
+const incARGBM = (target, value, mult) => {
   if (target) {
     target[0] += value[0] * mult;
     target[1] += value[1] * mult;
@@ -126,7 +111,7 @@ const incARGB = (target, value, mult) => {
 /**
  * @param {number[]} palette
  * @param {(c: number) => ARGB} read
- * @return {{ nearest: (c: ARGB) => number, values: ARGB[] }}
+ * @return {{ nearest: (c: Readonly<[...ARGB, ...unknown[]]>) => number, values: ARGB[] }}
  */
 function makePaletteLookup(palette, read) {
   const values = palette.map(read);

@@ -5,7 +5,8 @@
   "private": true,
   "bin": "./cli/index.mjs",
   "scripts": {
-    "start": "static-server --index index.html --port 8080"
+    "start": "static-server --index index.html --port 8080",
+    "test": "lean-test"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   "homepage": "https://github.com/davidje13/png-analyser#readme",
   "devDependencies": {
     "@types/node": "18.x",
+    "lean-test": "2.x",
     "static-server": "2.x"
   }
 }

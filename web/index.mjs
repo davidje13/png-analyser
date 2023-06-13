@@ -1,3 +1,4 @@
+import { COLOURSPACES } from '../src/actions/colour.mjs';
 import { DIFFUSION_TYPES } from '../src/actions/diffusions.mjs';
 import { quantise } from '../src/actions/dither.mjs';
 import { PALETTES } from '../src/actions/palettes.mjs';
@@ -74,6 +75,16 @@ async function process(data, name) {
         palette.append(opt);
       }
 
+      const colspace = document.createElement('select');
+      for (let i = 0; i < COLOURSPACES.length; ++i) {
+        const opt = document.createElement('option');
+        if (!i) {
+          opt.setAttribute('selected', 'selected');
+        }
+        opt.append(COLOURSPACES[i].name);
+        colspace.append(opt);
+      }
+
       const transLabel = document.createElement('label');
       const transparent = document.createElement('input');
       transparent.setAttribute('type', 'checkbox');
@@ -96,7 +107,7 @@ async function process(data, name) {
       const diffusion = document.createElement('select');
       for (let i = 0; i < DIFFUSION_TYPES.length; ++i) {
         const opt = document.createElement('option');
-        if (!i) {
+        if (i === 1) {
           opt.setAttribute('selected', 'selected');
         }
         opt.append(DIFFUSION_TYPES[i].name);
@@ -110,6 +121,7 @@ async function process(data, name) {
       serpLabel.append(serpentine, ' Serpentine');
 
       palette.addEventListener('change', updateDither);
+      colspace.addEventListener('change', updateDither);
       transparent.addEventListener('change', updateDither);
       matte.addEventListener('input', updateDither);
       amount.addEventListener('input', updateDither);
@@ -119,22 +131,25 @@ async function process(data, name) {
       const options = document.createElement('form');
       options.setAttribute('action', '#');
       options.classList.add('options');
-      options.append(palette, transLabel, matteLabel, amount, diffusion, serpLabel);
+      options.append(palette, colspace, transLabel, matteLabel, amount, diffusion, serpLabel);
       const ditherIn = image;
       const ditherOut = makeCanvas(ditherIn[0]?.length ?? 0, ditherIn.length);
       output.append(options, ditherOut.canvas);
 
       function updateDither() {
         let p = PALETTES[palette.selectedIndex].value;// ?? pickPalette(ditherIn, 8);
-        if (transparent.checked) {
+        if (transparent.checked && !p.includes(0)) {
           p = [0, ...p];
         }
-        const dithered = quantise(ditherIn, p, { dither: {
-          matte: transparent.checked ? -1 : Number.parseInt(matte.value.substring(1), 16),
-          amount: Number.parseFloat(amount.value),
-          diffusion: DIFFUSION_TYPES[diffusion.selectedIndex].value,
-          serpentine: serpentine.checked,
-        } });
+        const dithered = quantise(ditherIn, p, {
+          colourspaceConversion: COLOURSPACES[colspace.selectedIndex].fromSRGB,
+          dither: {
+            matte: transparent.checked ? -1 : Number.parseInt(matte.value.substring(1), 16),
+            amount: Number.parseFloat(amount.value),
+            diffusion: DIFFUSION_TYPES[diffusion.selectedIndex].value,
+            serpentine: serpentine.checked,
+          },
+        });
         ditherOut.ctx.putImageData(asImageData(dithered, true), 0, 0);
       }
       updateDither();

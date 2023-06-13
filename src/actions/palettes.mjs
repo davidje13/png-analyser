@@ -8,25 +8,49 @@ for (let i = 0; i < 0x100; ++i) {
   GREYSCALE.push((0xFF000000 | (0x010101 * i)) >>> 0);
 }
 
-export const SATURATED = [
-  0xFF000000,
-  0xFFFF0000,
-  0xFF00FF00,
-  0xFF0000FF,
-  0xFFFFFF00,
-  0xFF00FFFF,
-  0xFFFF00FF,
-  0xFFFFFFFF,
-];
+/**
+ * @param {number} n
+ * @param {number=} max
+ * @return {number[]}
+ */
+const makeSteps = (n, max = 0xFF) => {
+  /** @type {number[]} */ const result = [];
+  for (let i = 0; i < n; ++i) {
+    result.push(Math.round((i * max) / (n - 1)));
+  }
+  return result;
+}
 
-/** @type {number[]} */ export const WEBSAFE = [];
-for (let r = 0; r < 0x100; r += 0x33) {
-  for (let g = 0; g < 0x100; g += 0x33) {
-    for (let b = 0; b < 0x100; b += 0x33) {
-      WEBSAFE.push((0xFF000000 | (r << 16) | (g << 8) | b) >>> 0);
+/**
+ * @param {number[]} steps
+ * @param {number=} alpha
+ * @return {number[]}
+ */
+const makeCube = (steps, alpha = 0xFF) => {
+  /** @type {number[]} */ const result = [];
+  for (const r of steps) {
+    for (const g of steps) {
+      for (const b of steps) {
+        result.push(((alpha << 24) | (r << 16) | (g << 8) | b) >>> 0);
+      }
     }
   }
-}
+  return result;
+};
+
+export const SATURATED = makeCube(makeSteps(2));
+export const REGULAR_3 = makeCube(makeSteps(3));
+export const REGULAR_4 = makeCube(makeSteps(4));
+export const REGULAR_5 = makeCube(makeSteps(5));
+export const WEBSAFE = makeCube(makeSteps(6));
+
+export const REGULAR_5_ALPHA = [
+  0,
+  ...makeCube(makeSteps(2), 0x40),
+  ...makeCube(makeSteps(3), 0x80),
+  ...makeCube(makeSteps(4), 0xC0),
+  ...makeCube(makeSteps(5)),
+];
 
 // https://en.wikipedia.org/wiki/List_of_software_palettes
 export const OS2 = [
@@ -112,7 +136,11 @@ export const PALETTES = [
   { name: 'Black & White', value: BLACK_WHITE },
   { name: 'Greyscale', value: GREYSCALE },
   { name: 'Saturated', value: SATURATED },
+  { name: 'Regular 3', value: REGULAR_3 },
+  { name: 'Regular 4', value: REGULAR_4 },
+  { name: 'Regular 5', value: REGULAR_5 },
   { name: 'Websafe', value: WEBSAFE },
+  { name: 'Regular 5 + Alpha', value: REGULAR_5_ALPHA },
   { name: 'IBM OS/2', value: OS2 },
   { name: 'Windows', value: WINDOWS },
   { name: 'Macintosh', value: MACINTOSH },

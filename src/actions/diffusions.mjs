@@ -2,6 +2,8 @@
  * @typedef {{ x: number, y: number, v: number }[]} Diffusion
  */
 
+/** @type {Diffusion} */ export const NONE = [];
+
 // https://en.wikipedia.org/wiki/Floyd%E2%80%93Steinberg_dithering
 /** @type {Diffusion} */ export const FLOYD_STEINBERG = [
   { x: 1, y: 0, v: 7 / 16 },
@@ -95,6 +97,7 @@
 ];
 
 export const DIFFUSION_TYPES = [
+  { name: 'None', value: NONE },
   { name: 'Floyd-Steinberg', value: FLOYD_STEINBERG },
   { name: 'Atkinson', value: ATKINSON },
   { name: 'Jarvis-Judice-Ninke', value: JARVIS_JUDICE_NINKE },
