@@ -1,9 +1,9 @@
-import { COLOURSPACES } from '../src/actions/colour.mjs';
-import { DIFFUSION_TYPES } from '../src/actions/diffusions.mjs';
-import { quantise } from '../src/actions/dither.mjs';
-import { PALETTES } from '../src/actions/palettes.mjs';
-import { readPNG } from '../src/png.mjs';
-import { asImageData, makeCanvas } from '../src/pretty.mjs';
+import { COLOURSPACES } from '../src/image/colour.mjs';
+import { DIFFUSION_TYPES } from '../src/image/diffusions.mjs';
+import { quantise } from '../src/image/actions/dither.mjs';
+import { PALETTES } from '../src/image/palettes.mjs';
+import { readPNG } from '../src/image/png/png.mjs';
+import { asImageData, makeCanvas } from '../src/display/pretty.mjs';
 
 /**
  * @param {ArrayBuffer} data
