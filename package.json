@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "PNG analysis",
   "private": true,
-  "bin": "./cli/index.mjs",
+  "bin": "./cli/png.mjs",
   "scripts": {
     "start": "static-server --index index.html --port 8080",
     "test": "lean-test"
