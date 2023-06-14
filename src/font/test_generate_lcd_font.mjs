@@ -63,7 +63,7 @@ const font = new Font({
 ];
 
 const advanceWidth = 13;
-const bounds = { xmin: 1, ymin: 1, xmax: 12, ymax: 22 };
+const bounds = { xmin: 0, ymin: 0, xmax: 13, ymax: 23 };
 
 font.setUnknownGlyph({ advanceWidth, bounds, instructions: [...T, ...TR, ...M, ...BL] });
 font.addGlyph('0', 'zero', { advanceWidth, bounds, instructions: [...T, ...TL, ...TR, ...BL, ...BR, ...B] });
