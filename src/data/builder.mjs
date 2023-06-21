@@ -230,16 +230,16 @@ export class ByteArrayBuilder {
   }
 
   /**
-   * @param {number} v
    * @param {number} bytes
+   * @param {number} v
    */
-  uintBE(v, bytes) {
+  uintBE(bytes, v) {
     switch (bytes) {
       case 1: return this.uint8(v);
       case 2: return this.uint16BE(v);
       case 3: return this.uint24BE(v);
       case 4: return this.uint32BE(v);
-      default: throw new Error('unsupported byte length');
+      default: throw new Error(`unsupported byte length ${bytes}`);
     }
   }
 
@@ -271,6 +271,13 @@ export class ByteArrayBuilder {
       this.view.setUint8(this.byteLength + i, code);
     }
     this.byteLength += v.length;
+  }
+
+  /**
+   * @param {string} v
+   */
+  utf8(v) {
+    this.append(new TextEncoder().encode(v));
   }
 
   /**

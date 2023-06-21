@@ -2,11 +2,12 @@ import { ByteArrayBuilder } from '../../data/builder.mjs';
 import { Dict } from './data_dict.mjs';
 import { writeIndex } from './data_index.mjs';
 import { CFFStrings } from './standard_strings.mjs';
-import { opArray, opFixedInt, opNumber, opStringID, opType2Number, writeOperation } from './operations.mjs';
-import { getCFFOp } from './glyph.mjs';
+import { opArray, opFixedInt, opNumber, opStringID, opType2Number, writeOperand, writeOperation } from './operations.mjs';
+import { getCFFOp } from './cff_glyph.mjs';
 
 /**
  * @typedef {import('../font.mjs').Font} Font
+ * @typedef {import('./cff_glyph.mjs').CFFGlyph} CFFGlyph
  */
 
 const OP_VERSION_STRING = { id: 0x00 };                  // SID
@@ -61,6 +62,8 @@ const OP_PRIVATE_FORCE_BOLD = { id: 0x0E, esc: true };   // boolean [false]
 const OP_PRIVATE_LANG_GROUP = { id: 0x11, esc: true };   // number [0]
 const OP_PRIVATE_EXP_FACTOR = { id: 0x12, esc: true };   // number [0.06]
 const OP_PRIVATE_INIT_RANDOM_SEED = { id: 0x13, esc: true }; // number [0]
+
+const CFF2_OP_VSTORE = { id: 0x18 };                     // file byte offset
 
 const CFF1_OP_ENDCHAR = { id: 0x0E, esc: false };
 
@@ -145,16 +148,22 @@ export class CFF {
       dataBuf.uint8(0); // format (0 = individual entries)
       // 0 (.notdef) is not included in this index
       for (let i = 1; i < font.glyphs.length; ++i) {
-        dataBuf.uint16BE(strings.add(font.glyphs[i].name));
+        dataBuf.uint16BE(strings.add(font.glyphs[i].cff.name));
       }
 
       // No FDSelect (not CIDFonts)
 
+      const widthInfo = getAdvanceWidthInfo(font.glyphs.map((g) => g.advanceWidth));
+
       // CharStrings Index
       dict.set(OP_CHAR_STRINGS_INDEX, opFixedInt(dataBuf.byteLength, baseOffset));
-      writeIndex(dataBuf, font.glyphs.map((glyph) => {
+      writeIndex(dataBuf, 2, font.glyphs.map((glyph) => {
         const gbuf = new ByteArrayBuilder();
-        for (const [op, ...data] of glyph.instructions) {
+        const charw = glyph.advanceWidth;
+        if (charw !== widthInfo.mode) {
+          writeOperand(gbuf, opType2Number(charw - widthInfo.nominal));
+        }
+        for (const [op, ...data] of glyph.cff.data.instructions) {
           const operator = getCFFOp(op);
           if (!operator || operator.cff1 === false) {
             throw new Error(`Unknown CFF1 operator: ${op}`);
@@ -169,6 +178,15 @@ export class CFF {
 
       // Private Dict
       const privateDict = new Dict();
+      //privateDict.set(OP_PRIVATE_BLUE_SCALE, opNumber(0.039625));
+      //privateDict.set(OP_PRIVATE_BLUE_SHIFT, opNumber(7));
+      //privateDict.set(OP_PRIVATE_BLUE_FUZZ, opNumber(1));
+      //privateDict.set(OP_PRIVATE_FORCE_BOLD, opNumber(0));
+      //privateDict.set(OP_PRIVATE_EXP_FACTOR, opNumber(0.06));
+      privateDict.set(OP_PRIVATE_DEFAULT_WIDTH_X, opNumber(widthInfo.mode));
+      if (!widthInfo.monospace) {
+        privateDict.set(OP_PRIVATE_NOMINAL_WIDTH_X, opNumber(widthInfo.nominal));
+      }
 
       const privateDictPos = dataBuf.byteLength;
       privateDict.write(dataBuf);
@@ -192,7 +210,7 @@ export class CFF {
     buf.uint8(absOffsetSize); // absolute offset size
 
     // Name Index
-    writeIndex(buf, this.fonts.map((f) => ByteArrayBuilder.latin1(f.name)));
+    writeIndex(buf, 2, this.fonts.map((f) => ByteArrayBuilder.latin1(f.name)));
 
     // Since the offsets recorded in the dictionaries depend on the size of the dictionary
     // and index, we have to perform 2 passes here: first with incorrect offsets (but fixed
@@ -201,19 +219,19 @@ export class CFF {
 
     // Top Dict Index (pass 1)
     const topDictBuf1 = new ByteArrayBuilder();
-    writeIndex(topDictBuf1, fontDicts.map((dict) => dict.toBytes()));
+    writeIndex(topDictBuf1, 2, fontDicts.map((dict) => dict.toBytes()));
 
     // String Index
     const ssBuf = new ByteArrayBuilder();
-    writeIndex(ssBuf, strings.strings.map(ByteArrayBuilder.latin1));
+    writeIndex(ssBuf, 2, strings.strings.map(ByteArrayBuilder.latin1));
 
     // Global Subroutine Index
-    writeIndex(ssBuf, []);
+    writeIndex(ssBuf, 2, []);
 
     baseOffset.value = buf.byteLength + topDictBuf1.byteLength + ssBuf.byteLength;
 
     // Top Dict Index (pass 2)
-    writeIndex(buf, fontDicts.map((dict) => dict.toBytes()));
+    writeIndex(buf, 2, fontDicts.map((dict) => dict.toBytes()));
 
     // String Index & Global Subroutine Index (unchanged by second pass)
     buf.append(ssBuf);
@@ -227,4 +245,128 @@ export class CFF {
 
     return buf;
   }
+
+  writeCFF2() {
+    // https://learn.microsoft.com/en-us/typography/opentype/spec/cff2
+
+    if (this.fonts.length !== 1) {
+      throw new Error('Cannot generate CFF2 for multiple fonts');
+    }
+    const font = this.fonts[0];
+
+    const dataBuf = new ByteArrayBuilder();
+    const baseOffset = { value: 0 }; // filled in later
+
+    // Top Dict Index (written later)
+    const topDict = new Dict();
+
+    if (font.em !== 1000) {
+      topDict.set(OP_FONT_MATRIX, opArray([
+        1 / font.em, 0, 0,
+        1 / font.em, 0, 0,
+      ]));
+    }
+
+    // CharStrings Index
+    topDict.set(OP_CHAR_STRINGS_INDEX, opFixedInt(dataBuf.byteLength, baseOffset));
+    writeIndex(dataBuf, 4, font.glyphs.map((glyph) => {
+      const gbuf = new ByteArrayBuilder();
+      for (const [op, ...data] of glyph.cff.data.instructions) {
+        const operator = getCFFOp(op);
+        if (!operator || operator.cff1 === false) {
+          throw new Error(`Unknown CFF1 operator: ${op}`);
+        }
+        writeOperation(gbuf, operator, data.map(opType2Number));
+      }
+      return gbuf;
+    }));
+
+    // Private Dict
+    const privateDict = new Dict();
+    //privateDict.set(OP_PRIVATE_BLUE_SCALE, opNumber(0.039625));
+    //privateDict.set(OP_PRIVATE_BLUE_SHIFT, opNumber(7));
+    //privateDict.set(OP_PRIVATE_BLUE_FUZZ, opNumber(1));
+    //privateDict.set(OP_PRIVATE_FORCE_BOLD, opNumber(0));
+    //privateDict.set(OP_PRIVATE_EXP_FACTOR, opNumber(0.06));
+
+    // Just one Font DICT - not currently supporting FDSelect
+    const fontDicts = [new Dict()];
+
+    const privateDictPos = dataBuf.byteLength;
+    privateDict.write(dataBuf);
+    fontDicts[0].set(
+      OP_PRIVATE_INDEX,
+      opNumber(dataBuf.byteLength - privateDictPos),
+      opFixedInt(privateDictPos, baseOffset),
+    );
+
+    topDict.set(OP_CID_FONT_DICT_ARRAY, opFixedInt(dataBuf.byteLength, baseOffset));
+    writeIndex(dataBuf, 4, fontDicts.map((dict) => dict.toBytes()));
+
+    const buf = new ByteArrayBuilder();
+
+    // Header
+    buf.uint8(2); // major version
+    buf.uint8(0); // minor version
+    buf.uint8(5); // header size
+
+    // CFF2 maintains the need to perform 2 passes to get correct indices:
+
+    // Top Dict Index (pass 1)
+    const topDictBuf1 = topDict.toBytes();
+    buf.uint16BE(topDictBuf1.byteLength); // Top DICT size
+
+    // Global Subroutine Index
+    const sBuf = new ByteArrayBuilder();
+    writeIndex(sBuf, 4, []);
+
+    baseOffset.value = buf.byteLength + topDictBuf1.byteLength + sBuf.byteLength;
+
+    // Top Dict Index (pass 2)
+    buf.append(topDict.toBytes());
+    buf.append(sBuf);
+
+    if (buf.byteLength !== baseOffset.value) {
+      throw new Error('dictionary size changed!');
+    }
+
+    // Rest of data (Encodings / Charsets / etc.)
+    buf.append(dataBuf);
+
+    return buf;
+  }
+}
+
+/**
+ * @param {number[]} advanceWidths
+ * @return {{ monospace: boolean; mode: number; nominal: number }}
+ */
+function getAdvanceWidthInfo(advanceWidths) {
+  const n = advanceWidths.length;
+  if (!n) {
+    return { monospace: true, mode: 0, nominal: 0 };
+  }
+  const widths = advanceWidths.sort((a, b) => a - b);
+  if (widths[n - 1] === widths[0]) {
+    return { monospace: true, mode: widths[0], nominal: widths[0] };
+  }
+  let maxVal = 0;
+  let maxCount = 0;
+
+  let count = 0;
+  let cur = -1;
+  for (let i = 0; i < n + 1; ++i) {
+    if (widths[i] === cur) {
+      ++count;
+    } else {
+      if (count > maxCount) {
+        maxVal = cur;
+        maxCount = count;
+      }
+      cur = widths[i];
+      count = 1;
+    }
+  }
+  // nominal should actually be chosen more carefully for best compression, but median seems like a good starting point
+  return { monospace: false, mode: maxVal, nominal: widths[n >>> 1] };
 }

@@ -4,10 +4,11 @@
 
 /**
  * @param {ByteArrayBuilder} buf
+ * @param {number} countBytes
  * @param {(ByteArrayBuilder | ArrayBufferView)[]} items
  */
-export function writeIndex(buf, items) {
-  buf.uint16BE(items.length);
+export function writeIndex(buf, countBytes, items) {
+  buf.uintBE(countBytes, items.length);
   if (!items.length) {
     return;
   }
@@ -29,10 +30,10 @@ export function writeIndex(buf, items) {
   buf.uint8(v);
   offset = 1;
   for (const item of items) {
-    buf.uintBE(offset, v);
+    buf.uintBE(v, offset);
     offset += item.byteLength;
   }
-  buf.uintBE(offset, v);
+  buf.uintBE(v, offset);
   for (const item of items) {
     buf.append(item);
   }

@@ -1,10 +1,11 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
 import { CFF } from '../cff/cff.mjs';
-import { Glyph } from '../cff/glyph.mjs';
 import { UniqueStrings } from '../unique_strings.mjs';
 
 /**
  * @typedef {import('../font.mjs').Font} Font
+ * @typedef {import('./off_glyph.mjs').OFFGlyph} OFFGlyph
+ * @typedef {import('./off_glyph.mjs').CharactersSVGDocument} CharactersSVGDocument
  *
  * @typedef {{
  *   tag: string;
@@ -13,6 +14,8 @@ import { UniqueStrings } from '../unique_strings.mjs';
  *   length: number;
  *   buf: ByteArrayBuilder | ArrayBufferView;
  * }} Table
+ *
+ * @typedef {Pick<Table, 'tag' | 'buf'>} TableDef
  */
 
 const TABLE_DIRECTORY_HEADER_LENGTH = 12;
@@ -137,12 +140,13 @@ function makeBuf(fn) {
 }
 
 /**
- * @param {Omit<Table, 'offset' | 'length' | 'checksum'>[]} tables
+ * @param {(TableDef | null)[]} tables
  * @return {Table[]}
  */
 function normaliseTables(tables) {
-  let curOffset = TABLE_DIRECTORY_HEADER_LENGTH + tables.length * TABLE_RECORD_LENGTH;
-  return [...tables].sort((a, b) => (a.tag < b.tag) ? -1 : (a.tag > b.tag) ? 1 : 0).map((table) => {
+  const t = tables.filter(notNull);
+  let curOffset = TABLE_DIRECTORY_HEADER_LENGTH + t.length * TABLE_RECORD_LENGTH;
+  return [...t].sort((a, b) => (a.tag < b.tag) ? -1 : (a.tag > b.tag) ? 1 : 0).map((table) => {
     const length = table.buf.byteLength;
     curOffset = ((curOffset + 3) & ~3) + length;
     return {
@@ -155,7 +159,7 @@ function normaliseTables(tables) {
 }
 
 /**
- * @param {Glyph[]} glyphs
+ * @param {OFFGlyph[]} glyphs
  */
 function makeSegments(glyphs) {
   let curSegment = null;
@@ -252,6 +256,8 @@ export class OpenTypeFont {
   writeOTF() {
     const em = this.font.em;
 
+    /** @type {(TableDef | null)[]} */ const tableDefs = [];
+
     this.font.glyphs.sort((a, b) => (a.charCode - b.charCode));
     let uniqueGlyphAdvanceWidths = 1;
     let lastAdvanceWidth = -1;
@@ -264,7 +270,7 @@ export class OpenTypeFont {
       }
     }
     const segments = makeSegments(this.font.glyphs);
-    const nonEmptyGlyphs = this.font.glyphs.filter((g) => !g.isEmpty());
+    const nonEmptyGlyphs = this.font.nonEmptyGlyphs;
 
     const names = createNames(this.font);
 
@@ -284,19 +290,20 @@ export class OpenTypeFont {
       (a.type - b.type)
     ));
 
-    const head = { tag: 'head', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'head', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/head
       buf.uint16BE(1); // major version
       buf.uint16BE(0); // minor version
-      buf.uint16BE(this.font.majorVersion); // font revision major (see name.version_string)
-      buf.uint16BE(this.font.minorVersion); // font revision minor (see name.version_string)
+      buf.uint32BE(Math.round(( // font revision [16.16 fixed] (see CFF1 name.version_string)
+        this.font.majorVersion + this.font.minorVersion * 0.001
+      ) * 0x10000));
       buf.uint32BE(0); // checksum adjustment (filled in at end; see HEAD_CHECKSUM_ADJUSTMENT_INDEX)
       buf.uint32BE(0x5F0F3CF5); // "magic number"
       buf.uint16BE(flags(
         false, // 0: baseline for font at y=0
-        false, // 1: left sidebearing point at x=0
+        nonEmptyGlyphs.every((g) => g.leftSideBearing === g.cff.data.bounds.xmin), // 1: left sidebearing point at x=0
         false, // 2: instructions may depend on font size
-        false, // 3: force ppem to integer for all internal scalar math
+        this.font.forceInteger, // 3: force ppem to integer for all internal scalar math
         false, // 4: instructions may alter advance width
         false, // 5: unused
         false, false, false, false, false, // 6-10: unused
@@ -328,9 +335,9 @@ export class OpenTypeFont {
       buf.uint16BE(2); // font direction hint (deprecated; fixed at 2)
       buf.uint16BE(0); // offsets are: 16bits (0) or 32bits (1)
       buf.uint16BE(0); // glyph data format
-    }) };
+    }) });
 
-    const name = { tag: 'name', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'name', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/name
       const headerLength = 6 + names.length * 12 + 2 + languageTags.length * 4;
       let curOffset = 0;
@@ -364,13 +371,13 @@ export class OpenTypeFont {
       for (const languageTag of languageTags.strings) {
         buf.utf16BE(languageTag);
       }
-    }) };
+    }) });
 
-    const os2 = { tag: 'OS/2', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'OS/2', buf: makeBuf((buf) => {
       const version = 5;
       // https://docs.microsoft.com/en-us/typography/opentype/spec/os2
       buf.uint16BE(version); // version
-      buf.int16BE(Math.round(average(nonEmptyGlyphs.map((g) => (g.bounds.xmax - g.bounds.xmin))))); // average char width
+      buf.int16BE(Math.round(average(nonEmptyGlyphs.map((g) => g.advanceWidth)))); // average char width
       buf.uint16BE(this.font.weight); // us weight class
       buf.uint16BE(5); // us width class
       buf.uint16BE(flags( // fs type (licensing)
@@ -392,7 +399,7 @@ export class OpenTypeFont {
       buf.int16BE(0); // y superscript x offset
       buf.int16BE(em / 2); // y superscript y offset
       buf.int16BE(this.font.strikeoutSize); // y strikeout size
-      buf.int16BE(em / 2); // y strikeout position
+      buf.int16BE(this.font.strikeoutPosition); // y strikeout position
       buf.int8(8); // s family class general [8 = sans-serif]
       buf.int8(9); // s family class specific [9 = typewriter]
       buf.uint8(2); // panose family type [2 = latin text] - https://monotype.github.io/panose/pan2.htm
@@ -420,18 +427,20 @@ export class OpenTypeFont {
         false, // 4: strikeout
         false, // 5: bold
         true, // 6: regular
-        true, // 7: use typo metrics
-        false, // 8: weight/width/slipe
-        false, // 9: oblique
+        version >= 4 && true, // 7: use typo metrics
+        version >= 4 && false, // 8: weight/width/slope
+        version >= 4 && false, // 9: oblique
         false, false, false, false, false, false, // 10-15: reserved
       ));
       buf.uint16BE(Math.min(this.font.glyphs[1]?.charCode ?? 0xFFFF, 0xFFFF)); // us first char index
       buf.uint16BE(Math.min(this.font.glyphs[this.font.glyphs.length - 1].charCode, 0xFFFF)); // us last char index
-      buf.int16BE(em); // s typo ascender
-      buf.int16BE(0); // s typo descender
-      buf.int16BE(0); // s typo line gap
-      buf.uint16BE(em); // us win ascent
-      buf.uint16BE(0); // us win descent
+      const asc = Math.max(...nonEmptyGlyphs.map((g) => g.cff.data.bounds.ymax));
+      const desc = Math.min(...nonEmptyGlyphs.map((g) => g.cff.data.bounds.ymin));
+      buf.int16BE(asc); // s typo ascender
+      buf.int16BE(desc); // s typo descender
+      buf.int16BE(Math.round(this.font.em * this.font.lineheight - (asc - desc))); // s typo line gap
+      buf.uint16BE(asc); // us win ascent
+      buf.uint16BE(-desc); // us win descent
       if (version >= 1) {
         buf.uint32BE(0x00000001); // ul code page range 1
         buf.uint32BE(0x00000000); // ul code page range 2
@@ -447,19 +456,19 @@ export class OpenTypeFont {
         buf.uint16BE(0); // us lower optical point size
         buf.uint16BE(0xFFFF); // us upper optical point size
       }
-    }) };
+    }) });
 
-    const hhea = { tag: 'hhea', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'hhea', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/hhea
       buf.uint16BE(1); // major version
       buf.uint16BE(0); // minor version
-      buf.int16BE(em); // ascender
-      buf.int16BE(0); // descender
+      buf.int16BE(Math.max(0, ...nonEmptyGlyphs.map((g) => g.cff.data.bounds.ymax))); // ascender
+      buf.int16BE(Math.min(0, ...nonEmptyGlyphs.map((g) => g.cff.data.bounds.ymin))); // descender // TODO: should sign be positive?
       buf.int16BE(0); // line gap
       buf.uint16BE(Math.max(...this.font.glyphs.map((g) => g.advanceWidth))); // advance width max
-      buf.int16BE(Math.min(...nonEmptyGlyphs.map((g) => g.bounds.xmin))); // min left side bearing
-      buf.int16BE(Math.min(...nonEmptyGlyphs.map((g) => (g.advanceWidth - g.bounds.xmax)))); // min right side bearing
-      buf.int16BE(Math.max(...this.font.glyphs.map((g) => g.bounds.xmax))); // x max extent
+      buf.int16BE(Math.min(...nonEmptyGlyphs.map((g) => g.leftSideBearing))); // min left side bearing
+      buf.int16BE(Math.min(...nonEmptyGlyphs.map((g) => g.rightSideBearing))); // min right side bearing
+      buf.int16BE(Math.max(...nonEmptyGlyphs.map((g) => g.leftSideBearing + g.boundsWidth))); // x max extent
       buf.int16BE(1); // caret slope rise
       buf.int16BE(0); // caret slope run
       buf.int16BE(0); // caret offset
@@ -469,26 +478,26 @@ export class OpenTypeFont {
       buf.int16BE(0); // reserved
       buf.int16BE(0); // metric data format
       buf.uint16BE(uniqueGlyphAdvanceWidths); // count of hMetric entries in hmtx
-    }) };
+    }) });
 
-    const hmtx = { tag: 'hmtx', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'hmtx', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/hmtx
       for (let i = 0; i < this.font.glyphs.length; ++i) {
         const glyph = this.font.glyphs[i];
         if (i < uniqueGlyphAdvanceWidths) {
           buf.uint16BE(glyph.advanceWidth); // advance width
         }
-        buf.int16BE(glyph.bounds.xmin); // left side bearing
+        buf.int16BE(glyph.leftSideBearing); // left side bearing
       }
-    }) };
+    }) });
 
-    const maxp = { tag: 'maxp', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'maxp', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/maxp
       buf.uint32BE(0x00005000); // version
       buf.uint16BE(this.font.glyphs.length); // glyph count
-    }) };
+    }) });
 
-    const post = { tag: 'post', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'post', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/post
       buf.uint16BE(0x0003); // major version
       buf.uint16BE(0x0000); // minor version
@@ -500,7 +509,7 @@ export class OpenTypeFont {
       buf.uint32BE(0); // optional memory management info
       buf.uint32BE(0); // optional memory management info
       buf.uint32BE(0); // optional memory management info
-    }) };
+    }) });
 
     /**
      * @type {{
@@ -539,7 +548,7 @@ export class OpenTypeFont {
     }) });
     encodingRecords.push({ platformID: 3, encodingID: 1, buf: 0 }); // Windows BMP is same as Unicode BMP; share data
 
-    const cmap = { tag: 'cmap', buf: makeBuf((buf) => {
+    tableDefs.push({ tag: 'cmap', buf: makeBuf((buf) => {
       // https://docs.microsoft.com/en-us/typography/opentype/spec/cmap
       buf.uint16BE(0); // version
       buf.uint16BE(encodingRecords.length); // encoding table count
@@ -564,13 +573,83 @@ export class OpenTypeFont {
           buf.append(encodingRecord.buf);
         }
       }
-    }) };
+    }) });
 
-    const cff = { tag: 'CFF ', buf: new CFF([this.font]).writeCFF() };
+    // gasp is for TrueType outlines
+    //if (this.font.ttRendering.length) {
+    //  tableDefs.push({ tag: 'gasp', buf: makeBuf((buf) => {
+    //    buf.uint16BE(1); // version
+    //    buf.uint16BE(this.font.ttRendering.length); // record count
+    //    for (const r of this.font.ttRendering) {
+    //      buf.uint16BE(r.emMaxPixels);
+    //      buf.uint16BE(r.mode);
+    //    }
+    //  }) });
+    //}
+
+    const cff2 = false;
+
+    if (cff2) {
+      tableDefs.push({ tag: 'CFF2', buf: new CFF([this.font]).writeCFF2() });
+    } else {
+      tableDefs.push({ tag: 'CFF ', buf: new CFF([this.font]).writeCFF() });
+    }
+
+    /** @type {{ doc: string | CharactersSVGDocument; start: number; end: number }[]} */ const svgDocs = [];
+    for (let i = 0; i <= this.font.glyphs.length; ++i) {
+      const g = this.font.glyphs[i];
+      const svg = g?.data?.svg;
+      if (!svg) {
+        continue;
+      }
+      const prev = svgDocs[svgDocs.length - 1];
+      if (prev?.doc === svg.document && prev?.end === i - 1) {
+        prev.end = i;
+      } else {
+        svgDocs.push({ doc: svg.document, start: i, end: i });
+      }
+    }
+
+    if (svgDocs.length) {
+      tableDefs.push({ tag: 'SVG ', buf: makeBuf((buf) => {
+        // https://learn.microsoft.com/en-us/typography/opentype/spec/svg
+        buf.uint16BE(0); // version
+        buf.uint32BE(10); // svg documents index location (i.e. header size)
+        buf.uint32BE(0); // reserved
+
+        const dataBuf = new ByteArrayBuilder();
+
+        // TODO: it is actually possible to reference the same document for multiple ranges,
+        // so non-contiguous glyph ID ranges can reference a single document
+        // (current code will duplicate the document for each range)
+
+        const offset0 = 2 + svgDocs.length * 12;
+        buf.uint16BE(svgDocs.length); // number of documents
+        for (const { doc, start, end } of svgDocs) {
+          let svgDocument = typeof doc === 'string' ? doc : `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs>${(doc.defs ?? []).join('')}</defs>${doc.parts.join('')}</svg>`;
+          for (let i = start; i <= end; ++i) {
+            const oldID = this.font.glyphs[i].data.svg?.id ?? err();
+            const newID = `glyph${i}`;
+            const r = svgDocument.replace(`id="${oldID}"`, `id="${newID}"`);
+            if (r === svgDocument) {
+              throw new Error(`glyph ID ${oldID} not in SVG document`);
+            }
+            svgDocument = r;
+          }
+          const offset = dataBuf.byteLength;
+          dataBuf.utf8(svgDocument.trim());
+          buf.uint16BE(start); // start glyph ID
+          buf.uint16BE(end); // end glyph ID
+          buf.uint32BE(offset0 + offset); // offset
+          buf.uint32BE(dataBuf.byteLength - offset); // length (bytes)
+        }
+        buf.append(dataBuf);
+      }) });
+    }
 
     const buf = new ByteArrayBuilder();
 
-    const tables = normaliseTables([head, name, os2, hhea, hmtx, maxp, post, cmap, cff]);
+    const tables = normaliseTables(tableDefs);
     writeTableDirectory(buf, tag('OTTO'), tables);
 
     for (const table of tables) {
@@ -590,6 +669,11 @@ export class OpenTypeFont {
     return buf;
   }
 }
+
+/**
+ * @type {<T>(x: T | null) => x is T}
+ */
+const notNull = (x) => x !== null;
 
 /**
  * @param {string=} msg

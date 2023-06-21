@@ -16,7 +16,6 @@
  *   | 'rrcurveto'
  *   | 'callsubr'
  *   | 'return'
- *   | 'endchar'
  *   | 'vsindex'
  *   | 'blend'
  *   | 'hstemhm'
@@ -71,39 +70,20 @@
  *   advanceWidth: number;
  *   bounds: Bounds;
  *   instructions: Instruction[];
- * }} GlyphData
+ * }} CFFGlyphData
  */
 
-export class Glyph {
+export class CFFGlyph {
   /**
    * @param {number | string} char
    * @param {string} name
-   * @param {GlyphData} data
+   * @param {CFFGlyphData} data
    */
   constructor(char, name, data) {
     /** @type {number} */ this.charCode = (typeof char === 'number' ? char : char.charCodeAt(0));
     /** @type {string} */ this.name = name;
 
-    /** @type {number} */ this.advanceWidth;
-    /** @type {Bounds} */ this.bounds;
-    /** @type {Instruction[]} */ this.instructions;
-
-    // internal value used by font formats
-    /** @type {number | undefined} */ this.index;
-    this.replace(data);
-  }
-
-  /**
-   * @param {GlyphData} data
-   */
-  replace({ advanceWidth, bounds, instructions }) {
-    this.advanceWidth = advanceWidth;
-    this.bounds = bounds;
-    this.instructions = instructions;
-  }
-
-  isEmpty() {
-    return !this.instructions.length;
+    /** @type {CFFGlyphData} */ this.data = data;
   }
 }
 
