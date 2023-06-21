@@ -126,22 +126,23 @@ function makeSVGPixelsGrid(dx, dy, ranges) {
 }
 
 /** @type {CharactersSVGDocument} */ const svgDocument = {
+  // For now these have hard-coded fill=red, as Safari otherwise always uses black (firefox correctly uses current text colour as the default)
   defs: [
-    `<g id="s00" opacity="0.5"><path d="${makeSVGPixelsGrid(2, 0, [[3, -22, 4], [4, -21, 3], [5, -20, 2]])}" /></g>`,
-    `<g id="s10" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[1, -21, 5], [2, -20, 4], [3, -19, 3]])}" /></g>`,
-    `<g id="s20" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[11, -21, 5], [10, -20, 4], [9, -19, 3]])}" /></g>`,
-    `<g id="s30" opacity="0.5"><path d="${makeSVGPixelsGrid(2, 0, [[3, -12, 4], [4, -11, 3], [4, -13, 3]])}" /></g>`,
-    `<g id="s40" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[1, -11, 5], [2, -10, 4], [3, -9, 3]])}" /></g>`,
-    `<g id="s50" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[11, -11, 5], [10, -10, 4], [9, -9, 3]])}" /></g>`,
-    `<g id="s60" opacity="0.5"><path d="${makeSVGPixelsGrid(2, 0, [[3, -2, 4], [4, -3, 3], [5, -4, 2]])}" /></g>`,
+    `<g id="s00" opacity="0.5"><path d="${makeSVGPixelsGrid(2, 0, [[3, -22, 4], [4, -21, 3], [5, -20, 2]])}" fill="red" /></g>`,
+    `<g id="s10" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[1, -21, 5], [2, -20, 4], [3, -19, 3]])}" fill="red" /></g>`,
+    `<g id="s20" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[11, -21, 5], [10, -20, 4], [9, -19, 3]])}" fill="red" /></g>`,
+    `<g id="s30" opacity="0.5"><path d="${makeSVGPixelsGrid(2, 0, [[3, -12, 4], [4, -11, 3], [4, -13, 3]])}" fill="red" /></g>`,
+    `<g id="s40" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[1, -11, 5], [2, -10, 4], [3, -9, 3]])}" fill="red" /></g>`,
+    `<g id="s50" opacity="0.5"><path d="${makeSVGPixelsGrid(0, 2, [[11, -11, 5], [10, -10, 4], [9, -9, 3]])}" fill="red" /></g>`,
+    `<g id="s60" opacity="0.5"><path d="${makeSVGPixelsGrid(2, 0, [[3, -2, 4], [4, -3, 3], [5, -4, 2]])}" fill="red" /></g>`,
 
-    `<g id="s01"><path d="${makeSVGPath(T)}" /></g>`,
-    `<g id="s11"><path d="${makeSVGPath(TL)}" /></g>`,
-    `<g id="s21"><path d="${makeSVGPath(TR)}" /></g>`,
-    `<g id="s31"><path d="${makeSVGPath(M)}" /></g>`,
-    `<g id="s41"><path d="${makeSVGPath(BL)}" /></g>`,
-    `<g id="s51"><path d="${makeSVGPath(BR)}" /></g>`,
-    `<g id="s61"><path d="${makeSVGPath(B)}" /></g>`,
+    `<g id="s01"><path d="${makeSVGPath(T)}" fill="red" /></g>`,
+    `<g id="s11"><path d="${makeSVGPath(TL)}" fill="red" /></g>`,
+    `<g id="s21"><path d="${makeSVGPath(TR)}" fill="red" /></g>`,
+    `<g id="s31"><path d="${makeSVGPath(M)}" fill="red" /></g>`,
+    `<g id="s41"><path d="${makeSVGPath(BL)}" fill="red" /></g>`,
+    `<g id="s51"><path d="${makeSVGPath(BR)}" fill="red" /></g>`,
+    `<g id="s61"><path d="${makeSVGPath(B)}" fill="red" /></g>`,
   ],
   parts: [],
 };
