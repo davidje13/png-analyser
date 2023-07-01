@@ -453,6 +453,7 @@ export class OpenTypeFont {
         buf.uint16BE(1); // us max context
       }
       if (version >= 5) {
+        // superseded by STAT table
         buf.uint16BE(0); // us lower optical point size
         buf.uint16BE(0xFFFF); // us upper optical point size
       }
