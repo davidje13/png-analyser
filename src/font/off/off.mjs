@@ -1,4 +1,5 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
+import { writePNG32 } from '../../image/png/png-write.mjs';
 import { CFF } from '../cff/cff.mjs';
 import { UniqueStrings } from '../unique_strings.mjs';
 
@@ -6,6 +7,8 @@ import { UniqueStrings } from '../unique_strings.mjs';
  * @typedef {import('../font.mjs').Font} Font
  * @typedef {import('./off_glyph.mjs').OFFGlyph} OFFGlyph
  * @typedef {import('./off_glyph.mjs').CharactersSVGDocument} CharactersSVGDocument
+ * @typedef {import('./off_glyph.mjs').Raster} Raster
+ * @typedef {import('./off_glyph.mjs').SbixRaster} SbixRaster
  *
  * @typedef {{
  *   tag: string;
@@ -16,6 +19,9 @@ import { UniqueStrings } from '../unique_strings.mjs';
  * }} Table
  *
  * @typedef {Pick<Table, 'tag' | 'buf'>} TableDef
+ *
+ * @typedef {{ glyph: OFFGlyph; raster: Raster }[]} Strike
+ * @typedef {{ glyph: OFFGlyph; raster: SbixRaster }[]} SbixStrike
  */
 
 const TABLE_DIRECTORY_HEADER_LENGTH = 12;
@@ -590,6 +596,7 @@ export class OpenTypeFont {
 
     const cff2 = false;
 
+    // TODO: support bitmap-only font by not writing these tables
     if (cff2) {
       tableDefs.push({ tag: 'CFF2', buf: new CFF([this.font]).writeCFF2() });
     } else {
@@ -648,6 +655,137 @@ export class OpenTypeFont {
       }) });
     }
 
+    /** @type {Strike[]} */ const strikes = [];
+    for (const glyph of this.font.glyphs) {
+      for (const raster of glyph.data.bitmaps ?? []) {
+        let strike = strikes.find((s) => {
+          const cmp = s[0].raster;
+          return cmp.emPixels === raster.emPixels && cmp.bitsPerPixel === raster.bitsPerPixel;
+        });
+        if (!strike) {
+          strike = [];
+          strikes.push(strike);
+        }
+        // font.glyphs is already sorted by index, so these entries are pre-sorted
+        strike.push({ glyph, raster });
+      }
+    }
+
+    /** @type {SbixStrike[]} */ const sbixStrikes = [];
+    for (const glyph of this.font.glyphs) {
+      for (const raster of glyph.data.sbixBitmaps ?? []) {
+        let strike = sbixStrikes.find((s) => {
+          const cmp = s[0].raster;
+          return cmp.emPixels === raster.emPixels && (cmp.pixelsPerInch ?? 72) === (raster.pixelsPerInch ?? 72);
+        });
+        if (!strike) {
+          strike = [];
+          sbixStrikes.push(strike);
+        }
+        // font.glyphs is already sorted by index, so these entries are pre-sorted
+        strike.push({ glyph, raster });
+      }
+    }
+
+    const greyStrikes = strikes.filter((s) => s[0].raster.bitsPerPixel !== 32);
+    const rgbaStrikes = strikes.filter((s) => s[0].raster.bitsPerPixel === 32 || s[0].raster.forceColour);
+
+    if (greyStrikes.length) {
+      const { locationBuf, dataBuf } = makeBitmapTables(greyStrikes, 2);
+      tableDefs.push({ tag: 'EBLC', buf: locationBuf });
+      tableDefs.push({ tag: 'EBDT', buf: dataBuf });
+    }
+
+    if (rgbaStrikes.length) {
+      const { locationBuf, dataBuf } = makeBitmapTables(strikes, 3);
+      tableDefs.push({ tag: 'CBLC', buf: locationBuf });
+      tableDefs.push({ tag: 'CBDT', buf: dataBuf });
+    }
+
+    if (sbixStrikes.length) {
+      tableDefs.push({ tag: 'sbix', buf: makeBuf((buf) => {
+        buf.uint16BE(1); // version
+        buf.uint16BE(0b0000000000000001); // flags
+        buf.uint32BE(sbixStrikes.length); // strike count
+        writeIndexedData(
+          buf,
+          sbixStrikes,
+          4,
+          (dataBuf, strike) => {
+            dataBuf.uint16BE(strike[0].raster.emPixels);
+            dataBuf.uint16BE(strike[0].raster.pixelsPerInch ?? 72);
+            writeIndexedData(
+              dataBuf,
+              [...this.font.glyphs, null],
+              4,
+              (glyphBuf, glyph) => {
+                const data = strike.find((s) => s.glyph === glyph);
+                if (!data) {
+                  return; // glyph not defined for this strike
+                }
+                // these positions are somehow relative to the bottom left extent of the RENDERED glyph,
+                // causing the position to look somewhat random. The image is also clipped within the bounds
+                // of the rendered glyph in Chrome, so we cannot correct for the behaviour even with careful
+                // choice of x and y offset here. To improve consistency, we render a bounding box around the
+                // glyph if we have sbix data (on the assumption that all viewers will support at least one
+                // of the other rendering methods)
+                if (!data.glyph.cff.data.renderBounds) {
+                  throw new Error('sbix data for glyph without renderBounds - positioning will probably be random');
+                }
+                glyphBuf.int16BE(0); // x offset
+                glyphBuf.int16BE(0); // y offset
+                glyphBuf.uint32BE(tag('png '));
+                glyphBuf.append(writePNG32(data.raster.bitmap));
+              },
+              (indexBuf, _, meta) => indexBuf.uint32BE(meta.data.indexOffset + 4),
+            );
+          },
+          (indexBuf, _, meta) => indexBuf.uint32BE(meta.data.absoluteOffset),
+        );
+      }) });
+    }
+
+    //if (scaledStrikes.length) {
+    //  tableDefs.push({ tag: 'EBSC', buf: makeBuf((buf) => {
+    //    buf.uint16BE(2); // major version
+    //    buf.uint16BE(0); // minor version
+    //    buf.uint32BE(scaledStrikes.length); // number of sizes
+
+    //    for (const strike of scaledStrikes) {
+    //      buf.int8(); // h ascender
+    //      buf.int8(); // h descender
+    //      buf.uint8(); // h max width
+    //      buf.int8(); // h caret slope numerator
+    //      buf.int8(); // h caret slope denominator
+    //      buf.int8(); // h caret offset
+    //      buf.int8(); // h min origin sb
+    //      buf.int8(); // h min advance sb
+    //      buf.int8(); // h max before bl
+    //      buf.int8(); // h min after bl
+    //      buf.int8(0); // h pad 1
+    //      buf.int8(0); // h pad 2
+
+    //      buf.int8(); // v ascender
+    //      buf.int8(); // v descender
+    //      buf.uint8(); // v max width
+    //      buf.int8(); // v caret slope numerator
+    //      buf.int8(); // v caret slope denominator
+    //      buf.int8(); // v caret offset
+    //      buf.int8(); // v min origin sb
+    //      buf.int8(); // v min advance sb
+    //      buf.int8(); // v max before bl
+    //      buf.int8(); // v min after bl
+    //      buf.int8(0); // v pad 1
+    //      buf.int8(0); // v pad 2
+
+    //      buf.uint8(strike.em); // pixels per em x
+    //      buf.uint8(strike.em); // pixels per em y
+    //      buf.uint8(); // substitute pixels per em x
+    //      buf.uint8(); // substitute pixels per em y
+    //    }
+    //  }) });
+    //}
+
     const buf = new ByteArrayBuilder();
 
     const tables = normaliseTables(tableDefs);
@@ -672,9 +810,249 @@ export class OpenTypeFont {
 }
 
 /**
+ * @param {Strike[]} strikes
+ * @param {number} version
+ */
+function makeBitmapTables(strikes, version) {
+  const dataBuf = new ByteArrayBuilder();
+  dataBuf.uint16BE(version); // major version
+  dataBuf.uint16BE(0); // minor version
+
+  const locationBuf = new ByteArrayBuilder();
+  locationBuf.uint16BE(version); // major version
+  locationBuf.uint16BE(0); // minor version
+  locationBuf.uint32BE(strikes.length); // number of sizes
+
+  // TODO: there is an issue with bounding boxes with these raster images:
+  // Chrome uses a bounding box which imagines the raster's bottom edge matches the baseline.
+  // The metrics listed here do not seem to help, so presumably there is another table of metrics which must be provided.
+
+  writeIndexedData(
+    locationBuf,
+    strikes,
+    48,
+    (strikeDataBuf, strike) => {
+      // TODO: pick subranges more intelligently for compression
+      const subtables = divide(strike, (a, b) => b.glyph.index === (a.glyph.index ?? err()) + 1);
+      const { indexByteLength } = writeIndexedData(
+        strikeDataBuf,
+        subtables,
+        8,
+        (entryDataBuf, subtable) => {
+          const start = dataBuf.byteLength;
+
+          const indexFormat = 1; // TODO: pick index format more intelligently for compression
+          const imageFormat = 6; // TODO: pick image format more intelligently for compression
+          entryDataBuf.uint16BE(indexFormat); // index format
+          entryDataBuf.uint16BE(imageFormat); // image format
+          entryDataBuf.uint32BE(start); // image data offset in **DT
+          // index format 1:
+          for (const { raster } of subtable) {
+            entryDataBuf.uint32BE(dataBuf.byteLength - start);
+
+            const h = raster.bitmap.length;
+            const w = raster.bitmap[0].length;
+
+            dataBuf.uint8(h); // height
+            dataBuf.uint8(w); // width
+            dataBuf.int8(raster.horizontalMetrics.tlOrigin.x); // horizontal bearing X
+            dataBuf.int8(raster.horizontalMetrics.tlOrigin.y); // horizontal bearing Y
+            dataBuf.uint8(raster.horizontalMetrics.advance); // horizontal advance
+            dataBuf.int8(raster.verticalMetrics?.tlOrigin?.x ?? 0); // vertical bearing X
+            dataBuf.int8(raster.verticalMetrics?.tlOrigin?.y ?? 0); // vertical bearing Y
+            dataBuf.uint8(raster.verticalMetrics?.advance ?? 0); // vertical advance
+
+            if (raster.bitsPerPixel === 8) {
+              for (let y = 0; y < h; ++y) {
+                for (let x = 0; x < w; ++x) {
+                  dataBuf.uint8(raster.bitmap[y][x]);
+                }
+              }
+            } else if (raster.bitsPerPixel === 32) {
+              for (let y = 0; y < h; ++y) {
+                for (let x = 0; x < w; ++x) {
+                  const c = raster.bitmap[y][x]; // expects pre-multiplied
+                  // RGBA -> BGRA
+                  dataBuf.uint8((c >>> 8) & 0xFF);
+                  dataBuf.uint8((c >>> 16) & 0xFF);
+                  dataBuf.uint8((c >>> 24) & 0xFF);
+                  dataBuf.uint8(c & 0xFF);
+                }
+              }
+            } else {
+              throw new Error('unsupported bit depth');
+            }
+          }
+          // offset padding
+          entryDataBuf.uint32BE(dataBuf.byteLength - start);
+          entryDataBuf.uint32BE(0);
+        },
+        (indexBuf, subtable, meta) => {
+          const startIndex = subtable[0].glyph.index ?? err();
+          const endIndex = subtable[subtable.length - 1].glyph.index ?? err();
+          indexBuf.uint16BE(startIndex); // start glyph index
+          indexBuf.uint16BE(endIndex); // end glyph index
+          indexBuf.uint32BE(meta.data.indexOffset);
+        },
+      );
+      return { subtables, indexByteLength };
+    },
+    (indexBuf, strike, meta) => {
+      indexBuf.uint32BE(meta.data.absoluteOffset);
+      indexBuf.uint32BE(meta.data.byteLength);
+      indexBuf.uint32BE(meta.dataResult.subtables.length);
+      indexBuf.uint32BE(0); // color ref (unused / reserved)
+
+      // TODO: check if calculation for these values is correct
+      indexBuf.int8(Math.max(...strike.map((e) => e.raster.horizontalMetrics.tlOrigin.y))); // h ascender
+      indexBuf.int8(Math.min(...strike.map((e) => e.raster.horizontalMetrics.tlOrigin.y - e.raster.bitmap.length))); // h descender
+      indexBuf.uint8(Math.max(...strike.map((e) => e.raster.bitmap[0].length))); // h max width
+      indexBuf.int8(0); // h caret slope numerator
+      indexBuf.int8(1); // h caret slope denominator
+      indexBuf.int8(0); // h caret offset
+      indexBuf.int8(Math.min(...strike.map((e) => e.raster.horizontalMetrics.tlOrigin.x))); // h min origin sb
+      indexBuf.int8(Math.min(...strike.map((e) => e.raster.horizontalMetrics.advance - e.raster.bitmap[0].length - e.raster.horizontalMetrics.tlOrigin.x))); // h min advance sb
+      indexBuf.int8(Math.max(...strike.map((e) => e.raster.horizontalMetrics.tlOrigin.y - e.raster.bitmap.length))); // h max before bl
+      indexBuf.int8(Math.min(...strike.map((e) => e.raster.horizontalMetrics.tlOrigin.y))); // h min after bl
+      indexBuf.int8(0); // h pad 1
+      indexBuf.int8(0); // h pad 2
+
+      indexBuf.int8(0); // v ascender
+      indexBuf.int8(0); // v descender
+      indexBuf.uint8(0); // v max width
+      indexBuf.int8(0); // v caret slope numerator
+      indexBuf.int8(0); // v caret slope denominator
+      indexBuf.int8(0); // v caret offset
+      indexBuf.int8(0); // v min origin sb
+      indexBuf.int8(0); // v min advance sb
+      indexBuf.int8(0); // v max before bl
+      indexBuf.int8(0); // v min after bl
+      indexBuf.int8(0); // v pad 1
+      indexBuf.int8(0); // v pad 2
+
+      indexBuf.uint16BE(strike[0].glyph.index ?? err()); // start glyph index
+      indexBuf.uint16BE(strike[strike.length - 1].glyph.index ?? err()); // end glyph index
+
+      indexBuf.uint8(strike[0].raster.emPixels); // pixels per em x
+      indexBuf.uint8(strike[0].raster.emPixels); // pixels per em y
+      indexBuf.uint8(strike[0].raster.bitsPerPixel); // bit depth (1 / 2 / 4 / 8) / 32 for CB** tables
+      indexBuf.uint8(0b00000001); // flags (0b00000001 = horizontal metrics, 0b00000010 = vertical) (unused since we are currently using bigmetrics for all characters)
+    },
+  );
+
+  return { locationBuf, dataBuf };
+}
+
+/**
  * @type {<T>(x: T | null) => x is T}
  */
 const notNull = (x) => x !== null;
+
+/**
+ * @template {unknown} T
+ * @param {T[]} list
+ * @param {(prev: T, next: T) => boolean} continuationFn
+ * @return {T[][]}
+ */
+function divide(list, continuationFn) {
+  /** @type {T[][]} */ const result = [];
+  /** @type {T[]} */ let cur = [];
+  for (let i = 0; i < list.length; ++i) {
+    if (!i || !continuationFn(list[i - 1], list[i])) {
+      cur = [];
+      result.push(cur);
+    }
+    cur.push(list[i]);
+  }
+  return result;
+}
+
+/**
+ * @template {unknown} T
+ * @template {unknown} V
+ * @param {ByteArrayBuilder} target
+ * @param {T[]} entries
+ * @param {number} indexEntrySize
+ * @param {(
+ *   target: ByteArrayBuilder,
+ *   entry: T,
+ *   meta: {
+ *     i: number;
+ *     data: {
+ *       dataOffset: number;
+ *       indexOffset: number;
+ *       absoluteOffset: number;
+ *     };
+ *     index: {
+ *       indexOffset: number;
+ *       absoluteOffset: number;
+ *     };
+ *   },
+ * ) => V} dataFn
+ * @param {(
+ *   target: ByteArrayBuilder,
+ *   entry: T,
+ *   meta: {
+ *     i: number;
+ *     data: {
+ *       dataOffset: number;
+ *       indexOffset: number;
+ *       absoluteOffset: number;
+ *       byteLength: number;
+ *     };
+ *     index: {
+ *       indexOffset: number;
+ *       absoluteOffset: number;
+ *     };
+ *     dataResult: V;
+ *   },
+ * ) => void} indexFn
+ */
+function writeIndexedData(target, entries, indexEntrySize, dataFn, indexFn) {
+  const offset0 = target.byteLength;
+  const indexByteLength = entries.length * indexEntrySize;
+  const dataBuf = new ByteArrayBuilder();
+  for (let i = 0; i < entries.length; ++i) {
+    const entry = entries[i];
+    const dataStart = dataBuf.byteLength;
+    const dataResult = dataFn(dataBuf, entry, {
+      i,
+      data: {
+        dataOffset: dataStart,
+        indexOffset: indexByteLength + dataStart,
+        absoluteOffset: offset0 + indexByteLength + dataStart,
+      },
+      index: {
+        indexOffset: target.byteLength - offset0,
+        absoluteOffset: target.byteLength,
+      },
+    });
+    const dataEnd = dataBuf.byteLength;
+    indexFn(target, entry, {
+      i,
+      data: {
+        dataOffset: dataStart,
+        indexOffset: indexByteLength + dataStart,
+        absoluteOffset: offset0 + indexByteLength + dataStart,
+        byteLength: dataEnd - dataStart,
+      },
+      index: {
+        indexOffset: target.byteLength - offset0,
+        absoluteOffset: target.byteLength,
+      },
+      dataResult,
+    });
+  }
+  if (target.byteLength !== offset0 + indexByteLength) {
+    throw new Error('index size mismatch');
+  }
+  target.append(dataBuf);
+
+  return {
+    indexByteLength,
+    dataByteLength: dataBuf.byteLength,
+  };
+}
 
 /**
  * @param {string=} msg

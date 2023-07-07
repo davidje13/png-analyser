@@ -9,8 +9,31 @@ import { CFFGlyph } from '../cff/cff_glyph.mjs';
  * }} CharactersSVGDocument
  *
  * @typedef {{
+ *   emPixels: number;
+ *   bitsPerPixel: 1 | 2 | 4 | 8 | 32;
+ *   forceColour?: boolean; // duplicate 1/2/3/8 bpp rasters into CB** tables to force their use (scaled) over vectors
+ *   horizontalMetrics: {
+ *     tlOrigin: { x: number; y: number }; // right/up relative to (0,baseline)
+ *     advance: number;
+ *   };
+ *   verticalMetrics?: {
+ *     tlOrigin: { x: number; y: number }; // left/down relative to (middle,top)
+ *     advance: number;
+ *   };
+ *   bitmap: number[][];
+ * }} Raster
+ *
+ * @typedef {{
+ *   emPixels: number;
+ *   pixelsPerInch?: number; // bitmap will be scaled if this is not 72
+ *   bitmap: number[][];
+ * }} SbixRaster
+ *
+ * @typedef {{
  *   leftSideBearing?: number | undefined;
  *   cff: CFFGlyphData;
+ *   bitmaps?: Raster[];
+ *   sbixBitmaps?: SbixRaster[];
  *   svg?: { document: string | CharactersSVGDocument; id: string };
  * }} OFFGlyphData
  */

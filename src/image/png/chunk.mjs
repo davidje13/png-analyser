@@ -1,6 +1,6 @@
 import { CRC } from '../../data/crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
-import { asBytes, asDataView, subViewLen } from '../../data/utils.mjs';
+import { asBytes, asDataView, subView, subViewLen } from '../../data/utils.mjs';
 import { debugWrite, printNice } from '../../display/pretty.mjs';
 import './chunks/index.mjs';
 
@@ -13,6 +13,7 @@ import './chunks/index.mjs';
 /**
  * @typedef {import('./chunks/registry.mjs').Chunk} Chunk
  * @typedef {import('./chunks/registry.mjs').State} State
+ * @typedef {import('../../data/builder.mjs').ByteArrayBuilder} ByteArrayBuilder
  */
 
 /**
@@ -68,6 +69,19 @@ export function readChunk(data, pos, warnings) {
       }
     },
   };
+}
+
+/**
+ * @param {ByteArrayBuilder} buf
+ * @param {string} type
+ * @param {ByteArrayBuilder | ArrayBufferView} data
+ */
+export function writeChunk(buf, type, data) {
+  buf.uint32BE(data.byteLength);
+  const crcBegin = buf.byteLength;
+  buf.uint32BE(char32(type));
+  buf.append(data);
+  buf.uint32BE(new CRC().update(subView(buf.toBytes(), crcBegin)).get());
 }
 
 /**
@@ -176,3 +190,9 @@ const printType = (type) => {
   }
   return n;
 };
+
+/**
+ * @param {string} name
+ * @return {number}
+ */
+const char32 = (name) => (name.charCodeAt(0) << 24) | (name.charCodeAt(1) << 16) | (name.charCodeAt(2) << 8) | name.charCodeAt(3);

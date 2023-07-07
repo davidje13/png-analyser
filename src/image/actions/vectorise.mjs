@@ -3,7 +3,7 @@
  */
 
 /**
- * @param {boolean[][]} image
+ * @param {unknown[][]} image
  * @return {Point[][]}
  */
 export function vectorisePixelated(image) {

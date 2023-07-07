@@ -6,7 +6,7 @@ import { Font } from './font.mjs';
 import { OpenTypeFont } from './off/off.mjs';
 import { bytesToStream } from '../data/node/stream.mjs';
 import { vectorisePixelated } from '../image/actions/vectorise.mjs';
-import { bitmapOr, extractValue, toSVGPath, toType2Instructions, translate, scale } from './generation.mjs';
+import { bitmapOr, extractValue, toSVGPath, toType2Instructions, translate, scale, upscaleBitmap } from './generation.mjs';
 
 /**
  * @typedef {import('./off/off_glyph.mjs').OFFGlyphData} OFFGlyphData
@@ -58,13 +58,6 @@ const SEGMENTATION = `
 const baseline = 21;
 const advanceWidth = 13;
 
-const bounds = {
-  xmin: 0,
-  ymin: baseline - SEGMENTATION.length,
-  xmax: SEGMENTATION[0].length,
-  ymax: baseline,
-};
-
 /**
  * @template {unknown} T
  * @param {T[][]} bitmap
@@ -72,8 +65,8 @@ const bounds = {
  * @param {T} vOff
  */
 function extractSegment(bitmap, vOn, vOff) {
-  const bitmapOff = extractValue(bitmap, vOff);
-  const bitmapOn = bitmapOr(extractValue(bitmap, vOn), bitmapOff);
+  const bitmapOff = extractValue(bitmap, vOff, 128, 0);
+  const bitmapOn = bitmapOr(extractValue(bitmap, vOn, 255, 0), extractValue(bitmap, vOff, 255, 0));
   return {
     bitmapOn,
     bitmapOff,
@@ -101,18 +94,40 @@ function make7Seg(...segments) {
   const svgID = `g${svgDocument.parts.length}`;
   const svgSegs = segments.map((en, i) => `<use xlink:href="#s${i}${en ? '1' : '0'}"/>`);
   svgDocument.parts.push(`<g id="${svgID}">${svgSegs.join('')}</g>`);
+
+  const outline = SEGMENTS.flatMap((seg, i) => segments[i] ? seg.vectorOn : []);
+  const bitmap = SEGMENTS.map((seg, i) => segments[i] ? seg.bitmapOn : seg.bitmapOff).reduce(bitmapOr);
+  const rgbaBitmap = bitmap.map((ln) => ln.map((v) => (v * 0x00000001) | 0xFF000000));
+
   return {
     cff: {
       advanceWidth,
-      bounds,
-      instructions: toType2Instructions(SEGMENTS
-        .filter((_, i) => segments[i])
-        .flatMap((seg) => seg.vectorOn)
-        .map(scale(1, -1))
-      ),
+      bounds: {
+        xmin: 0,
+        ymin: baseline - SEGMENTATION.length,
+        xmax: SEGMENTATION[0].length,
+        ymax: baseline,
+      },
+      renderBounds: true,
+      instructions: toType2Instructions(outline.map(scale(1, -1))),
     },
-    //bitmap: {
-    //},
+    //bitmaps: [
+    //  {
+    //    emPixels: bitmap.length,
+    //    bitsPerPixel: 8,
+    //    forceColour: true,
+    //    horizontalMetrics: {
+    //      tlOrigin: { x: 0, y: baseline },
+    //      advance: advanceWidth,
+    //    },
+    //    bitmap,
+    //  },
+    //],
+    sbixBitmaps: [1, 2, 3].map((bitmapScale) => ({
+      emPixels: bitmap.length,
+      pixelsPerInch: 72 * bitmapScale,
+      bitmap: upscaleBitmap(rgbaBitmap, bitmapScale),
+    })),
     // SVG fonts are not supported by Chrome, but are supported by Firefox
     svg: {
       document: svgDocument,
@@ -134,34 +149,34 @@ font.addGlyph('8', 'eight', make7Seg(1, 1, 1, 1, 1, 1, 1));
 font.addGlyph('9', 'nine',  make7Seg(1, 1, 1, 1, 0, 1, 1));
 
 font.addGlyph('-', 'minus',        make7Seg(0, 0, 0, 1, 0, 0, 0));
-font.addGlyph('_', 'underscore',   make7Seg(0, 0, 0, 0, 0, 0, 1));
+//font.addGlyph('_', 'underscore',   make7Seg(0, 0, 0, 0, 0, 0, 1));
 font.addGlyph(' ', 'space',        make7Seg(0, 0, 0, 0, 0, 0, 0));
-font.addGlyph('=', 'equal',        make7Seg(0, 0, 0, 1, 0, 0, 1));
-font.addGlyph('"', 'quotedbl',     make7Seg(0, 1, 1, 0, 0, 0, 0));
-font.addGlyph('\'', 'quotesingle', make7Seg(0, 0, 1, 0, 0, 0, 0));
+//font.addGlyph('=', 'equal',        make7Seg(0, 0, 0, 1, 0, 0, 1));
+//font.addGlyph('"', 'quotedbl',     make7Seg(0, 1, 1, 0, 0, 0, 0));
+//font.addGlyph('\'', 'quotesingle', make7Seg(0, 0, 1, 0, 0, 0, 0));
 
-font.addGlyph('A', 'A', make7Seg(1, 1, 1, 1, 1, 1, 0));
-font.addGlyph('b', 'b', make7Seg(0, 1, 0, 1, 1, 1, 1));
-font.addGlyph('c', 'c', make7Seg(0, 0, 0, 1, 1, 0, 1));
-font.addGlyph('C', 'C', make7Seg(1, 1, 0, 0, 1, 0, 1));
-font.addGlyph('d', 'd', make7Seg(0, 0, 1, 1, 1, 1, 1));
-font.addGlyph('e', 'e', make7Seg(1, 1, 1, 1, 1, 0, 1));
-font.addGlyph('E', 'E', make7Seg(1, 1, 0, 1, 1, 0, 1));
-font.addGlyph('F', 'F', make7Seg(1, 1, 0, 1, 1, 0, 0));
-font.addGlyph('G', 'G', make7Seg(1, 1, 0, 0, 1, 1, 1));
-font.addGlyph('h', 'h', make7Seg(0, 1, 0, 1, 1, 1, 0));
-font.addGlyph('H', 'H', make7Seg(0, 1, 1, 1, 1, 1, 0));
-font.addGlyph('i', 'i', make7Seg(0, 0, 0, 0, 0, 1, 0));
-font.addGlyph('J', 'J', make7Seg(0, 0, 1, 0, 0, 1, 1));
-font.addGlyph('L', 'L', make7Seg(0, 1, 0, 0, 1, 0, 1));
-font.addGlyph('n', 'n', make7Seg(0, 0, 0, 1, 1, 1, 0));
-font.addGlyph('o', 'o', make7Seg(0, 0, 0, 1, 1, 1, 1));
-font.addGlyph('P', 'P', make7Seg(1, 1, 1, 1, 1, 0, 0));
-font.addGlyph('q', 'q', make7Seg(1, 1, 1, 1, 0, 1, 0));
-font.addGlyph('r', 'r', make7Seg(0, 0, 0, 1, 1, 0, 0));
-font.addGlyph('t', 't', make7Seg(0, 1, 0, 1, 1, 0, 1));
-font.addGlyph('u', 'u', make7Seg(0, 0, 0, 0, 1, 1, 1));
-font.addGlyph('U', 'U', make7Seg(0, 1, 1, 0, 1, 1, 1));
-font.addGlyph('y', 'y', make7Seg(0, 1, 1, 1, 0, 1, 1));
+//font.addGlyph('A', 'A', make7Seg(1, 1, 1, 1, 1, 1, 0));
+//font.addGlyph('b', 'b', make7Seg(0, 1, 0, 1, 1, 1, 1));
+//font.addGlyph('c', 'c', make7Seg(0, 0, 0, 1, 1, 0, 1));
+//font.addGlyph('C', 'C', make7Seg(1, 1, 0, 0, 1, 0, 1));
+//font.addGlyph('d', 'd', make7Seg(0, 0, 1, 1, 1, 1, 1));
+//font.addGlyph('e', 'e', make7Seg(1, 1, 1, 1, 1, 0, 1));
+//font.addGlyph('E', 'E', make7Seg(1, 1, 0, 1, 1, 0, 1));
+//font.addGlyph('F', 'F', make7Seg(1, 1, 0, 1, 1, 0, 0));
+//font.addGlyph('G', 'G', make7Seg(1, 1, 0, 0, 1, 1, 1));
+//font.addGlyph('h', 'h', make7Seg(0, 1, 0, 1, 1, 1, 0));
+//font.addGlyph('H', 'H', make7Seg(0, 1, 1, 1, 1, 1, 0));
+//font.addGlyph('i', 'i', make7Seg(0, 0, 0, 0, 0, 1, 0));
+//font.addGlyph('J', 'J', make7Seg(0, 0, 1, 0, 0, 1, 1));
+//font.addGlyph('L', 'L', make7Seg(0, 1, 0, 0, 1, 0, 1));
+//font.addGlyph('n', 'n', make7Seg(0, 0, 0, 1, 1, 1, 0));
+//font.addGlyph('o', 'o', make7Seg(0, 0, 0, 1, 1, 1, 1));
+//font.addGlyph('P', 'P', make7Seg(1, 1, 1, 1, 1, 0, 0));
+//font.addGlyph('q', 'q', make7Seg(1, 1, 1, 1, 0, 1, 0));
+//font.addGlyph('r', 'r', make7Seg(0, 0, 0, 1, 1, 0, 0));
+//font.addGlyph('t', 't', make7Seg(0, 1, 0, 1, 1, 0, 1));
+//font.addGlyph('u', 'u', make7Seg(0, 0, 0, 0, 1, 1, 1));
+//font.addGlyph('U', 'U', make7Seg(0, 1, 1, 0, 1, 1, 1));
+//font.addGlyph('y', 'y', make7Seg(0, 1, 1, 1, 0, 1, 1));
 
 bytesToStream(new OpenTypeFont(font).writeOTF().toBytes()).pipe(process.stdout);

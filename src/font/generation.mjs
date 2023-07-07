@@ -4,19 +4,23 @@
  */
 
 /**
- * @template {unknown} T
- * @param {T[][]} bitmap
- * @param {T} value
- * @return {boolean[][]}
+ * @template {unknown} TIn
+ * @template {unknown} TOut
+ * @param {TIn[][]} bitmap
+ * @param {TIn} value
+ * @param {TOut} resultOn
+ * @param {TOut} resultOff
+ * @return {TOut[][]}
  */
-export function extractValue(bitmap, value) {
-  return bitmap.map((ln) => ln.map((v) => v === value));
+export function extractValue(bitmap, value, resultOn, resultOff) {
+  return bitmap.map((ln) => ln.map((v) => v === value ? resultOn : resultOff));
 }
 
 /**
- * @param {boolean[][]} bitmap1
- * @param {boolean[][]} bitmap2
- * @return {boolean[][]}
+ * @template {unknown} T
+ * @param {T[][]} bitmap1
+ * @param {T[][]} bitmap2
+ * @return {T[][]}
  */
 export function bitmapOr(bitmap1, bitmap2) {
   if (bitmap2.length !== bitmap1.length) {
@@ -29,6 +33,28 @@ export function bitmapOr(bitmap1, bitmap2) {
     throw new Error('size mismatch');
   }
   return bitmap1.map((ln, y) => ln.map((v, x) => v || bitmap2[y][x]));
+}
+
+/**
+ * @template {unknown} T
+ * @param {T[][]} bitmap
+ * @param {number} scale
+ * @return {T[][]}
+ */
+export function upscaleBitmap(bitmap, scale) {
+  /** @type {T[][]} */ const result = [];
+  for (const row of bitmap) {
+    /** @type {T[]} */ const resultRow = [];
+    for (const cell of row) {
+      for (let i = 0; i < scale; ++i) {
+        resultRow.push(cell);
+      }
+    }
+    for (let i = 0; i < scale; ++i) {
+      result.push(resultRow);
+    }
+  }
+  return result;
 }
 
 /**
@@ -116,7 +142,7 @@ export function toType2Instructions(loops) {
 
   /** @type {Instruction[]} */ const instructions = [];
   for (const rawLoop of loops) {
-    const loop = ensureDirection(rawLoop, false);
+    const loop = ensureDirection(rawLoop, false); // TODO: should probably enforce direction earlier, so that inner holes remain clockwise
 
     // this instruction doubles as closing the last loop, so don't omit it if the delta is 0
     instructions.push(['rmoveto', loop[0].x - pos.x, loop[0].y - pos.y]);

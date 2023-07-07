@@ -8,6 +8,7 @@ import { getCFFOp } from './cff_glyph.mjs';
 /**
  * @typedef {import('../font.mjs').Font} Font
  * @typedef {import('./cff_glyph.mjs').CFFGlyph} CFFGlyph
+ * @typedef {import('./cff_glyph.mjs').Instruction} Instruction
  */
 
 const OP_VERSION_STRING = { id: 0x00 };                  // SID
@@ -163,7 +164,7 @@ export class CFF {
         if (charw !== widthInfo.mode) {
           writeOperand(gbuf, opType2Number(charw - widthInfo.nominal));
         }
-        for (const [op, ...data] of glyph.cff.data.instructions) {
+        for (const [op, ...data] of getInstructions(glyph.cff)) {
           const operator = getCFFOp(op);
           if (!operator || operator.cff1 === false) {
             throw new Error(`Unknown CFF1 operator: ${op}`);
@@ -271,10 +272,10 @@ export class CFF {
     topDict.set(OP_CHAR_STRINGS_INDEX, opFixedInt(dataBuf.byteLength, baseOffset));
     writeIndex(dataBuf, 4, font.glyphs.map((glyph) => {
       const gbuf = new ByteArrayBuilder();
-      for (const [op, ...data] of glyph.cff.data.instructions) {
+      for (const [op, ...data] of getInstructions(glyph.cff)) {
         const operator = getCFFOp(op);
-        if (!operator || operator.cff1 === false) {
-          throw new Error(`Unknown CFF1 operator: ${op}`);
+        if (!operator || operator.cff2 === false) {
+          throw new Error(`Unknown CFF2 operator: ${op}`);
         }
         writeOperation(gbuf, operator, data.map(opType2Number));
       }
@@ -335,6 +336,26 @@ export class CFF {
 
     return buf;
   }
+}
+
+/**
+ * @param {CFFGlyph} cff
+ * @return {Instruction[]}
+ */
+function getInstructions(cff) {
+  if (cff.data.renderBounds) {
+    const { xmin, xmax, ymin, ymax } = cff.data.bounds;
+    const delta = 1e-5; // this is the smallest value which still seems to fix the sbix rendering bug
+    return [
+      ['rmoveto', xmin, ymin],
+      ['hlineto', delta, delta, -delta],
+      ['rmoveto', xmax - xmin, ymax - ymin - delta],
+      ['hlineto', -delta, -delta, delta],
+      ['rmoveto', -xmax, delta - ymax],
+      ...cff.data.instructions,
+    ];
+  }
+  return cff.data.instructions;
 }
 
 /**

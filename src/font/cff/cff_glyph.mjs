@@ -69,6 +69,7 @@
  * @typedef {{
  *   advanceWidth: number;
  *   bounds: Bounds;
+ *   renderBounds?: boolean;
  *   instructions: Instruction[];
  * }} CFFGlyphData
  */
