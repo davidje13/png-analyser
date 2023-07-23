@@ -330,7 +330,8 @@ const mapRGBARow = () => (row) => {
  */
 function makeFilterTargets(size) {
   const filters = [];
-  for (let i = 0; i < 5; ++i) {
+  // currently excluding paeth, as it seems to be generally larger overall but the heuristics here don't spot that
+  for (let i = 0; i < 4; ++i) {
     filters[i] = new Uint8Array(1 + size);
     filters[i][0] = i;
   }
@@ -346,19 +347,19 @@ function makeFilterTargets(size) {
 function applyFilters(row, prevRow, leftShift, filtersOut) {
   for (let i = 0; i < row.length; ++i) {
     const above = prevRow[i];
-    const aboveLeft = prevRow[i - leftShift] ?? 0;
+    //const aboveLeft = prevRow[i - leftShift] ?? 0;
     const left = row[i - leftShift] ?? 0;
     const value = row[i];
-    const base = left + above - aboveLeft;
-    const dL = Math.abs(left - base);
-    const dA = Math.abs(above - base);
-    const dD = Math.abs(aboveLeft - base);
-    const paeth = (dL <= dA && dL <= dD) ? left : (dA <= dD) ? above : aboveLeft;
+    //const base = left + above - aboveLeft;
+    //const dL = Math.abs(left - base);
+    //const dA = Math.abs(above - base);
+    //const dD = Math.abs(aboveLeft - base);
+    //const paeth = (dL <= dA && dL <= dD) ? left : (dA <= dD) ? above : aboveLeft;
     filtersOut[0][i + 1] = value;
     filtersOut[1][i + 1] = (value - left) & 0xFF;
     filtersOut[2][i + 1] = (value - above) & 0xFF;
     filtersOut[3][i + 1] = (value - ((left + above) >>> 1)) & 0xFF;
-    filtersOut[4][i + 1] = (value - paeth) & 0xFF;
+    //filtersOut[4][i + 1] = (value - paeth) & 0xFF;
   }
 }
 
@@ -379,26 +380,35 @@ function pickFilters(rowBytes, leftShift, filters) {
     applyFilters(row, prevRow, leftShift, filters);
 
     /** @type {GraphNode[]} */ const curNodes = [];
-    for (let f = 0; f < 5; ++f) {
+    for (let f = 0; f < filters.length; ++f) {
       /** @type {Set<number>} */ const tokens = new Set();
       const filter = filters[f];
-      for (let i = 0; i < sz - 2; ++i) {
-        tokens.add((filter[i] << 16) | (filter[i + 1] << 8) | filter[i + 2]);
+      for (let i = 0; i < sz - 3; ++i) {
+        let tuple = filter[i] | (filter[i + 1] << 8) | (filter[i + 2] << 16);
+        tokens.add(tuple);
+        tuple |= filter[i + 3] << 24;
+        tokens.add(tuple);
       }
       let best = prevNodes[0];
       let bestCost = Number.POSITIVE_INFINITY;
       for (const prev of prevNodes) {
-        const mergedTokens = new Set(prev.tokens);
+        let n = prev.tokens.size;
         for (const v of tokens) {
-          mergedTokens.add(v);
+          if (!prev.tokens.has(v)) {
+            ++n;
+          }
         }
-        const cost = prev.cost + mergedTokens.size - prev.tokens.size;
+        const cost = prev.cost + n - prev.tokens.size * 0.4;
         if (cost < bestCost) {
           best = prev;
           bestCost = cost;
         }
       }
       curNodes.push({ prev: best, cost: bestCost, filter: f, tokens });
+    }
+    for (const prev of prevNodes) {
+      // remove old token values to reduce RAM usage
+      /** @type {any} */ (prev.tokens) = null;
     }
     prevNodes = curNodes;
     prevRow = row;
