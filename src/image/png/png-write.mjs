@@ -14,6 +14,13 @@ const VOID = new Uint8Array(0);
  *   plte?: ArrayBufferView | undefined;
  *   trns?: ArrayBufferView | undefined;
  * }} EncodingOption
+ *
+ * @typedef {{
+ *   prev: GraphNode | null;
+ *   cost: number;
+ *   filter: number;
+ *   tokens: Set<number>;
+ * }} GraphNode
  */
 
 /**
@@ -29,19 +36,20 @@ export function writePNG(image) {
   let bestCompressed;
   let bestSize = Number.POSITIVE_INFINITY;
   for (const option of options) {
+    const leftShift = option.filterStep;
+    const mapped = image.map(option.rowMapper);
+    const sz = mapped[0].length;
+    const filters = makeFilterTargets(sz);
+    const rowFilters = pickFilters(mapped, leftShift, filters);
+
     const idat = new ByteArrayBuilder();
-    // TODO: compression optimisation:
-    // - each row can be calculated independently, using all possible filters
-    // - compression is likely to be better if there are fewer unique symbols across the file
-    // - deflate uses a 3-byte lookup table to find previous matches - we can do the same to minimise differences
-    // - for each filter type for each row, compute the 3-byte lookup table
-    // - for each sequential pair of rows, calculate the combined (unioned) 3-byte lookup table size (number of distinct entries)
-    // - create a graph linking each filter type of a row with each filter type of the row below, using the value above as the cost of the vertex
-    // - add a start and end node with links of cost 0 to all possible filter values of the start/end row
-    // - find the least-cost path from top to bottom. Use these filter values for the rows.
-    for (const row of image.map(option.rowMapper)) {
-      idat.uint8(0); // row filter type
-      idat.append(row);
+    let prev = new Uint8Array(sz);
+    for (let r = 0; r < mapped.length; ++r) {
+      const row = mapped[r];
+      const rowFilterType = rowFilters[r];
+      applyFilters(row, prev, leftShift, filters);
+      idat.append(filters[rowFilterType]);
+      prev = row;
     }
     const compressed = deflateSync(idat.toBytes(), { level: 9 }); // method=8, window size <= 32kB, no dictionary
     const size = (
@@ -316,3 +324,97 @@ const mapRGBARow = () => (row) => {
   }
   return b;
 };
+
+/**
+ * @param {number} size
+ */
+function makeFilterTargets(size) {
+  const filters = [];
+  for (let i = 0; i < 5; ++i) {
+    filters[i] = new Uint8Array(1 + size);
+    filters[i][0] = i;
+  }
+  return filters;
+}
+
+/**
+ * @param {Uint8Array} row
+ * @param {Uint8Array} prevRow
+ * @param {number} leftShift
+ * @param {Uint8Array[]} filtersOut
+ */
+function applyFilters(row, prevRow, leftShift, filtersOut) {
+  for (let i = 0; i < row.length; ++i) {
+    const above = prevRow[i];
+    const aboveLeft = prevRow[i - leftShift] ?? 0;
+    const left = row[i - leftShift] ?? 0;
+    const value = row[i];
+    const base = left + above - aboveLeft;
+    const dL = Math.abs(left - base);
+    const dA = Math.abs(above - base);
+    const dD = Math.abs(aboveLeft - base);
+    const paeth = (dL <= dA && dL <= dD) ? left : (dA <= dD) ? above : aboveLeft;
+    filtersOut[0][i + 1] = value;
+    filtersOut[1][i + 1] = (value - left) & 0xFF;
+    filtersOut[2][i + 1] = (value - above) & 0xFF;
+    filtersOut[3][i + 1] = (value - ((left + above) >>> 1)) & 0xFF;
+    filtersOut[4][i + 1] = (value - paeth) & 0xFF;
+  }
+}
+
+/**
+ * @param {Uint8Array[]} rowBytes
+ * @param {number} leftShift
+ * @param {Uint8Array[]} filters
+ */
+function pickFilters(rowBytes, leftShift, filters) {
+  if (!rowBytes.length) {
+    return [];
+  }
+
+  const sz = rowBytes[0].length;
+  let prevRow = new Uint8Array(sz);
+  /** @type {GraphNode[]} */ let prevNodes = [{ prev: null, cost: 0, filter: 0, tokens: new Set() }];
+  for (const row of rowBytes) {
+    applyFilters(row, prevRow, leftShift, filters);
+
+    /** @type {GraphNode[]} */ const curNodes = [];
+    for (let f = 0; f < 5; ++f) {
+      /** @type {Set<number>} */ const tokens = new Set();
+      const filter = filters[f];
+      for (let i = 0; i < sz - 2; ++i) {
+        tokens.add((filter[i] << 16) | (filter[i + 1] << 8) | filter[i + 2]);
+      }
+      let best = prevNodes[0];
+      let bestCost = Number.POSITIVE_INFINITY;
+      for (const prev of prevNodes) {
+        const mergedTokens = new Set(prev.tokens);
+        for (const v of tokens) {
+          mergedTokens.add(v);
+        }
+        const cost = prev.cost + mergedTokens.size - prev.tokens.size;
+        if (cost < bestCost) {
+          best = prev;
+          bestCost = cost;
+        }
+      }
+      curNodes.push({ prev: best, cost: bestCost, filter: f, tokens });
+    }
+    prevNodes = curNodes;
+    prevRow = row;
+  }
+
+  let best = prevNodes[0];
+  for (const prev of prevNodes) {
+    if (prev.cost < best.cost) {
+      best = prev;
+    }
+  }
+  const filterChoices = [];
+  while (best.prev) {
+    filterChoices.push(best.filter);
+    best = best.prev;
+  }
+  filterChoices.reverse();
+  return filterChoices;
+}
