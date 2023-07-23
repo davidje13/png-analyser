@@ -1,5 +1,5 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
-import { writePNG32 } from '../../image/png/png-write.mjs';
+import { writePNG } from '../../image/png/png-write.mjs';
 import { CFF } from '../cff/cff.mjs';
 import { UniqueStrings } from '../unique_strings.mjs';
 
@@ -735,7 +735,7 @@ export class OpenTypeFont {
                 glyphBuf.int16BE(0); // x offset
                 glyphBuf.int16BE(0); // y offset
                 glyphBuf.uint32BE(tag('png '));
-                glyphBuf.append(writePNG32(data.raster.bitmap));
+                glyphBuf.append(writePNG(data.raster.bitmap));
               },
               (indexBuf, _, meta) => indexBuf.uint32BE(meta.data.indexOffset + 4),
             );

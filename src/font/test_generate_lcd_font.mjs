@@ -97,7 +97,7 @@ function make7Seg(...segments) {
 
   const outline = SEGMENTS.flatMap((seg, i) => segments[i] ? seg.vectorOn : []);
   const bitmap = SEGMENTS.map((seg, i) => segments[i] ? seg.bitmapOn : seg.bitmapOff).reduce(bitmapOr);
-  const rgbaBitmap = bitmap.map((ln) => ln.map((v) => (v * 0x00000001) | 0xFF000000));
+  const rgbaBitmap = bitmap.map((ln) => ln.map((v) => (v * 0x01000000) | 0x00FF0000));
 
   return {
     cff: {
