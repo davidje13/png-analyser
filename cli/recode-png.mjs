@@ -14,6 +14,6 @@ if (!image) {
   process.stderr.write('Failed to read PNG\n');
   process.exit(1);
 }
-const recodedBuf = writePNG(image).toBytes();
+const recodedBuf = writePNG(image, { preserveTransparentColour: false }).toBytes();
 process.stderr.write(`Input:  ${data.byteLength}\nOutput: ${recodedBuf.byteLength}\n`);
 process.stdout.write(recodedBuf);
