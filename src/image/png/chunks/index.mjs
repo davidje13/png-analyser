@@ -6,4 +6,6 @@ import './private/apple/index.mjs';
 import './private/doom/index.mjs';
 import './private/fireworks/index.mjs';
 import './private/gldpng/index.mjs';
+import './private/microsoft/index.mjs';
+import './private/skitch/index.mjs';
 import './private/worms/index.mjs';

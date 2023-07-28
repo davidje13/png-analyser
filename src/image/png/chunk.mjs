@@ -19,10 +19,11 @@ import './chunks/index.mjs';
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
  * @param {number} pos
+ * @param {number} filePos
  * @param {string[]} warnings
  * @return {Chunk}
  */
-export function readChunk(data, pos, warnings) {
+export function readChunk(data, pos, filePos, warnings) {
   const d = asDataView(data);
   const type = d.getUint32(pos + 4);
   let name = '';
@@ -57,9 +58,10 @@ export function readChunk(data, pos, warnings) {
     type,
     name,
     data: subViewLen(d, pos + 8, length),
+    filePos,
     advance: 12 + length,
     toString() {
-      const { name, type, data, advance, display, ...rest } = this;
+      const { name, type, data, filePos, advance, display, ...rest } = this;
       return printNice(rest);
     },
     display(summary, content) {

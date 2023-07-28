@@ -1,4 +1,6 @@
 // http://www.libpng.org/pub/png/spec/iso/index-noobject.html
+// https://github.com/w3c/PNG-spec
+// https://github.com/w3c/PNG-spec/blob/main/Third_Edition_Explainer.md
 
 import { checkHeader } from './header.mjs';
 import { readChunk, parseChunks } from './chunk.mjs';
@@ -19,7 +21,7 @@ export function readPNG(data) {
   }
   const chunks = [];
   for (let p = 0; p < body.byteLength;) {
-    const chunk = readChunk(body, p, warnings);
+    const chunk = readChunk(body, p, p + 8, warnings);
     chunks.push(chunk);
     p += chunk.advance;
   }

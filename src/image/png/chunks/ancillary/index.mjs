@@ -1,9 +1,13 @@
 import './bKGD.mjs';
 import './cHRM.mjs';
+import './cICP.mjs';
+import './cLLi.mjs';
 import './gAMA.mjs';
 import './hIST.mjs';
+import './iCCN.mjs';
 import './iCCP.mjs';
 import './iTXt.mjs';
+import './mDCv.mjs';
 import './pHYs.mjs';
 import './sBIT.mjs';
 import './sPLT.mjs';

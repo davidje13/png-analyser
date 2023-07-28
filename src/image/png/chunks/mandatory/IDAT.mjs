@@ -12,8 +12,9 @@ import { asCanvas, printImage } from '../../../../display/pretty.mjs';
  *   trns?: import('../ancillary/tRNS.mjs').tRNSChunk,
  *   sbit?: import('../ancillary/sBIT.mjs').sBITChunk,
  *   gama?: import('../ancillary/gAMA.mjs').gAMAChunk,
+ *   idot?: import('../private/apple/iDOT.mjs').iDOTChunk,
  *   idat?: { raw: ArrayBufferView, image: number[][], levels: SubImage[] },
- *   idats?: ArrayBufferView[],
+ *   idats?: import('../registry.mjs').Chunk[],
  *   isApple?: boolean,
  * }} IDATState
  */
@@ -23,7 +24,7 @@ const displayMax = 255;
 
 registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState} */ state, warnings) => {
   state.idats ||= [];
-  state.idats.push(chunk.data);
+  state.idats.push(chunk);
 
   if (state.apngCurrentFrame?.state === 1 || state.apngCurrentFrame?.state === 2) {
     state.apngCurrentFrame.data.push(chunk.data);
@@ -66,12 +67,25 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     warnings.push(`Compression method ${state.ihdr?.compressionMethod} is not supported`);
     return;
   }
+
+  if (state.idot) {
+    for (let s = 0; s < state.idot.segments.length; ++s) {
+      const seg = state.idot.segments[s];
+      const begin = state.idats.findIndex((c) => c.filePos === seg.idatChunkFilePos);
+      if (begin === -1) {
+        warnings.push(`Unable to find IDAT chunk for iDOT segment #${s + 1}`);
+      } else {
+        seg.idatIndex = s;
+      }
+    }
+  }
+
   let raw = new Uint8Array(0);
   try {
     if (state.isApple) {
-      raw = asBytes(inflateRaw(concat(state.idats)));
+      raw = asBytes(inflateRaw(concat(state.idats.map((c) => c.data))));
     } else {
-      raw = asBytes(inflate(concat(state.idats)));
+      raw = asBytes(inflate(concat(state.idats.map((c) => c.data))));
     }
   } catch (e) {
     warnings.push(`idat compressed data is unreadable ${e}`);

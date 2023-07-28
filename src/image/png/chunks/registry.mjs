@@ -23,6 +23,7 @@
  *   type: number,
  *   name: string,
  *   data: DataView,
+ *   filePos: number,
  *   advance: number,
  *   toString: () => string,
  *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
