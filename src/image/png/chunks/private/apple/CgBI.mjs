@@ -12,7 +12,7 @@ import { registerChunk } from '../../registry.mjs';
 
 // https://iphonedevwiki.net/index.php/CgBI_file_format
 
-// channel order is BGRA (non-standard) and RGP are pre-multiplied by alpha
+// channel order is BGRA (non-standard) and RGB are pre-multiplied by alpha
 // idat is raw zlib data (no header / footer / crc)
 
 registerChunk('CgBI', { max: 1, notAfter: ['IHDR'], allowBeforeIHDR: true }, (/** @type {CgBIChunk} */ chunk, /** @type {CgBIState} */ state, warnings) => {
