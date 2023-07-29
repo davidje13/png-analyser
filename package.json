@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/davidje13/png-analyser#readme",
   "devDependencies": {
-    "@types/node": "18.x",
+    "@types/node": "20.x",
     "lean-test": "2.x",
     "static-server": "2.x"
   }

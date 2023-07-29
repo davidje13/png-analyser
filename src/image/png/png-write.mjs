@@ -155,7 +155,7 @@ function getEncodingOptions(image, preserveTransparentColour) {
     }
   }
   if (preserveTransparentColour) {
-    if (transparentColour === MULTI || (transparentColour !== NONE && colours.has(transparentColour | 0xFF000000))) {
+    if (transparentColour === MULTI || (transparentColour !== NONE && colours.has((transparentColour | 0xFF000000) >>> 0))) {
       needsAlpha = true;
     }
   }
@@ -228,7 +228,7 @@ function getEncodingOptions(image, preserveTransparentColour) {
     } else {
       if (anyFullyTransparent && !preserveTransparentColour) {
         for (let i = 0; i < 0x1000000; ++i) {
-          if (!colours.has(0xFF000000 | i)) {
+          if (!colours.has((0xFF000000 | i) >>> 0)) {
             transparentColour = i;
             break;
           }
