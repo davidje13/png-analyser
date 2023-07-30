@@ -735,7 +735,7 @@ export class OpenTypeFont {
                 glyphBuf.int16BE(0); // x offset
                 glyphBuf.int16BE(0); // y offset
                 glyphBuf.uint32BE(tag('png '));
-                glyphBuf.append(writePNG(data.raster.bitmap));
+                glyphBuf.append(writePNG(data.raster.bitmap).data);
               },
               (indexBuf, _, meta) => indexBuf.uint32BE(meta.data.indexOffset + 4),
             );

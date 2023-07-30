@@ -152,7 +152,7 @@ async function process(data, name) {
         });
         ditherOut.ctx.putImageData(asImageData(dithered, true), 0, 0);
       }
-      updateDither();
+      setTimeout(updateDither, 0);
     }
   } catch (e) {
     if (e && typeof e === 'object' && /** @type {any} */ (e).message) {
