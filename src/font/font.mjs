@@ -1,4 +1,3 @@
-import { CFFGlyph } from './cff/cff_glyph.mjs';
 import { OFFGlyph } from './off/off_glyph.mjs';
 
 /**
