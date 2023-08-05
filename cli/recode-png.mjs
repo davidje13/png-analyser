@@ -9,8 +9,10 @@ let totalCount = 0;
 let sumOut = 0;
 let largerCount = 0;
 /** @type {Map<string, number>} */ const filterPickers = new Map();
-/** @type {Map<number, number>} */ const zlibLevels = new Map();
+/** @type {Map<string, number>} */ const zlibOptions = new Map();
 /** @type {Map<number, number>} */ const attemptNumbers = new Map();
+/** @type {Map<string, number>} */ const encodingPossible = new Map();
+/** @type {Map<string, number>} */ const encodingChosen = new Map();
 
 if (process.argv.length > 2) {
   for (let i = 2; i < process.argv.length; ++i) {
@@ -20,15 +22,16 @@ if (process.argv.length > 2) {
   process.stderr.write(`  files:             ${align(totalCount)}\n`);
   process.stderr.write(`  larger than input: ${align(largerCount)} (${((largerCount * 100) / totalCount).toFixed(1)}%)\n`);
   process.stderr.write(`  output bytes:      ${align(sumOut)}\n`);
+  printRatioDist('encoding', encodingChosen, encodingPossible);
   printDist('filter pickers', filterPickers);
-  printDist('zlib levels', zlibLevels);
-  printDist('best attempts', attemptNumbers, true);
+  printDist('zlib options', zlibOptions);
+  printAttemptsDist('best attempts', attemptNumbers);
 } else {
   try {
     const result = recode(process.stdin.fd, process.stdout.fd);
     process.stderr.write(`Input:  ${align(result.input.byteLength)}\n`);
     process.stderr.write(`Output: ${align(result.output.data.byteLength)}\n`);
-    process.stderr.write(`Best filter picker: ${result.output.filterPicker}, zlib level: ${result.output.zlibLevel}\n`);
+    process.stderr.write(`Best encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib options: ${result.output.zlibOptions.id}\n`);
     process.stderr.write(`Attempts: ${result.output.totalAttempts} (found best on attempt ${result.output.attemptNumber})\n`);
     process.stderr.write(`IDAT cache misses: ${result.output.idatCacheMisses}\n`);
   } catch (e) {
@@ -50,12 +53,14 @@ function recodeRecur(path) {
     process.stderr.write(`recoding: ${path} to ${pathOut}\n`);
     try {
       const result = recode(path, pathOut);
-      process.stderr.write(`- in: ${result.input.byteLength}, out: ${result.output.data.byteLength}, cache misses: ${result.output.idatCacheMisses}\n`);
+      process.stderr.write(`- in: ${result.input.byteLength}, out: ${result.output.data.byteLength}, encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib options: ${result.output.zlibOptions.id}, cache misses: ${result.output.idatCacheMisses}\n`);
       ++totalCount;
       sumOut += result.output.data.byteLength;
       accumDist(filterPickers, result.output.filterPicker);
-      accumDist(zlibLevels, result.output.zlibLevel);
+      accumDist(zlibOptions, result.output.zlibOptions.id);
       accumDist(attemptNumbers, result.output.attemptNumber);
+      accumDist(encodingChosen, result.output.encoding);
+      result.output.availableEncodings.forEach((e) => accumDist(encodingPossible, e));
       if (result.output.data.byteLength > result.input.byteLength) {
         process.stderr.write(`! Failed to compress\n`);
         ++largerCount;
@@ -89,12 +94,41 @@ function recode(inFile, outFile) {
  * @template {unknown} T
  * @param {string} label
  * @param {Map<T, number>} dist
- * @param {boolean=} sortByValue
  */
-function printDist(label, dist, sortByValue = false) {
+function printDist(label, dist) {
   process.stderr.write(`  ${label}:\n`);
-  for (const [name, n] of [...dist.entries()].sort(sortByValue ? ((a, b) => a[0] > b[0] ? 1 : -1) : ((a, b) => b[1] - a[1]))) {
-    process.stderr.write(`  - ${String(name).padEnd(12, ' ')}: ${n.toString().padStart(5, ' ')} (${((n * 100) / totalCount).toFixed(1)}%)\n`);
+  const maxLen = Math.max(...[...dist].map(([name]) => String(name).length));
+  for (const [name, n] of [...dist].sort((a, b) => b[1] - a[1])) {
+    process.stderr.write(`  - ${String(name).padEnd(maxLen, ' ')}: ${n.toString().padStart(5, ' ')} (${((n * 100) / totalCount).toFixed(1).padStart(4, ' ')}%)\n`);
+  }
+}
+
+/**
+ * @template {unknown} T
+ * @param {string} label
+ * @param {Map<T, number>} dist
+ * @param {Map<T, number>} totals
+ */
+function printRatioDist(label, dist, totals) {
+  process.stderr.write(`  ${label}:\n`);
+  const values = [...totals.entries()].map(([id, n]) => ({ id, ratio: (dist.get(id) ?? 0) / n, overall: (dist.get(id) ?? 0) / totalCount }));
+  const maxLen = Math.max(...values.map(({ id }) => String(id).length));
+  for (const { id, ratio, overall } of values.sort((a, b) => b.ratio - a.ratio)) {
+    process.stderr.write(`  - ${String(id).padEnd(maxLen, ' ')}: ${(ratio * 100).toFixed(1).padStart(5, ' ')}% (${(overall * 100).toFixed(1).padStart(5, ' ')}% of all)\n`);
+  }
+}
+
+/**
+ * @param {string} label
+ * @param {Map<number, number>} dist
+ */
+function printAttemptsDist(label, dist) {
+  process.stderr.write(`  ${label}:\n`);
+  let sum = 0;
+  const maxLen = Math.max(...[...dist].map(([name]) => String(name).length));
+  for (const [name, n] of [...dist].sort((a, b) => a[0] > b[0] ? 1 : -1)) {
+    sum += n;
+    process.stderr.write(`  - ${String(name).padStart(maxLen, ' ')}: ${n.toString().padStart(5, ' ')} (${((n * 100) / totalCount).toFixed(1).padStart(4, ' ')}%) ${((sum * 100) / totalCount).toFixed(1).padStart(5, ' ')}%\n`);
   }
 }
 

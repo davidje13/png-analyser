@@ -1,4 +1,4 @@
-import { deflateSync } from 'node:zlib'; // https://www.ietf.org/rfc/rfc1950.txt / https://www.ietf.org/rfc/rfc1951.txt
+import { deflateSync, constants } from 'node:zlib'; // https://www.ietf.org/rfc/rfc1950.txt / https://www.ietf.org/rfc/rfc1951.txt
 import { ByteArrayBuilder } from '../../data/builder.mjs';
 import { writeChunk } from './chunk.mjs';
 import { getEncodingOptions } from './optimisation/encoding-options.mjs';
@@ -8,13 +8,14 @@ const VOID = new Uint8Array(0);
 
 /**
  * @typedef {import('./optimisation/encoding-options.mjs').EncodingOption} EncodingOption
+ * @typedef {{ id: string, level: number, memLevel: number, chunkSize: number, strategy: number }} ZLibOptions
  *
  * @typedef {{
  *   encoding: EncodingOption;
  *   compressed: ArrayBufferView;
  *   size: number;
  *   attemptNumber: number;
- *   zlibLevel: number;
+ *   zlibOptions: ZLibOptions;
  *   filterPicker: string;
  * }} EncodingChoice
  *
@@ -34,7 +35,7 @@ export function writePNG(image, { preserveTransparentColour = false, compression
     throw new Error('Cannot save empty image');
   }
 
-  const { choice, totalAttempts, idatCacheMisses } = pickOption(image, preserveTransparentColour, compressionTimeAllotment);
+  const { choice, totalAttempts, availableEncodings, idatCacheMisses } = pickOption(image, preserveTransparentColour, compressionTimeAllotment);
   if (!choice) {
     throw new Error('Failed to encode image');
   }
@@ -63,9 +64,11 @@ export function writePNG(image, { preserveTransparentColour = false, compression
   return {
     data: buf,
     filterPicker: choice.filterPicker,
-    zlibLevel: choice.zlibLevel,
+    zlibOptions: choice.zlibOptions,
     attemptNumber: choice.attemptNumber,
     totalAttempts,
+    encoding: choice.encoding.id,
+    availableEncodings,
     idatCacheMisses,
   };
 }
@@ -78,16 +81,23 @@ export function writePNG(image, { preserveTransparentColour = false, compression
 function pickOption(image, preserveTransparentColour, compressionTimeAllotment) {
   const timeout = Date.now() + compressionTimeAllotment;
 
-  const options = getEncodingOptions(image, preserveTransparentColour).flatMap((encoding) =>
+  const encodingOptions = getEncodingOptions(image, preserveTransparentColour);
+  const encodingOptionIds = encodingOptions.map((encoding) => encoding.id);
+  const options = encodingOptions.flatMap((encoding) =>
     FILTER_PICKERS.flatMap((filterPicker) =>
-      ZLIB_COMPRESSION_LEVELS.flatMap((zlibLevel) => ({
+      ZLIB_OPTIONS.flatMap((zlibOptions) => ({
         encoding,
         filterPicker,
-        zlibLevel,
-        weight: encoding.weight * filterPicker.weight * zlibLevel.weight,
+        zlibOptions,
+        weight: encoding.weight * filterPicker.weight * zlibOptions.weight,
       }))
     )
-  ).sort((a, b) => b.weight - a.weight); // sort by descending weight
+  );
+  if (Number.isFinite(compressionTimeAllotment)) {
+    // sort by descending weight
+    // (but only if we are capping the search - else it's more optimal to keep them in the default order)
+    options.sort((a, b) => b.weight - a.weight);
+  }
 
   const IDAT_CACHE_MAX_SIZE = 20;
   let idatCacheMisses = 0;
@@ -107,7 +117,7 @@ function pickOption(image, preserveTransparentColour, compressionTimeAllotment) 
 
   let attempt = 0;
   /** @type {EncodingChoice | null} */ let choice = null;
-  for (const { encoding, filterPicker, zlibLevel } of options) {
+  for (const { encoding, filterPicker, zlibOptions } of options) {
     let encState = encodingCache.get(encoding);
     if (!encState) {
       const mapped = image.map(encoding.rowMapper);
@@ -163,50 +173,68 @@ function pickOption(image, preserveTransparentColour, compressionTimeAllotment) 
     }
 
     ++attempt;
-    const o = compress(idat.toBytes(), encoding.plte, encoding.trns, zlibLevel.level);
+    const o = compress(idat.toBytes(), encoding.plte, encoding.trns, zlibOptions);
     if (!choice || o.size < choice.size) {
       choice = {
         encoding,
         compressed: o.compressed,
         size: o.size,
-        zlibLevel: zlibLevel.level,
+        zlibOptions,
         filterPicker: filterPicker.id,
         attemptNumber: attempt,
       };
     }
     if (Date.now() >= timeout) {
-      return { choice, totalAttempts: attempt, idatCacheMisses };
+      break;
     }
   }
-  return { choice, totalAttempts: attempt, idatCacheMisses };
+
+  return {
+    choice,
+    totalAttempts: attempt,
+    availableEncodings: encodingOptionIds,
+    idatCacheMisses,
+  };
 }
 
-// experimentally: 9 is best 74% of the time, then 5 (18%), 8 (5%), 7/4/6 (3% combined)
-const ZLIB_COMPRESSION_LEVELS = [
-  { level: 9, weight: 380 },
-  { level: 8, weight: 25 },
-  { level: 7, weight: 5 },
-  { level: 6, weight: 5 },
-  { level: 5, weight: 92 },
-  { level: 4, weight: 3 },
+/** @type {(ZLibOptions & { weight: number })[]} */ const ZLIB_OPTIONS = [
+  { id: 'L9', level: 9, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 228 },
+  { id: 'L8', level: 8, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 14 },
+  { id: 'L7', level: 7, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 4 },
+  { id: 'L6', level: 6, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 4 },
+  { id: 'L5', level: 5, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 12 },
+  { id: 'L4', level: 4, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 1 },
+
+  { id: 'L9 filtered', level: 9, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_FILTERED, weight: 173 },
+  { id: 'L8 filtered', level: 8, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_FILTERED, weight: 17 },
+  { id: 'L7 filtered', level: 7, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_FILTERED, weight: 1 },
+  { id: 'L6 filtered', level: 6, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_FILTERED, weight: 3 },
+  { id: 'L5 filtered', level: 5, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_FILTERED, weight: 9 },
+  { id: 'L4 filtered', level: 4, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_FILTERED, weight: 2 },
+
+  { id: 'L9 RLE', level: 9, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_RLE, weight: 27 },
+  { id: 'L9 huffman', level: 9, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_HUFFMAN_ONLY, weight: 16 },
+
+  // non-16k chunk sizes never seem to be better
 ];
 
 /**
  * @param {Uint8Array} idat
  * @param {ArrayBufferView | undefined} plte
  * @param {ArrayBufferView | undefined} trns
- * @param {number} zlibLevel
+ * @param {ZLibOptions} zlibOptions
  */
-function compress(idat, plte, trns, zlibLevel) {
-  let windowBits = 8;
+function compress(idat, plte, trns, zlibOptions) {
+  let windowBits = constants.Z_MIN_WINDOWBITS;
   while (windowBits < 15 && (1 << windowBits) < idat.byteLength) { // window size <= 32kB
     ++windowBits;
   }
   const compressed = deflateSync(idat, { // method=8, no dictionary
     windowBits,
-    level: zlibLevel,
-    memLevel: 9,
-    chunkSize: 16 * 1024,
+    level: zlibOptions.level,
+    memLevel: zlibOptions.memLevel,
+    chunkSize: zlibOptions.chunkSize,
+    strategy: zlibOptions.strategy,
   });
   const size = (
     compressed.byteLength +
@@ -262,14 +290,19 @@ function applyFilters(row, prevRow, leftShift, filtersOut) {
  * @type {{ id: string, weight: number, picker: FilterPicker }[]}
  */
 const FILTER_PICKERS = [
-  { id: 'dynamic 1', weight: 200, picker: filterPicker_dynamic(1) },
-  { id: 'dynamic 0.95', weight: 171, picker: filterPicker_dynamic(0.95) },
-  { id: 'dynamic 0.9', weight: 20, picker: filterPicker_dynamic(0.9) },
-  { id: 'all 0', weight: 34, picker: filterPicker_static(0) },
-  { id: 'all 1', weight: 38, picker: filterPicker_static(1) },
-  { id: 'all 2', weight: 10, picker: filterPicker_static(2) },
-  { id: 'all 3', weight: 4, picker: filterPicker_static(3) },
-  { id: 'all 4', weight: 33, picker: filterPicker_static(4) },
+  // http://www.libpng.org/pub/png/book/chapter09.html
+  { id: 'min-sum-abs w=1', weight: 107, picker: filterPicker_minSumAbs(1) },
+  { id: 'min-sum-abs w=0.9', weight: 23, picker: filterPicker_minSumAbs(0.9) },
+  { id: 'min-sum-abs w=0.8', weight: 26, picker: filterPicker_minSumAbs(0.8) },
+
+  { id: 'dynamic w=1', weight: 142, picker: filterPicker_dynamic(1) },
+  { id: 'dynamic w=0.95', weight: 125, picker: filterPicker_dynamic(0.95) },
+
+  { id: 'all 0', weight: 27, picker: filterPicker_static(0) },
+  { id: 'all 1', weight: 28, picker: filterPicker_static(1) },
+  { id: 'all 2', weight: 8, picker: filterPicker_static(2) },
+  { id: 'all 3', weight: 1, picker: filterPicker_static(3) },
+  { id: 'all 4', weight: 9, picker: filterPicker_static(4) },
 ];
 
 /**
@@ -278,6 +311,50 @@ const FILTER_PICKERS = [
  */
 function filterPicker_static(filter) {
   return (rowBytes) => rowBytes.map(() => filter);
+}
+
+/**
+ * @param {number} weighting
+ * @return {FilterPicker}
+ */
+function filterPicker_minSumAbs(weighting) {
+  return function(rowBytes, leftShift, filters) {
+    if (!rowBytes.length) {
+      return [];
+    }
+
+    const sz = rowBytes[0].length;
+    let prevRow = new Uint8Array(sz);
+    let prevF = -1;
+
+    /** @type {number[]} */ const result = [];
+    for (const row of rowBytes) {
+      applyFilters(row, prevRow, leftShift, filters);
+
+      let bestF = 0;
+      let best = Number.POSITIVE_INFINITY;
+      for (let f = 0; f < filters.length; ++f) {
+        const filter = filters[f];
+
+        let sum = 0;
+        for (let i = 0; i < sz; ++i) {
+          const v = filter[i];
+          sum += (v >= 128) ? 256 - v : v; // abs(signed(v))
+        }
+        if (f === prevF) {
+          sum *= weighting;
+        }
+        if (sum < best) {
+          bestF = f;
+          best = sum;
+        }
+      }
+      prevF = bestF;
+      result.push(bestF);
+      prevRow = row;
+    }
+    return result;
+  }
 }
 
 /**

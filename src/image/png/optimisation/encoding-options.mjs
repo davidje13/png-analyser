@@ -2,6 +2,7 @@ import { getImageStats, NONE, MULTI } from './stats.mjs';
 
 /**
  * @typedef {{
+ *   id: string;
  *   bitDepth: number;
  *   colourType: number;
  *   rowMapper: (row: number[]) => Uint8Array;
@@ -35,16 +36,17 @@ export function getEncodingOptions(image, preserveTransparentColour) {
       }
     }
     const trns = new Uint8Array(palette.slice(0, maxAlpha).map((c) => c >>> 24));
-    for (let bitDepth = 1; bitDepth <= 8; bitDepth *= 2) {
-      if (palette.length <= (1 << bitDepth)) {
+    for (const p of PALETTES) {
+      if (palette.length <= (1 << p.bits)) {
         options.push({
-          bitDepth,
+          id: `palette-${p.bits}-bit`,
+          bitDepth: p.bits,
           colourType: 3, // indexed
-          rowMapper: mapPaletteRow(palette, bitDepth),
+          rowMapper: mapPaletteRow(palette, p.bits),
           filterStep: 1,
           plte: paletteBytes,
           trns: trns,
-          weight: 256 * (bitDepth < 8 ? 0.4 : 1) / bitDepth,
+          weight: p.weight,
         });
       }
     }
@@ -52,11 +54,12 @@ export function getEncodingOptions(image, preserveTransparentColour) {
   if (allGreyscale) {
     if (colours.size > 256 || needsAlpha) {
       options.push({
+        id: 'grey+alpha',
         bitDepth: 8,
         colourType: 4, // Grey + Alpha
         rowMapper: mapGreyAlphaRow(),
         filterStep: 2,
-        weight: 256 / 16,
+        weight: 70,
       });
     } else {
       const visibleGreys = [...colours.values()]
@@ -70,23 +73,25 @@ export function getEncodingOptions(image, preserveTransparentColour) {
             tc = (grey.values.find((v) => !visibleGreys.includes(v)) ?? 0) * 0x010101;
           }
           options.push({
+            id: `grey-${grey.bits}-bit`,
             bitDepth: grey.bits,
             colourType: 0, // Grey
             rowMapper: mapGreyRow(tc, grey.bits),
             filterStep: 1,
             trns: anyFullyTransparent ? new Uint8Array([0, (tc & 0xFF) >> (8 - grey.bits)]) : undefined,
-            weight: 224 * (grey.bits < 8 ? 0.4 : 1) / grey.bits,
+            weight: grey.weight,
           });
         }
       }
     }
   } else if (colours.size > 0x1000000 || needsAlpha) {
     options.push({
+      id: 'rgba',
       bitDepth: 8,
       colourType: 6, // RGBA
       rowMapper: mapRGBARow(),
       filterStep: 4,
-      weight: 256 / 24,
+      weight: 74,
     });
   } else {
     let tc = transparentColour;
@@ -101,6 +106,7 @@ export function getEncodingOptions(image, preserveTransparentColour) {
       }
     }
     options.push({
+      id: 'rgb',
       bitDepth: 8,
       colourType: 2, // RGB
       rowMapper: mapRGBRow(tc),
@@ -110,13 +116,25 @@ export function getEncodingOptions(image, preserveTransparentColour) {
         0, (tc >>> 8) & 0xFF,
         0, tc & 0xFF,
       ]) : undefined,
-      weight: 256 / 32,
+      weight: 74,
     });
   }
   return options;
 }
 
-const GREYS = [1, 2, 4, 8].map((bits) => ({ bits, values: makeScale(0, 255, 255 / ((1 << bits) - 1)) }));
+const PALETTES = [
+  { bits: 1, weight: 16 },
+  { bits: 2, weight: 6 },
+  { bits: 4, weight: 5 },
+  { bits: 8, weight: 30 },
+];
+
+const GREYS = [
+  { bits: 1, weight: 96 },
+  { bits: 2, weight: 6 },
+  { bits: 4, weight: 5 },
+  { bits: 8, weight: 62 },
+].map(({ bits, weight }) => ({ bits, weight, values: makeScale(0, 255, 255 / ((1 << bits) - 1)) }));
 
 /**
  * @param {number} min
