@@ -16,9 +16,10 @@ import { getImageStats, NONE, MULTI } from './stats.mjs';
 /**
  * @param {number[][]} image
  * @param {boolean} preserveTransparentColour
+ * @param {boolean} allowMatteTransparency
  */
-export function getEncodingOptions(image, preserveTransparentColour) {
-  const { colours, transparentColour, needsAlpha, allGreyscale } = getImageStats(image, preserveTransparentColour);
+export function getEncodingOptions(image, preserveTransparentColour, allowMatteTransparency) {
+  const { colours, transparentColour, needsAlpha, allGreyscale } = getImageStats(image, preserveTransparentColour, allowMatteTransparency);
   const anyFullyTransparent = transparentColour !== NONE;
 
   /** @type {EncodingOption[]} */ const options = [];

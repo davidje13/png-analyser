@@ -735,7 +735,11 @@ export class OpenTypeFont {
                 glyphBuf.int16BE(0); // x offset
                 glyphBuf.int16BE(0); // y offset
                 glyphBuf.uint32BE(tag('png '));
-                glyphBuf.append(writePNG(data.raster.bitmap, { compressionTimeAllotment: Number.POSITIVE_INFINITY }).data);
+                const png = writePNG(data.raster.bitmap, {
+                  allowMatteTransparency: false, // non-palette version of tRNS chunk is not supported by readers
+                  compressionTimeAllotment: Number.POSITIVE_INFINITY,
+                });
+                glyphBuf.append(png.data);
               },
               (indexBuf, _, meta) => indexBuf.uint32BE(meta.data.indexOffset + 4),
             );

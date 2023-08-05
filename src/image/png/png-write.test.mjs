@@ -26,6 +26,18 @@ describe('writePNG', () => {
     },
 
     {
+      name: 'black, white, and transparent, without matte transparency',
+      image: [
+        [0xFFFFFFFF, 0xFF000000],
+        [0x00000000, 0x00FFFFFF],
+      ],
+      preserveTransparentColour: false,
+      allowMatteTransparency: false,
+      expectBitDepth: 8,
+      expectChannels: ['luminosity', 'alpha'],
+    },
+
+    {
       name: 'white and transparent black, preserving colour',
       image: [
         [0xFFFFFFFF, 0x00000000],
@@ -116,6 +128,35 @@ describe('writePNG', () => {
     },
 
     {
+      name: 'indexed colour with transparent',
+      image: [
+        // random colour choices; should be random enough to prevent truecolour compressing better
+        [c1, c2, c3, 0, c2, 0, c1, c3, 0, c3, c2, c1, c3, c1, 0, c3],
+        [c2, c2, 0, c1, c3, c3, c1, 0, c2, c3, c1, c3, 0, c1, c2, c2],
+        [c1, c3, 0, c3, c2, c1, c2, c3, 0, c2, 0, c1, c3, c1, 0, c3],
+        [c2, c2, 0, c1, c3, c3, c1, 0, c1, c2, c2, c2, c3, c1, c3, 0],
+      ],
+      expectIndexed: true,
+      expectBitDepth: 2,
+      expectChannels: ['red', 'green', 'blue'],
+    },
+
+    {
+      name: 'indexed colour with alpha, without matte transparency',
+      image: [
+        // random colour choices; should be random enough to prevent truecolour compressing better
+        [c1, c2, c3, 0, c2, 0, c1, c3, 0, c3, c2, c1, c3, c1, 0, c3],
+        [c2, c2, 0, c1, c3, c3, c1, 0, c2, c3, c1, c3, 0, c1, c2, c2],
+        [c1, c3, 0, c3, c2, c1, c2, c3, 0, c2, 0, c1, c3, c1, 0, c3],
+        [c2, c2, 0, c1, c3, c3, c1, 0, c1, c2, c2, c2, c3, c1, c3, 0],
+      ],
+      expectIndexed: true,
+      allowMatteTransparency: false,
+      expectBitDepth: 2,
+      expectChannels: ['red', 'green', 'blue'],
+    },
+
+    {
       name: 'indexed colour with alpha',
       image: [
         // random colour choices; should be random enough to prevent truecolour compressing better
@@ -142,6 +183,31 @@ describe('writePNG', () => {
     },
 
     {
+      name: 'RGB with transparent',
+      image: [
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+      ],
+      expectBitDepth: 8,
+      expectChannels: ['red', 'green', 'blue'],
+    },
+
+    {
+      name: 'RGB with transparent, without matte transparency',
+      image: [
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+        [c1, c1, c1, c1, 0, 0, 0, 0],
+      ],
+      expectBitDepth: 8,
+      allowMatteTransparency: false,
+      expectChannels: ['red', 'green', 'blue', 'alpha'],
+    },
+
+    {
       name: '32-bit RGBA',
       image: [
         [c1, c1, c1, c1, cT, cT, cT, cT],
@@ -156,12 +222,13 @@ describe('writePNG', () => {
     const {
       image,
       preserveTransparentColour = false,
+      allowMatteTransparency = true,
       expectIndexed = false,
       expectBitDepth,
       expectChannels,
     } = /** @type {RoundTripParams} */ (params);
 
-    const png = writePNG(image, { preserveTransparentColour }).data.toBytes();
+    const png = writePNG(image, { preserveTransparentColour, allowMatteTransparency }).data.toBytes();
 
     const roundtrip = readPNG(png);
     expect(roundtrip.warnings).isEmpty();
@@ -188,6 +255,7 @@ const cT = 0x80123456;
  * @typedef {{
  *   image: number[][],
  *   preserveTransparentColour?: boolean,
+ *   allowMatteTransparency?: boolean,
  *   expectIndexed?: boolean,
  *   expectBitDepth: number,
  *   expectChannels: string[],

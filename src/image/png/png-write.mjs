@@ -30,12 +30,12 @@ const VOID = new Uint8Array(0);
 /**
  * @param {number[][]} image
  */
-export function writePNG(image, { preserveTransparentColour = false, compressionTimeAllotment = 2000 } = {}) {
+export function writePNG(image, { preserveTransparentColour = false, allowMatteTransparency = true, compressionTimeAllotment = 2000 } = {}) {
   if (!image[0]?.length) {
     throw new Error('Cannot save empty image');
   }
 
-  const { choice, totalAttempts, availableEncodings, idatCacheMisses } = pickOption(image, preserveTransparentColour, compressionTimeAllotment);
+  const { choice, totalAttempts, availableEncodings, idatCacheMisses } = pickOption(image, preserveTransparentColour, allowMatteTransparency, compressionTimeAllotment);
   if (!choice) {
     throw new Error('Failed to encode image');
   }
@@ -76,12 +76,13 @@ export function writePNG(image, { preserveTransparentColour = false, compression
 /**
  * @param {number[][]} image
  * @param {boolean} preserveTransparentColour
+ * @param {boolean} allowMatteTransparency
  * @param {number} compressionTimeAllotment
  */
-function pickOption(image, preserveTransparentColour, compressionTimeAllotment) {
+function pickOption(image, preserveTransparentColour, allowMatteTransparency, compressionTimeAllotment) {
   const timeout = Date.now() + compressionTimeAllotment;
 
-  const encodingOptions = getEncodingOptions(image, preserveTransparentColour);
+  const encodingOptions = getEncodingOptions(image, preserveTransparentColour, allowMatteTransparency);
   const encodingOptionIds = encodingOptions.map((encoding) => encoding.id);
   const options = encodingOptions.flatMap((encoding) =>
     FILTER_PICKERS.flatMap((filterPicker) =>
