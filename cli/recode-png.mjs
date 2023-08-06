@@ -9,7 +9,7 @@ let totalCount = 0;
 let sumOut = 0;
 let largerCount = 0;
 /** @type {Map<string, number>} */ const filterPickers = new Map();
-/** @type {Map<string, number>} */ const zlibOptions = new Map();
+/** @type {Map<string, number>} */ const zlibConfigs = new Map();
 /** @type {Map<number, number>} */ const attemptNumbers = new Map();
 /** @type {Map<string, number>} */ const encodingPossible = new Map();
 /** @type {Map<string, number>} */ const encodingChosen = new Map();
@@ -24,14 +24,14 @@ if (process.argv.length > 2) {
   process.stderr.write(`  output bytes:      ${align(sumOut)}\n`);
   printRatioDist('encoding', encodingChosen, encodingPossible);
   printDist('filter pickers', filterPickers);
-  printDist('zlib options', zlibOptions);
+  printDist('zlib configurations', zlibConfigs);
   printAttemptsDist('best attempts', attemptNumbers);
 } else {
   try {
     const result = recode(process.stdin.fd, process.stdout.fd);
     process.stderr.write(`Input:  ${align(result.input.byteLength)}\n`);
     process.stderr.write(`Output: ${align(result.output.data.byteLength)}\n`);
-    process.stderr.write(`Best encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib options: ${result.output.zlibOptions.id}\n`);
+    process.stderr.write(`Best encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib configuration: ${result.output.zlibConfig}\n`);
     process.stderr.write(`Attempts: ${result.output.totalAttempts} (found best on attempt ${result.output.attemptNumber})\n`);
     process.stderr.write(`IDAT cache misses: ${result.output.idatCacheMisses}\n`);
   } catch (e) {
@@ -53,11 +53,11 @@ function recodeRecur(path) {
     process.stderr.write(`recoding: ${path} to ${pathOut}\n`);
     try {
       const result = recode(path, pathOut);
-      process.stderr.write(`- in: ${result.input.byteLength}, out: ${result.output.data.byteLength}, encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib options: ${result.output.zlibOptions.id}, cache misses: ${result.output.idatCacheMisses}\n`);
+      process.stderr.write(`- in: ${result.input.byteLength}, out: ${result.output.data.byteLength}, encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib configuration: ${result.output.zlibConfig}, cache misses: ${result.output.idatCacheMisses}\n`);
       ++totalCount;
       sumOut += result.output.data.byteLength;
       accumDist(filterPickers, result.output.filterPicker);
-      accumDist(zlibOptions, result.output.zlibOptions.id);
+      accumDist(zlibConfigs, result.output.zlibConfig);
       accumDist(attemptNumbers, result.output.attemptNumber);
       accumDist(encodingChosen, result.output.encoding);
       result.output.availableEncodings.forEach((e) => accumDist(encodingPossible, e));

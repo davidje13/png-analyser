@@ -15,10 +15,8 @@ import { getImageStats, NONE, MULTI } from './stats.mjs';
 
 /**
  * @param {number[][]} image
- * @param {boolean} preserveTransparentColour
- * @param {boolean} allowMatteTransparency
  */
-export function getEncodingOptions(image, preserveTransparentColour, allowMatteTransparency) {
+export function getEncodingOptions(image, { preserveTransparentColour = false, allowMatteTransparency = true } = {}) {
   const { colours, transparentColour, needsAlpha, allGreyscale } = getImageStats(image, preserveTransparentColour, allowMatteTransparency);
   const anyFullyTransparent = transparentColour !== NONE;
 
@@ -54,14 +52,7 @@ export function getEncodingOptions(image, preserveTransparentColour, allowMatteT
   }
   if (allGreyscale) {
     if (colours.size > 256 || needsAlpha) {
-      options.push({
-        id: 'grey+alpha',
-        bitDepth: 8,
-        colourType: 4, // Grey + Alpha
-        rowMapper: mapGreyAlphaRow(),
-        filterStep: 2,
-        weight: 70,
-      });
+      options.push(GREY_ALPHA_ENCODING);
     } else {
       const visibleGreys = [...colours.values()]
         .filter((c) => preserveTransparentColour || (c >>> 24))
@@ -86,14 +77,7 @@ export function getEncodingOptions(image, preserveTransparentColour, allowMatteT
       }
     }
   } else if (colours.size > 0x1000000 || needsAlpha) {
-    options.push({
-      id: 'rgba',
-      bitDepth: 8,
-      colourType: 6, // RGBA
-      rowMapper: mapRGBARow(),
-      filterStep: 4,
-      weight: 74,
-    });
+    options.push(RGBA_ENCODING);
   } else {
     let tc = transparentColour;
     if (anyFullyTransparent && !preserveTransparentColour) {
@@ -242,4 +226,22 @@ const mapRGBARow = () => (row) => {
     b[x * 4 + 3] = c >>> 24; // A
   }
   return b;
+};
+
+/** @type {EncodingOption} */ export const GREY_ALPHA_ENCODING = {
+  id: 'grey+alpha',
+  bitDepth: 8,
+  colourType: 4, // Grey + Alpha
+  rowMapper: mapGreyAlphaRow(),
+  filterStep: 2,
+  weight: 70,
+};
+
+/** @type {EncodingOption} */ export const RGBA_ENCODING = {
+  id: 'rgba',
+  bitDepth: 8,
+  colourType: 6, // RGBA
+  rowMapper: mapRGBARow(),
+  filterStep: 4,
+  weight: 74,
 };

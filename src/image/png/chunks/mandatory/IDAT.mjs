@@ -75,7 +75,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       if (begin === -1) {
         warnings.push(`Unable to find IDAT chunk for iDOT segment #${s + 1}`);
       } else {
-        seg.idatIndex = s;
+        seg.idatIndex = begin;
       }
     }
   }
