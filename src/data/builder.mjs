@@ -51,8 +51,11 @@ export class ByteArrayBuilder {
     }
     const size = length ?? b.byteLength;
     this._ensureCapacity(size);
+    const src = (b instanceof ByteArrayBuilder || ArrayBuffer.isView(b))
+      ? new Uint8Array(b.buffer, b.byteOffset + offset, size)
+      : new Uint8Array(b, offset, size);
     new Uint8Array(this.view.buffer, this.view.byteOffset + this.byteLength, size)
-      .set(ArrayBuffer.isView(b) ? new Uint8Array(b.buffer, b.byteOffset + offset, size) : new Uint8Array(b));
+      .set(src);
     this.byteLength += size;
   }
 

@@ -13,6 +13,7 @@ import { writeICO } from '../src/image/ico/ico-write.mjs';
 /** @type {import('node:fs').PathOrFileDescriptor} */ let outFile = process.stdout.fd;
 /** @type {string[]} */ const flags = [];
 process.stderr.write(`Reading input images\n`);
+let anyInFiles = false;
 for (let i = 2; i < process.argv.length; ++i) {
   const p = process.argv[i];
   if (p === '--output') {
@@ -21,8 +22,12 @@ for (let i = 2; i < process.argv.length; ++i) {
   } else if (p.startsWith('--')) {
     flags.push(p);
   } else {
+    anyInFiles = true;
     images.push(...readImage(p === '-' ? process.stdin.fd : p));
   }
+}
+if (!anyInFiles) {
+  images.push(...readImage(process.stdin.fd));
 }
 
 process.stderr.write(`Found ${images.length} image${images.length === 1 ? '' : 's'}\n`);
