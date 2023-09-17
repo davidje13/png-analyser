@@ -1,4 +1,4 @@
-import { subView } from '../../../../data/utils.mjs';
+import { subViewFrom } from '../../../../data/utils.mjs';
 import { registerChunk } from '../registry.mjs';
 
 /**
@@ -18,7 +18,7 @@ registerChunk('fdAT', { requires: ['acTL'] }, (/** @type {fdATChunk} */ chunk, /
 
   if (state.apngCurrentFrame?.state === 1 || state.apngCurrentFrame?.state === 3) {
     state.apngCurrentFrame.state = 3;
-    state.apngCurrentFrame.data.push(subView(chunk.data, 4));
+    state.apngCurrentFrame.data.push(subViewFrom(chunk.data, 4));
   } else if (state.apngCurrentFrame?.state === 2) {
     warnings.push(`IDAT and fdAT chunks for frame ${state.apngCurrentFrame.num}`);
   } else {

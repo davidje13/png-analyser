@@ -36,27 +36,33 @@ export function asDataView(data) {
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
- * @param {number=} from
- * @param {number=} to
+ * @param {number} from
  * @return {DataView}
  */
-export function subView(data, from = 0, to = undefined) {
-  return subViewLen(data, from, (to ?? data.byteLength) - from);
+export function subViewFrom(data, from) {
+  return subViewLen(data, from, data.byteLength - from, null);
 }
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
  * @param {number} from
  * @param {number} length
+ * @param {string[] | null} warnings
  * @return {DataView}
  */
-export function subViewLen(data, from, length) {
+export function subViewLen(data, from, length, warnings) {
+  if (from < 0 || from + length > data.byteLength || length < 0) {
+    const msg = `sub-view range ${from} - ${from + length} cannot be satisfied (total data: ${data.byteLength})`;
+    if (!warnings) {
+      throw new Error(msg);
+    }
+    warnings.push(msg);
+    length = Math.max(Math.min(from + length, data.byteLength) - Math.max(from, 0), 0);
+    from = Math.max(Math.min(from, data.byteLength), 0);
+  }
+
   if (ArrayBuffer.isView(data)) {
-    return new DataView(
-      data.buffer,
-      data.byteOffset + from,
-      length ?? (data.byteLength - from),
-    );
+    return new DataView(data.buffer, data.byteOffset + from, length);
   } else {
     return new DataView(data, from, length);
   }
@@ -64,11 +70,11 @@ export function subViewLen(data, from, length) {
 
 /**
  * @param {string} encoding
- * @return {(data: ArrayBuffer | ArrayBufferView, from?: number, to?: number) => string}
+ * @return {(...params: [ArrayBuffer | ArrayBufferView] | [ArrayBuffer | ArrayBufferView, number, number, string[] | null]) => string}
  */
 const makeDecoder = (encoding) => {
   const decoder = new TextDecoder(encoding);
-  return (data, from, to) => decoder.decode(subView(data, from, to));
+  return (data, from = 0, to = data.byteLength, warnings = null) => decoder.decode(subViewLen(data, from, to - from, warnings));
 };
 
 export const getLatin1 = makeDecoder('latin1');
@@ -120,5 +126,3 @@ export function concat(datas) {
   }
   return new DataView(out.buffer);
 }
-
-export const VOID = new DataView(new Uint8Array(0).buffer);

@@ -2,32 +2,39 @@
 // https://github.com/w3c/PNG-spec
 // https://github.com/w3c/PNG-spec/blob/main/Third_Edition_Explainer.md
 
-import { checkHeader } from './header.mjs';
+import { checkHeader, isPerfectPNGHeader } from './header.mjs';
 import { readChunk, parseChunks } from './chunk.mjs';
 
+export const isPNG = isPerfectPNGHeader;
+
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
- * @return {{
+ * @typedef {{
  *   warnings: string[],
  *   chunks: import('./chunk.mjs').Chunk[],
  *   state: import('./chunk.mjs').State & import('./chunks/mandatory/IDAT.mjs').IDATState,
- * }}
+ *   bitDepth: number,
+ * }} PNGResult
+ */
+
+/**
+ * @param {ArrayBuffer | ArrayBufferView} data
+ * @return {PNGResult}
  */
 export function readPNG(data) {
-  /** @type {string[]} */ const warnings = [];
-  const body = checkHeader(data, warnings);
-  if (!body.byteLength) {
-    return { warnings, chunks: [], state: {} };
+  /** @type {PNGResult} */ const result = { warnings: [], chunks: [], state: {}, bitDepth: 0 };
+  const body = checkHeader(data, result.warnings);
+  if (!body) {
+    return result;
   }
-  const chunks = [];
   for (let p = 0; p < body.byteLength;) {
-    const chunk = readChunk(body, p, p + 8, warnings);
-    chunks.push(chunk);
+    const chunk = readChunk(body, p, p + 8, result.warnings);
+    result.chunks.push(chunk);
     p += chunk.advance;
   }
-  const state = parseChunks(chunks, warnings);
+  result.state = parseChunks(result.chunks, result.warnings);
+  result.bitDepth = result.state.ihdr?.bitDepth ?? 0;
 
-  return { warnings, chunks, state };
+  return result;
 }
 
 //const npot = (v) => 1 << (32 - Math.clz32(v - 1));

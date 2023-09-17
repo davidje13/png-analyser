@@ -12,7 +12,7 @@ registerChunk('tpNG', { max: 1 }, (/** @type {tpNGChunk} */ chunk, state, warnin
   if (chunk.data.byteLength !== 8) {
     warnings.push(`tpNG chunk length ${chunk.data.byteLength} is not 8`);
   }
-  chunk.version = getLatin1(chunk.data, 0, 4);
+  chunk.version = getLatin1(chunk.data, 0, 4, warnings);
   if (chunk.version !== 'GLD3') {
     warnings.push(`unrecognised tpNG magic value ${chunk.version}`);
   }

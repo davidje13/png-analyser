@@ -1,6 +1,6 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
 import { writeChunk } from './chunk.mjs';
-import { getEncodingOptions } from './optimisation/encoding-options.mjs';
+import { RGBA_ENCODING, getEncodingOptions } from './optimisation/encoding-options.mjs';
 import { FILTER_PICKER_OPTIONS } from './optimisation/filter-picker-options.mjs';
 import { ZLIB_CONFIG_OPTIONS } from './optimisation/zlib-config-options.mjs';
 import { findOptimalCompression } from './optimisation/brute.mjs';
@@ -15,14 +15,22 @@ const VOID = new Uint8Array(0);
 /**
  * @param {number[][]} image
  */
-export function writePNG(image, { preserveTransparentColour = false, allowMatteTransparency = true, compressionTimeAllotment = 2000 } = {}) {
+export function writePNG(image, {
+  forceRGBA = false,
+  preserveTransparentColour = false,
+  allowMatteTransparency = true,
+  compressionTimeAllotment = 2000,
+} = {}) {
   if (!image[0]?.length) {
     throw new Error('Cannot save empty image');
   }
 
   const timeout = Date.now() + compressionTimeAllotment;
 
-  const encodingOptions = getEncodingOptions(image, { preserveTransparentColour, allowMatteTransparency });
+  const encodingOptions = forceRGBA ? [RGBA_ENCODING] : getEncodingOptions(image, {
+    preserveTransparentColour,
+    allowMatteTransparency,
+  });
   const { choice, totalAttempts, idatCacheMisses } = findOptimalCompression(
     image,
     encodingOptions,

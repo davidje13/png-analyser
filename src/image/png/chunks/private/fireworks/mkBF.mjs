@@ -1,4 +1,4 @@
-import { subView } from '../../../../../data/utils.mjs';
+import { subViewFrom } from '../../../../../data/utils.mjs';
 import { registerChunk } from '../../registry.mjs';
 
 /**
@@ -16,7 +16,7 @@ registerChunk('mkBF', {}, (/** @type {mkBFChunk} */ chunk, state, warnings) => {
     warnings.push(`mkBF marker 0x${marker.toString(16).padStart(8, '0')} does not match 0xFADECAFE (unknown format)`);
     return;
   }
-  chunk.testData = subView(chunk.data, 4); // debug
+  chunk.testData = subViewFrom(chunk.data, 4); // debug
   // TODO: always seems to be 00000004 then all 0s ?
   // maybe relates to pages or animations?
 });

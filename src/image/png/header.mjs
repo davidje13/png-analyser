@@ -1,17 +1,24 @@
-import { VOID, asBytes, asDataView, findIndex, subView, toLatin1 } from '../../data/utils.mjs';
+import { asBytes, asDataView, findIndex, subViewFrom, toLatin1 } from '../../data/utils.mjs';
 
 const PNG_HEADER            = [137, 80, 78, 71, 13, 10, 26, 10];
 const PNG_HEADER_LF_TO_CRLF = [137, 80, 78, 71, 13, 13, 10, 26, 13, 10];
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
+ */
+export function isPerfectPNGHeader(data) {
+  return checkMatch(asBytes(data), PNG_HEADER);
+}
+
+/**
+ * @param {ArrayBuffer | ArrayBufferView} data
  * @param {string[]} warnings
- * @returns {DataView}
+ * @returns {DataView | null}
  */
 export function checkHeader(data, warnings) {
   const bytes = asBytes(data);
   if (checkMatch(bytes, PNG_HEADER)) {
-    return subView(data, PNG_HEADER.length);
+    return subViewFrom(data, PNG_HEADER.length);
   }
   if (checkMatch(bytes, PNG_HEADER_LF_TO_CRLF)) {
     warnings.push('Malformed header (transfer error: LF converted to CR-LF) - auto-patching');
@@ -48,7 +55,7 @@ export function checkHeader(data, warnings) {
       warnings.push('Malformed header (possibly sent via 7-bit channel)');
     } else {
       warnings.push('Not a PNG file!');
-      return VOID;
+      return null;
     }
   }
   if (bytes[1] !== 80 || bytes[2] !== 78 || bytes[3] !== 71) {
@@ -82,7 +89,7 @@ export function checkHeader(data, warnings) {
   if (begin > PNG_HEADER.length && begin !== p) {
     warnings.push('Malformed header (extra data before chunks, or incorrect chunk order)');
   }
-  return VOID;
+  return null;
 }
 
 /**

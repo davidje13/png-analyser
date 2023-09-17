@@ -26,7 +26,7 @@ registerChunk('sPLT', { notAfter: ['IDAT'] }, (/** @type {sPLTChunk} */ chunk, /
     return;
   }
   state.splt ||= [];
-  chunk.name = getLatin1(chunk.data, 0, sep);
+  chunk.name = getLatin1(chunk.data, 0, sep, null);
   for (const existing of state.splt) {
     if (existing.name === chunk.name) {
       warnings.push(`duplicate sPLT chunks with name ${chunk.name}`);

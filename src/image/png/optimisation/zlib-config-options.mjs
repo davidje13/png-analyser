@@ -11,8 +11,17 @@ import { constants } from 'node:zlib';
  * }} ZLibConfigOption
  */
 
+/** @type {ZLibConfigOption} */ export const L9_ZLIB_CONFIG = {
+  id: 'L9',
+  level: 9,
+  memLevel: 9,
+  chunkSize: 16 * 1024,
+  strategy: constants.Z_DEFAULT_STRATEGY,
+  weight: 228,
+};
+
 /** @type {ZLibConfigOption[]} */ export const ZLIB_CONFIG_OPTIONS = [
-  { id: 'L9', level: 9, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 228 },
+  L9_ZLIB_CONFIG,
   { id: 'L8', level: 8, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 14 },
   { id: 'L7', level: 7, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 4 },
   { id: 'L6', level: 6, memLevel: 9, chunkSize: 16 * 1024, strategy: constants.Z_DEFAULT_STRATEGY, weight: 4 },

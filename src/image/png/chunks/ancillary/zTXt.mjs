@@ -1,4 +1,4 @@
-import { findIndex, getLatin1, subView } from '../../../../data/utils.mjs';
+import { findIndex, getLatin1, subViewFrom } from '../../../../data/utils.mjs';
 import { inflate } from '../../../../data/deflate.mjs';
 import { registerChunk } from '../registry.mjs';
 import { textDisplay, textWrite } from './shared_text.mjs';
@@ -20,14 +20,14 @@ registerChunk('zTXt', {}, (
   chunk.isCompressed = true;
   chunk.languageTag = '';
   chunk.translatedKeyword = '';
-  chunk.keyword = getLatin1(chunk.data, 0, sep);
+  chunk.keyword = getLatin1(chunk.data, 0, sep, null);
   if (sep < chunk.data.byteLength - 1) {
     chunk.compressionMethod = chunk.data.getUint8(sep + 1);
     if (chunk.compressionMethod !== 0) {
       warnings.push(`non-standard text compression method ${chunk.compressionMethod}`);
     }
     try {
-      chunk.value = getLatin1(inflate(subView(chunk.data, sep + 2)));
+      chunk.value = getLatin1(inflate(subViewFrom(chunk.data, sep + 2)));
     } catch (e) {
       warnings.push(`zTXt compressed data is unreadable ${e}`);
       chunk.value = '';

@@ -54,7 +54,7 @@ export function tokenise(buf, warnings) {
       ++p;
       continue;
     }
-    const full = getLatin1(buf, p, p + 4);
+    const full = getLatin1(buf, p, p + 4, warnings);
     const name = full.substring(0, 3);
     const type = full[3];
     p += 4;
@@ -83,7 +83,7 @@ export function tokenise(buf, warnings) {
         target.push({
           name,
           type,
-          value: getUTF16BE(buf, p + 2, end),
+          value: getUTF16BE(buf, p + 2, end, warnings),
         });
         p = end + 1;
         break;
@@ -94,7 +94,7 @@ export function tokenise(buf, warnings) {
           warnings.push(`mkBS missing } for ${full}`);
           end = buf.byteLength;
         }
-        const value = getLatin1(buf, p, end);
+        const value = getLatin1(buf, p, end, warnings);
         switch (type) {
           case 'i': // int
             target.push({

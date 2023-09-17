@@ -41,7 +41,7 @@ export class ByteArrayBuilder {
   }
 
   /**
-   * @param {ByteArrayBuilder | ArrayBufferView} b
+   * @param {ArrayBuffer | ArrayBufferView} b
    * @param {number=} offset
    * @param {(number | null)=} length
    */
@@ -52,7 +52,7 @@ export class ByteArrayBuilder {
     const size = length ?? b.byteLength;
     this._ensureCapacity(size);
     new Uint8Array(this.view.buffer, this.view.byteOffset + this.byteLength, size)
-      .set(new Uint8Array(b.buffer, b.byteOffset + offset, size));
+      .set(ArrayBuffer.isView(b) ? new Uint8Array(b.buffer, b.byteOffset + offset, size) : new Uint8Array(b));
     this.byteLength += size;
   }
 
@@ -63,11 +63,20 @@ export class ByteArrayBuilder {
     if (this.byteLength > bytePosition) {
       throw new Error(`Already past position ${bytePosition} (at ${this.byteLength})`);
     }
-    this._ensureCapacity(bytePosition - this.byteLength);
-    while (this.byteLength < bytePosition) {
-      this.view.setUint8(this.byteLength, 0);
-      this.byteLength += 1;
+    if (bytePosition > this.byteLength) {
+      this.appendMutableBytes(bytePosition - this.byteLength);
     }
+  }
+
+  /**
+   * @param {number} length
+   */
+  appendMutableBytes(length) {
+    this._ensureCapacity(length);
+    const view = new Uint8Array(this.view.buffer, this.view.byteOffset + this.byteLength, length);
+    view.fill(0);
+    this.byteLength += length;
+    return view;
   }
 
   /**
@@ -129,9 +138,27 @@ export class ByteArrayBuilder {
   /**
    * @param {number} v
    */
+  uint16LE(v) {
+    this._ensureCapacity(2);
+    this.view.setUint16(this.byteLength, v, true);
+    this.byteLength += 2;
+  }
+
+  /**
+   * @param {number} v
+   */
   int16BE(v) {
     this._ensureCapacity(2);
     this.view.setInt16(this.byteLength, v, false);
+    this.byteLength += 2;
+  }
+
+  /**
+   * @param {number} v
+   */
+  int16LE(v) {
+    this._ensureCapacity(2);
+    this.view.setInt16(this.byteLength, v, true);
     this.byteLength += 2;
   }
 
@@ -187,9 +214,27 @@ export class ByteArrayBuilder {
   /**
    * @param {number} v
    */
+  uint32LE(v) {
+    this._ensureCapacity(4);
+    this.view.setUint32(this.byteLength, v, true);
+    this.byteLength += 4;
+  }
+
+  /**
+   * @param {number} v
+   */
   int32BE(v) {
     this._ensureCapacity(4);
     this.view.setInt32(this.byteLength, v, false);
+    this.byteLength += 4;
+  }
+
+  /**
+   * @param {number} v
+   */
+  int32LE(v) {
+    this._ensureCapacity(4);
+    this.view.setInt32(this.byteLength, v, true);
     this.byteLength += 4;
   }
 
@@ -200,6 +245,15 @@ export class ByteArrayBuilder {
   replaceUint32BE(pos, v) {
     this._ensureExisting(pos, 4);
     this.view.setUint32(pos, v, false);
+  }
+
+  /**
+   * @param {number} pos
+   * @param {number} v
+   */
+  replaceUint32LE(pos, v) {
+    this._ensureExisting(pos, 4);
+    this.view.setUint32(pos, v, true);
   }
 
   /**

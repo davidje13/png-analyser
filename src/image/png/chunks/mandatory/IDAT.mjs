@@ -228,7 +228,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       const filter = raw[p];
       ++p;
       if (filter === 0) {
-        unfiltered.set(asBytes(subViewLen(raw, p, step)), 0);
+        unfiltered.set(asBytes(subViewLen(raw, p, step, warnings)), 0);
       } else {
         for (let i = 0; i < step; ++i) {
           const above = prevUnfiltered[i];

@@ -1,6 +1,6 @@
 import { CRC } from '../../data/crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
-import { asBytes, asDataView, subView, subViewLen } from '../../data/utils.mjs';
+import { asBytes, asDataView, subViewFrom, subViewLen } from '../../data/utils.mjs';
 import { debugWrite, printNice } from '../../display/pretty.mjs';
 import './chunks/index.mjs';
 
@@ -47,17 +47,18 @@ export function readChunk(data, pos, filePos, warnings) {
   }
   if (pos + length + 12 > d.byteLength) {
     warnings.push(`${name} length exceeds available data (file truncated?)`);
-  }
-  const calcCrc = new CRC().update(subViewLen(d, pos + 4, length + 4)).get();
-  const crc = d.getUint32(pos + 8 + length);
-  if (crc !== calcCrc) {
-    warnings.push(`${name} reported CRC ${hex32(crc)} does not match calculated CRC ${hex32(calcCrc)} (corrupt data?)`);
+  } else {
+    const calcCrc = new CRC().update(subViewLen(d, pos + 4, length + 4, warnings)).get();
+    const crc = d.getUint32(pos + 8 + length);
+    if (crc !== calcCrc) {
+      warnings.push(`${name} reported CRC ${hex32(crc)} does not match calculated CRC ${hex32(calcCrc)} (corrupt data?)`);
+    }
   }
 
   return {
     type,
     name,
-    data: subViewLen(d, pos + 8, length),
+    data: subViewLen(d, pos + 8, length, warnings),
     filePos,
     advance: 12 + length,
     toString() {
@@ -83,7 +84,7 @@ export function writeChunk(buf, type, data) {
   const crcBegin = buf.byteLength;
   buf.uint32BE(char32(type));
   buf.append(data);
-  buf.uint32BE(new CRC().update(subView(buf.toBytes(), crcBegin)).get());
+  buf.uint32BE(new CRC().update(subViewFrom(buf.toBytes(), crcBegin)).get());
 }
 
 /**

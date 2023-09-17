@@ -1,4 +1,4 @@
-import { subView } from '../../../../../data/utils.mjs';
+import { subViewFrom } from '../../../../../data/utils.mjs';
 import { inflate } from '../../../../../data/deflate.mjs';
 import { asCanvas, printImage } from '../../../../../display/pretty.mjs';
 import { registerChunk } from '../../registry.mjs';
@@ -33,7 +33,7 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
   // 8-76 is all 0s except the grayscale flag
 
   try {
-    const inflated = inflate(subView(chunk.data, 76));
+    const inflated = inflate(subViewFrom(chunk.data, 76));
     if (inflated.byteLength !== 65536) {
       warnings.push(`mkBT uncompressed length ${inflated.byteLength} is not 64kB`);
       return;

@@ -20,8 +20,8 @@ registerChunk('tEXt', {}, (
   chunk.compressionMethod = 0;
   chunk.languageTag = '';
   chunk.translatedKeyword = '';
-  chunk.keyword = getLatin1(chunk.data, 0, sep);
-  chunk.value = getLatin1(chunk.data, sep + 1);
+  chunk.keyword = getLatin1(chunk.data, 0, sep, null);
+  chunk.value = getLatin1(chunk.data, sep + 1, chunk.data.byteLength, null);
 
   chunk.toString = () => textWrite(chunk);
   chunk.display = (summary, content) => textDisplay(chunk, summary, content);

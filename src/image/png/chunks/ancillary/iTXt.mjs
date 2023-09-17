@@ -1,4 +1,4 @@
-import { findIndex, getLatin1, getUTF8, subView } from '../../../../data/utils.mjs';
+import { findIndex, getLatin1, getUTF8, subViewFrom } from '../../../../data/utils.mjs';
 import { inflate } from '../../../../data/deflate.mjs';
 import { registerChunk } from '../registry.mjs';
 import { textDisplay, textWrite } from './shared_text.mjs';
@@ -17,7 +17,7 @@ registerChunk('iTXt', {}, (
   } else if (sep === 0 || sep > 79) {
     warnings.push(`invalid iTXt keyword length ${sep}`);
   }
-  chunk.keyword = getLatin1(chunk.data, 0, sep);
+  chunk.keyword = getLatin1(chunk.data, 0, sep, null);
   if (sep >= chunk.data.byteLength - 1) {
     return;
   }
@@ -31,14 +31,14 @@ registerChunk('iTXt', {}, (
     warnings.push('iTXt does not contain null separator for language tag');
     sep2 = chunk.data.byteLength;
   }
-  chunk.languageTag = getLatin1(chunk.data, sep + 3, sep2);
+  chunk.languageTag = getLatin1(chunk.data, sep + 3, sep2, null);
   let sep3 = findIndex(chunk.data, 0x00, sep2 + 1);
   if (sep3 === -1) {
     warnings.push('iTXt does not contain null separator for translated keyword');
     sep3 = chunk.data.byteLength;
   }
-  chunk.translatedKeyword = getUTF8(chunk.data, sep2 + 1, sep3);
-  const rawValue = subView(chunk.data, sep3 + 1);
+  chunk.translatedKeyword = getUTF8(chunk.data, sep2 + 1, sep3, null);
+  const rawValue = subViewFrom(chunk.data, sep3 + 1);
   let uncompressedValue = rawValue;
   if (chunk.isCompressed) {
     try {
