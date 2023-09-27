@@ -81,7 +81,7 @@ export const WINDOWS = [
   ...OS2.slice(8),
 ];
 
-export const MACINTOSH = [
+export const MACINTOSH4 = [
   0xFFFFFFFF,
   0xFFFBF305,
   0xFFFF6403,
@@ -99,6 +99,25 @@ export const MACINTOSH = [
   0xFF404040,
   0xFF000000,
 ];
+
+// thanks, https://belkadan.com/blog/2018/01/Color-Palette-8/
+/** @type {number[]} */ export const MACINTOSH8 = [];
+for (let r = 6; (r --) > 0;) {
+  for (let g = 6; (g --) > 0;) {
+    for (let b = 6; (b --) > 0;) {
+      MACINTOSH8.push((r * 0x330000) | (g * 0x003300) | (b * 0x000033));
+    }
+  }
+}
+MACINTOSH8.pop();
+for (const m of [0x110000, 0x001100, 0x000011, 0x111111]) {
+  for (let i = 15; (i --) > 1;) {
+    if (i % 3) {
+      MACINTOSH8.push(i * m);
+    }
+  }
+}
+MACINTOSH8.push(0x000000);
 
 export const RISC = [
   0xFFFFFFFF,
@@ -143,7 +162,8 @@ export const PALETTES = [
   { name: 'Regular 5 + Alpha', value: REGULAR_5_ALPHA },
   { name: 'IBM OS/2', value: OS2 },
   { name: 'Windows', value: WINDOWS },
-  { name: 'Macintosh', value: MACINTOSH },
+  { name: 'Macintosh 4', value: MACINTOSH4 },
+  { name: 'Macintosh 8', value: MACINTOSH8 },
   { name: 'RISC OS', value: RISC },
   { name: 'MSX2 Screen 8', value: MSX2_SCREEN8 },
 ];
