@@ -1,4 +1,5 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
+import { char32 } from '../../data/utils.mjs';
 import { writePNG } from '../../image/png/png-write.mjs';
 import { CFF } from '../cff/cff.mjs';
 import { UniqueStrings } from '../unique_strings.mjs';
@@ -45,12 +46,7 @@ function tag(v) {
   if (v.length !== 4 || !/^[!-~]+ *$/.test(v)) {
     throw new Error(`Invalid tag: '${v}'`);
   }
-  return (
-    (v.charCodeAt(0) << 24) |
-    (v.charCodeAt(1) << 16) |
-    (v.charCodeAt(2) << 8) |
-    v.charCodeAt(3)
-  );
+  return char32(v);
 }
 
 /**

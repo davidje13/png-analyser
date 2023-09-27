@@ -1,6 +1,6 @@
 import { CRC } from '../../data/crc.mjs';
 import { getAllChunkTypes, getChunkInfo } from './chunks/registry.mjs';
-import { asBytes, asDataView, subViewFrom, subViewLen } from '../../data/utils.mjs';
+import { asBytes, asDataView, char32, hex32, printTag, subViewFrom, subViewLen } from '../../data/utils.mjs';
 import { debugWrite, printNice } from '../../display/pretty.mjs';
 import './chunks/index.mjs';
 
@@ -26,20 +26,14 @@ import './chunks/index.mjs';
 export function readChunk(data, pos, filePos, warnings) {
   const d = asDataView(data);
   const type = d.getUint32(pos + 4);
-  let name = '';
-  let validType = true;
   for (let i = 0; i < 4; ++i) {
     const v = (type >>> (i * 8)) & 0xFF;
     if (v < 65 || (v > 90 && v < 97) || v > 122) {
-      validType = false;
-      name = '0x' + hex32(type);
-      warnings.push(`chunk type ${name} is invalid`);
+      warnings.push(`chunk type ${hex32(type)} is invalid`);
       break;
     }
   }
-  if (validType) {
-    name = printType(type);
-  }
+  const name = printTag(type);
 
   const length = d.getUint32(pos);
   if (length > 0x7FFFFFFF) {
@@ -96,7 +90,7 @@ export function parseChunks(chunks, warnings) {
   const types = chunks.map((chunk) => chunk.type);
 
   for (const meta of getAllChunkTypes()) {
-    const name = printType(meta.type);
+    const name = printTag(meta.type);
     const count = types.filter((v) => v === meta.type).length;
     if (count < meta.min) {
       warnings.push(`missing mandatory chunk ${name}`);
@@ -127,13 +121,13 @@ export function parseChunks(chunks, warnings) {
     for (const other of meta.notAfter) {
       const otherP = types.indexOf(other);
       if (otherP !== -1 && otherP < lastP) {
-        warnings.push(`${name} cannot be before ${printType(other)}`);
+        warnings.push(`${name} cannot be before ${printTag(other)}`);
         break;
       }
     }
     for (const other of meta.notBefore) {
       if (types.lastIndexOf(other) > p) {
-        warnings.push(`${name} cannot be after ${printType(other)}`);
+        warnings.push(`${name} cannot be after ${printTag(other)}`);
         break;
       }
     }
@@ -148,7 +142,7 @@ export function parseChunks(chunks, warnings) {
 
   /** @type {State} */ const state = {};
   for (const chunk of chunks) {
-    const name = printType(chunk.type);
+    const name = printTag(chunk.type);
     const meta = getChunkInfo(chunk.type);
     if (!meta) {
       if (chunk.type & 0x20000000) {
@@ -167,35 +161,3 @@ export function parseChunks(chunks, warnings) {
 
   return state;
 }
-
-/**
- * @param {number} v
- * @return {string}
- */
-const hex32 = (v) => v.toString(16).padStart(8, '0');
-
-/** @type {Map<number, string>} */ const TYPE_NAMES = new Map();
-
-/**
- * @param {number} type
- * @return {string}
- */
-const printType = (type) => {
-  let n = TYPE_NAMES.get(type);
-  if (!n) {
-    n = [
-      String.fromCharCode(type >>> 24),
-      String.fromCharCode((type >>> 16) & 0xFF),
-      String.fromCharCode((type >>> 8) & 0xFF),
-      String.fromCharCode(type & 0xFF),
-    ].join('');
-    TYPE_NAMES.set(type, n);
-  }
-  return n;
-};
-
-/**
- * @param {string} name
- * @return {number}
- */
-const char32 = (name) => (name.charCodeAt(0) << 24) | (name.charCodeAt(1) << 16) | (name.charCodeAt(2) << 8) | name.charCodeAt(3);

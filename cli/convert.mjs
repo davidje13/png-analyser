@@ -7,6 +7,7 @@ import { writeANI } from '../src/image/ani/ani-write.mjs';
 import { writePNG } from '../src/image/png/png-write.mjs';
 import { readBMP, writeBMP, isBMP } from '../src/image/bmp/bmp.mjs';
 import { readICO, isICO } from '../src/image/ico/ico.mjs';
+import { readICNS, isICNS } from '../src/image/icns/icns.mjs';
 import { writeICO } from '../src/image/ico/ico-write.mjs';
 
 /** @type {number[][][]} */ const images = [];
@@ -119,7 +120,7 @@ function readImage(path) {
     if (!image) {
       throw new Error('  Failed to read PNG\n');
     }
-    process.stderr.write(`  ${image[0]?.length ?? 0}x${image.length}@${png.state.ihdr?.bitDepth ?? 0}\n`);
+    process.stderr.write(`  ${image[0]?.length ?? 0}x${image.length} [${png.state.ihdr?.bitDepth ?? 0}]\n`);
     return [image];
   } else if (isANI(input)) {
     process.stderr.write(`- reading: ${path} as ANI\n`);
@@ -129,9 +130,32 @@ function readImage(path) {
     }
     // TODO
     //for (const frame of ico.frames) {
-    //  process.stderr.write(`  ${frame.image[0]?.length ?? 0}x${frame.image.length}@${frame.bitDepth}\n`);
+    //  process.stderr.write(`  ${frame.image[0]?.length ?? 0}x${frame.image.length} [${frame.bitDepth}]\n`);
     //}
     return [];
+  } else if (isICNS(input)) {
+    process.stderr.write(`- reading: ${path} as ICNS\n`);
+    const icns = readICNS(input);
+    for (const warning of icns.warnings) {
+      process.stderr.write(`  WARN: ${warning}\n`);
+    }
+    /** @type {number[][][]} */ const allImages = [];
+    /**
+     * @param {string} prefix
+     * @param {import('../src/image/icns/icns.mjs').State} state
+     */
+    const visitImages = (prefix, state) => {
+      for (const icon of state.images) {
+        process.stderr.write(`  ${prefix}${icon.image[0]?.length ?? 0}x${icon.image.length}@${icon.scale}x [${icon.bitDepth}]\n`);
+      }
+      allImages.push(...state.images.map((icon) => icon.image));
+      for (const sub of state.sub) {
+        process.stderr.write(`  ${sub.type}:\n`);
+        visitImages(prefix + '  ', sub.state);
+      }
+    };
+    visitImages('', icns.state);
+    return allImages;
   } else if (isICO(input)) {
     process.stderr.write(`- reading: ${path} as ICO / CUR\n`);
     const ico = readICO(input);
@@ -139,7 +163,7 @@ function readImage(path) {
       process.stderr.write(`  WARN: ${warning}\n`);
     }
     for (const icon of ico.images) {
-      process.stderr.write(`  ${icon.image[0]?.length ?? 0}x${icon.image.length}@${icon.bitDepth}\n`);
+      process.stderr.write(`  ${icon.image[0]?.length ?? 0}x${icon.image.length} [${icon.bitDepth}]\n`);
     }
     return ico.images.map((icon) => icon.image);
   } else if (isBMP(input)) {
@@ -148,7 +172,7 @@ function readImage(path) {
     for (const warning of bmp.warnings) {
       process.stderr.write(`  WARN: ${warning}\n`);
     }
-    process.stderr.write(`  ${bmp.image[0]?.length ?? 0}x${bmp.image.length}@${bmp.bitDepth}\n`);
+    process.stderr.write(`  ${bmp.image[0]?.length ?? 0}x${bmp.image.length} [${bmp.bitDepth}]\n`);
     return [bmp.image];
   } else {
     process.stderr.write(`- cannot read ${path}: unsupported format\n`);

@@ -126,3 +126,44 @@ export function concat(datas) {
   }
   return new DataView(out.buffer);
 }
+
+/**
+ * @param {number} v
+ * @return {string}
+ */
+export const hex32 = (v) => v.toString(16).padStart(8, '0');
+
+/**
+ * @param {string} name
+ * @return {number}
+ */
+export const char32 = (name) => (name.charCodeAt(0) << 24) | (name.charCodeAt(1) << 16) | (name.charCodeAt(2) << 8) | name.charCodeAt(3);
+
+/** @type {Map<number, string>} */ const TYPE_NAMES = new Map();
+
+/**
+ * @param {number} type
+ * @return {string}
+ */
+export function printTag(type) {
+  let n = TYPE_NAMES.get(type);
+  if (n) {
+    return n;
+  }
+  for (let i = 0; i < 4; ++i) {
+    const v = (type >>> (i * 8)) & 0xFF;
+    if (v < 0x20 || v > 0x7E) {
+      n = `0x${hex32(type)}`;
+      TYPE_NAMES.set(type, n);
+      return n;
+    }
+  }
+  n = [
+    String.fromCharCode(type >>> 24),
+    String.fromCharCode((type >>> 16) & 0xFF),
+    String.fromCharCode((type >>> 8) & 0xFF),
+    String.fromCharCode(type & 0xFF),
+  ].join('');
+  TYPE_NAMES.set(type, n);
+  return n;
+}
