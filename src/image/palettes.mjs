@@ -105,7 +105,7 @@ export const MACINTOSH4 = [
 for (let r = 6; (r --) > 0;) {
   for (let g = 6; (g --) > 0;) {
     for (let b = 6; (b --) > 0;) {
-      MACINTOSH8.push((r * 0x330000) | (g * 0x003300) | (b * 0x000033));
+      MACINTOSH8.push((0xFF000000 | (r * 0x330000) | (g * 0x003300) | (b * 0x000033)) >>> 0);
     }
   }
 }
@@ -113,11 +113,11 @@ MACINTOSH8.pop();
 for (const m of [0x110000, 0x001100, 0x000011, 0x111111]) {
   for (let i = 15; (i --) > 1;) {
     if (i % 3) {
-      MACINTOSH8.push(i * m);
+      MACINTOSH8.push((0xFF000000 | (i * m)) >>> 0);
     }
   }
 }
-MACINTOSH8.push(0x000000);
+MACINTOSH8.push(0xFF000000);
 
 export const RISC = [
   0xFFFFFFFF,

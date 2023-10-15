@@ -4,6 +4,7 @@ import { MACINTOSH4, MACINTOSH8 } from '../palettes.mjs';
 import { isJPEG, isJPEG2000 } from '../jpeg/jpeg.mjs';
 
 // https://en.wikipedia.org/wiki/Apple_Icon_Image_format
+// https://chromium.googlesource.com/chromium/src.git/+/refs/heads/main/docs/mac/icons.md
 
 /**
  * @typedef {{
