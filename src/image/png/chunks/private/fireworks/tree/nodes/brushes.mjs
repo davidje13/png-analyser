@@ -143,6 +143,7 @@ registerNode('BPL', 'v', { // Brush Property List (?)
     const dashOff3 = getBasicValue(value, 'DF3', 'i');
 
     target.diameter = diameter ?? 1;
+    target.storage.diameter = diameter ?? 1;
 
     const details = [
       `shape: ${shape}`,

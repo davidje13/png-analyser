@@ -41,5 +41,36 @@ registerNode('PAT', 'v', { // PATtern (?)
       brush ? brushCol : undefined,
       brush?.usesTexture ? brushTex : undefined,
     ]));
+
+    if (target.parent) {
+      const display = {
+        fill: (
+          fill?.storage?.category === 'fc_Solid'
+            ? colToSVG(fillCol?.storage?.rgba)
+            : null
+        ) ?? 'none',
+        stroke: colToSVG(brushCol?.storage?.rgba) ?? 'black',
+        strokeWidth: brush?.storage?.diameter ?? 0,
+      };
+      target.parent.storage.svgPathDisplay = display;
+    }
   },
 });
+
+/**
+ * @param {[number, number, number, number] | null | undefined} v
+ * @return {string | null}
+ */
+function colToSVG(v) {
+  if (!v) {
+    return null;
+  }
+  const [r, g, b, a] = v;
+  if (!a) {
+    return 'transparent';
+  }
+  if (a === 255) {
+    return '#' + ((b << 16) | (g << 8) | r).toString(16).padStart(6, '0');
+  }
+  return `rgba(${r},${g},${b},${a})`;
+}

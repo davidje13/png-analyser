@@ -38,6 +38,19 @@ registerNode('IMG', 'v', { // IMaGe
       summary.append(toString());
       content.append(tilesAsCanvas(tileData));
     };
+
+    target.toSVG = (parts) => {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+      element.setAttribute('x', String(xLocation));
+      element.setAttribute('y', String(yLocation));
+      element.setAttribute('width', String(width));
+      element.setAttribute('height', String(height));
+      element.setAttribute('href', tilesAsCanvas(tileData).toDataURL('image/png'));
+      parts.push({
+        element,
+        bounds: { minX: xLocation, minY: yLocation, maxX: xLocation + width, maxY: yLocation + height },
+      });
+    };
   },
 });
 

@@ -182,14 +182,24 @@ registerNode('OPA', 'i', {
 
 registerNode('BCL', 'i', { // Brush CoLour
   read: (target, value) => {
+    const r = value & 0xFF;
+    const g = (value >>> 8) & 0xFF;
+    const b = (value >>> 16) & 0xFF;
+    const a = (value >>> 24) & 0xFF;
     target.value = value;
+    target.storage.rgba = [r, g, b, a];
     target.toString = () => `brush colour: ${value.toString(16).padStart(8, '0')}`;
   },
 });
 
 registerNode('FCL', 'i', { // Fill CoLour
   read: (target, value) => {
+    const r = value & 0xFF;
+    const g = (value >>> 8) & 0xFF;
+    const b = (value >>> 16) & 0xFF;
+    const a = (value >>> 24) & 0xFF;
     target.value = value;
+    target.storage.rgba = [r, g, b, a];
     target.toString = () => `fill colour: ${value.toString(16).padStart(8, '0')}`;
   },
 });

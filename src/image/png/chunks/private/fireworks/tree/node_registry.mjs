@@ -7,11 +7,25 @@
  *   'v': ProcessedNode[],
  * }} NodeTypes
  *
+ * @typedef {{
+ *   element: SVGElement,
+ *   bounds: {
+ *     minX: number,
+ *     minY: number,
+ *     maxX: number,
+ *     maxY: number,
+ *   },
+ * }} SVGPart
+ *
  * @typedef {Record<string, unknown> & {
  *   name: string,
  *   toString: () => string,
  *   display: (summary: HTMLElement, content: HTMLElement) => void,
+ *   toSVG?: (target: SVGPart[]) => void,
+ *   hasSVG?: () => boolean,
  *   visited: boolean,
+ *   parent: ProcessedNode | null,
+ *   storage: Record<string, any>,
  * }} ProcessedNode
  *
  * @typedef {{

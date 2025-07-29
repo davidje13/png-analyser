@@ -101,6 +101,24 @@ registerNode('PBP', 'v', { // Path Bezier Points
       summary.append(`Bezier Path: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`);
       content.append(c.canvas);
     };
+
+    target.toSVG = (parts) => {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      element.setAttribute('d', makeBezierPathSVG(points, isClosed));
+
+      const data = target.parent?.parent?.storage?.svgPathDisplay;
+      if (data) {
+        element.setAttribute('fill', String(data.fill ?? 'none'));
+        element.setAttribute('stroke', String(data.stroke ?? 'black'));
+        element.setAttribute('stroke-width', String(data.strokeWidth ?? 0));
+      } else if (isClosed) {
+        element.setAttribute('fill', 'black');
+      } else {
+        element.setAttribute('stroke', 'black');
+        element.setAttribute('stroke-width', '1');
+      }
+      parts.push({ element, bounds: extendBounds(getBezierBounds(points), 5) });
+    };
   },
 });
 
@@ -227,6 +245,23 @@ registerNode('PPL', 'v', { // Path Point List
 
       summary.append(`Segmented Path: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`);
       content.append(c.canvas);
+    };
+
+    target.toSVG = (parts) => {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      element.setAttribute('d', 'M' + points.map((p) => `${p.x} ${p.y}`).join('L') + (isClosed ? 'Z' : ''));
+      const data = target.parent?.parent?.storage?.svgPathDisplay;
+      if (data) {
+        element.setAttribute('fill', String(data.fill ?? 'none'));
+        element.setAttribute('stroke', String(data.stroke ?? 'black'));
+        element.setAttribute('stroke-width', String(data.strokeWidth ?? 0));
+      } else if (isClosed) {
+        element.setAttribute('fill', 'black');
+      } else {
+        element.setAttribute('stroke', 'black');
+        element.setAttribute('stroke-width', '1');
+      }
+      parts.push({ element, bounds: extendBounds(getBounds(points), 5) });
     };
   },
 });
@@ -442,6 +477,29 @@ function traceBezierPath(ctx, points, { minX, minY }, isClosed) {
     );
     ctx.closePath();
   }
+}
+
+/**
+ * @param {PBTNode[]} points
+ * @param {boolean} isClosed
+ * @return {string}
+ */
+function makeBezierPathSVG(points, isClosed) {
+  if (!points.length) {
+    return '';
+  }
+  let r = `M${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; ++i) {
+    const ptA = points[i - 1];
+    const pt = points[i];
+    r += `C${ptA.xC2} ${ptA.yC2} ${pt.xC1} ${pt.yC1} ${pt.x} ${pt.y}`;
+  }
+  if (isClosed) {
+    const ptA = points[points.length - 1];
+    const pt = points[0];
+    r += `C${ptA.xC2} ${ptA.yC2} ${pt.xC1} ${pt.yC1} ${pt.x} ${pt.y}Z`;
+  }
+  return r;
 }
 
 /**

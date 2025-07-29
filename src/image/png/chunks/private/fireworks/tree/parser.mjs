@@ -9,23 +9,26 @@ import './nodes/index.mjs';
 /**
  * @typedef {import('./node_registry.mjs').ProcessedNode} ProcessedNode
  *
+ * @param {ProcessedNode | null} parent
  * @param {import('./tokeniser.mjs').NodeToken} nodeToken
  * @param {import('./node_registry.mjs').NodeState} state
  * @return {ProcessedNode}
  */
-export function parse(nodeToken, state) {
+export function parse(parent, nodeToken, state) {
   const meta = getTypeMeta(nodeToken.name, nodeToken.type);
 
   /** @type {ProcessedNode} */ const processedNode = {
+    parent,
     name: nodeToken.name + nodeToken.type,
     visited: false,
     toString: () => `${processedNode.name}: ???`,
     display: (summary, content) => content.append(processedNode.toString()),
+    storage: {},
   };
   const fallbackDisplay = processedNode.display;
 
   if (nodeToken.type === 'v') {
-    const value = nodeToken.value.map((child) => parse(child, state));
+    const value = nodeToken.value.map((child) => parse(processedNode, child, state));
     meta.read(processedNode, value, state);
     const unvisited = value.filter((n) => !n.visited);
     if (unvisited.length) {
@@ -43,8 +46,19 @@ export function parse(nodeToken, state) {
         out.display(summary, content);
       };
     }
+    if (!processedNode.toSVG) {
+      processedNode.toSVG = (parts) => {
+        for (let i = value.length; (i--) > 0;) {
+          value[i].toSVG?.(parts);
+        }
+      };
+      processedNode.hasSVG = () => value.some((n) => n.hasSVG?.());
+    }
   } else {
     meta.read(processedNode, nodeToken.value, state);
+  }
+  if (processedNode.toSVG && !processedNode.hasSVG) {
+    processedNode.hasSVG = () => true;
   }
   return processedNode;
 }

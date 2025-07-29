@@ -23,7 +23,7 @@ registerChunk('mkBS', {}, (/** @type {mkBSChunk} */ chunk, /** @type {mkBSState}
   }
 }, (state, warnings) => {
   if (state.mkbs?.raw) {
-    const root = parse(state.mkbs.raw, { mkbts: state.mkbts, warnings });
+    const root = parse(null, state.mkbs.raw, { mkbts: state.mkbts, warnings });
     state.mkbs.root = root;
     state.mkbs.toString = () => root.toString();
     state.mkbs.display = (summary, content) => root.display(summary, content);

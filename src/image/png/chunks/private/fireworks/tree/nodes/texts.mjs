@@ -112,6 +112,7 @@ registerNode('TXT', 'v', { // TeXT
 
     const displayNodes = value.filter(({ name }) => !EXCLUDE.includes(name));
     displayNodes.push({
+      parent: target,
       name: 'TFSv',
       visited: true,
       toString: () => JSON.stringify(strings.map((s) => s.text).join('')),
@@ -197,6 +198,11 @@ registerNode('TXT', 'v', { // TeXT
           content.append(oStr);
         }
       },
+      storage: {},
+      toSVG: (parts) => {
+        // TODO
+      },
+      hasSVG: () => true,
     });
 
     target.value = value;

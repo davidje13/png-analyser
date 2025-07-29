@@ -176,6 +176,7 @@ registerNode('FPL', 'v', { // Fill Pattern (?) ??
       summary.append(`Fill: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
       content.append(details.join(', '));
     };
+    target.storage.category = category;
   },
 });
 
