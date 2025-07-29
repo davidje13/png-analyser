@@ -6,6 +6,7 @@
   "bin": "./cli/png.mjs",
   "scripts": {
     "start": "static-server --index index.html --port 8080",
+    "lint": "tsc",
     "test": "lean-test"
   },
   "repository": {
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/node": "20.x",
     "lean-test": "2.x",
-    "static-server": "2.x"
+    "static-server": "2.x",
+    "typescript": "5.8.x"
   }
 }
