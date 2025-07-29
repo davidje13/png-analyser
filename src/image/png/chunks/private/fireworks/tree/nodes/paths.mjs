@@ -1,11 +1,20 @@
 import { makeCanvas } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, getChildren, registerNode } from '../node_registry.mjs';
+import { outputNodes } from './generic.mjs';
 
 // PBL/PBP/BPT(/BZL?)
 
 /**
  * @typedef {import('../node_registry.mjs').ProcessedNode} ProcessedNode
  */
+
+registerNode('PTH', 'v', { // PaTH
+  read: (target, value, state) => {
+    Object.assign(target, outputNodes(target.name, value));
+    const fillOnTop = getBasicValue(value, 'FOT', 'b') ?? false;
+    target.storage.fillOnTop = fillOnTop;
+  },
+});
 
 /**
  * @typedef {ProcessedNode & {
@@ -111,6 +120,11 @@ registerNode('PBP', 'v', { // Path Bezier Points
         element.setAttribute('fill', String(data.fill ?? 'none'));
         element.setAttribute('stroke', String(data.stroke ?? 'black'));
         element.setAttribute('stroke-width', String(data.strokeWidth ?? 0));
+        element.setAttribute('stroke-linecap', 'round');
+        element.setAttribute('stroke-linejoin', 'round');
+        if (target.parent?.parent?.storage.fillOnTop) {
+          element.setAttribute('paint-order', 'stroke');
+        }
       } else if (isClosed) {
         element.setAttribute('fill', 'black');
       } else {
@@ -250,11 +264,17 @@ registerNode('PPL', 'v', { // Path Point List
     target.toSVG = (parts) => {
       const element = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       element.setAttribute('d', 'M' + points.map((p) => `${p.x} ${p.y}`).join('L') + (isClosed ? 'Z' : ''));
-      const data = target.parent?.parent?.storage?.svgPathDisplay;
+      element.setAttribute('visibility', 'hidden');
+      const data = target.parent?.parent?.storage.svgPathDisplay;
       if (data) {
         element.setAttribute('fill', String(data.fill ?? 'none'));
         element.setAttribute('stroke', String(data.stroke ?? 'black'));
         element.setAttribute('stroke-width', String(data.strokeWidth ?? 0));
+        element.setAttribute('stroke-linecap', 'round');
+        element.setAttribute('stroke-linejoin', 'round');
+        if (target.parent?.parent?.storage.fillOnTop) {
+          element.setAttribute('paint-order', 'stroke');
+        }
       } else if (isClosed) {
         element.setAttribute('fill', 'black');
       } else {
