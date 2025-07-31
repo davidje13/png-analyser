@@ -2,19 +2,32 @@ export const NONE = -1;
 export const MULTI = -2;
 
 /**
+ * @typedef {{
+ *   colours: Map<number, number>;
+ *   transparentColour: number;
+ *   needsAlpha: boolean;
+ *   allGreyscale: boolean;
+ *   preserveTransparentColour: boolean;
+ *   allowMatteTransparency: boolean;
+ * }} Stats
+ */
+
+/**
  * @param {number[][]} image
  * @param {boolean} preserveTransparentColour
  * @param {boolean} allowMatteTransparency
+ * @return {Stats}
  */
 export function getImageStats(image, preserveTransparentColour, allowMatteTransparency) {
-  const colours = new Set();
+  /** @type {Map<number, number>} */ const colours = new Map();
   let transparentColour = NONE;
   let needsAlpha = false;
   let allGreyscale = true;
   for (const row of image) {
     for (const c of row) {
       const alpha = c >>> 24;
-      colours.add((preserveTransparentColour || alpha) ? c : 0);
+      const key = (preserveTransparentColour || alpha) ? c : 0;
+      colours.set(key, (colours.get(key) ?? 0) + 1);
       if (!alpha) {
         if (transparentColour === NONE) {
           transparentColour = c;
@@ -43,5 +56,5 @@ export function getImageStats(image, preserveTransparentColour, allowMatteTransp
   if (!allowMatteTransparency && transparentColour !== NONE) {
     needsAlpha = true;
   }
-  return { colours, transparentColour, needsAlpha, allGreyscale };
+  return { colours, transparentColour, needsAlpha, allGreyscale, preserveTransparentColour, allowMatteTransparency };
 }

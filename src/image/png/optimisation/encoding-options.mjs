@@ -1,4 +1,4 @@
-import { getImageStats, NONE, MULTI } from './stats.mjs';
+import { NONE, MULTI } from './stats.mjs';
 
 /**
  * @typedef {{
@@ -14,15 +14,14 @@ import { getImageStats, NONE, MULTI } from './stats.mjs';
  */
 
 /**
- * @param {number[][]} image
+ * @param {import('./stats.mjs').Stats} stats
  */
-export function getEncodingOptions(image, { preserveTransparentColour = false, allowMatteTransparency = true } = {}) {
-  const { colours, transparentColour, needsAlpha, allGreyscale } = getImageStats(image, preserveTransparentColour, allowMatteTransparency);
+export function getEncodingOptions({ colours, transparentColour, needsAlpha, allGreyscale, preserveTransparentColour }) {
   const anyFullyTransparent = transparentColour !== NONE;
 
   /** @type {EncodingOption[]} */ const options = [];
   if (colours.size <= 256) {
-    const palette = [...colours.values()].sort(sortPalette);
+    const palette = [...colours.keys()].sort(sortPalette);
     const paletteBytes = new Uint8Array(palette.length * 3);
     let maxAlpha = 0;
     for (let i = 0; i < palette.length; ++i) {
@@ -54,7 +53,7 @@ export function getEncodingOptions(image, { preserveTransparentColour = false, a
     if (colours.size > 256 || needsAlpha) {
       options.push(GREY_ALPHA_ENCODING);
     } else {
-      const visibleGreys = [...colours.values()]
+      const visibleGreys = [...colours.keys()]
         .filter((c) => preserveTransparentColour || (c >>> 24))
         .map((c) => c & 0xFF);
       const needsTransparent = !preserveTransparentColour && anyFullyTransparent;

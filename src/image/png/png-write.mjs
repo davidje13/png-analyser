@@ -1,9 +1,13 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
+import { quantise } from '../actions/dither.mjs';
+import { FLOYD_STEINBERG } from '../diffusions.mjs';
 import { writeChunk } from './chunk.mjs';
 import { RGBA_ENCODING, getEncodingOptions } from './optimisation/encoding-options.mjs';
 import { FILTER_PICKER_OPTIONS } from './optimisation/filter-picker-options.mjs';
 import { ZLIB_CONFIG_OPTIONS } from './optimisation/zlib-config-options.mjs';
 import { findOptimalCompression } from './optimisation/brute.mjs';
+import { getImageStats } from './optimisation/stats.mjs';
+import { pickPalette } from './optimisation/pick-palette.mjs';
 
 const PNG_HEADER = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const VOID = new Uint8Array(0);
@@ -19,6 +23,7 @@ export function writePNG(image, {
   forceRGBA = false,
   preserveTransparentColour = false,
   allowMatteTransparency = true,
+  crushPalette = 0,
   compressionTimeAllotment = 2000,
 } = {}) {
   if (!image[0]?.length) {
@@ -27,10 +32,19 @@ export function writePNG(image, {
 
   const timeout = Date.now() + compressionTimeAllotment;
 
-  const encodingOptions = forceRGBA ? [RGBA_ENCODING] : getEncodingOptions(image, {
-    preserveTransparentColour,
-    allowMatteTransparency,
-  });
+  const preStats = getImageStats(image, preserveTransparentColour, false);
+  process.stderr.write(`Colours: ${preStats.colours.size}${preStats.allGreyscale ? ' (grayscale)' : ''}${preStats.needsAlpha ? ' with alpha' : ' no alpha'}\n`);
+
+  if (crushPalette && preStats.colours.size > crushPalette) {
+    process.stderr.write(`Crushing palette to ${crushPalette} entries...\n`);
+    const palette = pickPalette(image, preStats, crushPalette);
+    image = quantise(image, palette, { dither: { diffusion: FLOYD_STEINBERG, amount: 0.5 } });
+  }
+
+  process.stderr.write('Identifying available encoding modes...\n');
+  const stats = getImageStats(image, preserveTransparentColour, allowMatteTransparency);
+  const encodingOptions = forceRGBA ? [RGBA_ENCODING] : getEncodingOptions(stats);
+  process.stderr.write('Compressing...\n');
   const { choice, totalAttempts, idatCacheMisses } = findOptimalCompression(
     image,
     encodingOptions,

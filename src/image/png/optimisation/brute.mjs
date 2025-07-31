@@ -96,7 +96,7 @@ export function findOptimalCompression(image, encodingOptions, filterPickerOptio
       }
 
       if (idatCache.size > IDAT_CACHE_MAX_SIZE) {
-        const oldestKey = idatCache.keys().next().value;
+        const oldestKey = idatCache.keys().next().value ?? Number.NEGATIVE_INFINITY;
         idat = idatCache.get(oldestKey) ?? new ByteArrayBuilder();
         idat.truncate(0);
         idatCache.delete(oldestKey);

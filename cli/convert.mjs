@@ -13,12 +13,16 @@ import { writeICO } from '../src/image/ico/ico-write.mjs';
 /** @type {number[][][]} */ const images = [];
 /** @type {import('node:fs').PathOrFileDescriptor} */ let outFile = process.stdout.fd;
 /** @type {string[]} */ const flags = [];
+/** @type {number} */ let crushPalette = 0;
 process.stderr.write(`Reading input images\n`);
 let anyInFiles = false;
 for (let i = 2; i < process.argv.length; ++i) {
   const p = process.argv[i];
   if (p === '--output') {
     outFile = process.argv[i + 1];
+    ++i;
+  } else if (p === '--palette') {
+    crushPalette = Number.parseInt(process.argv[i + 1], 10);
     ++i;
   } else if (p.startsWith('--')) {
     flags.push(p);
@@ -63,7 +67,11 @@ process.stderr.write(`Writing converted image(s)\n`);
 switch (format) {
   case 'png':
     for (const image of images) {
-      const output = writePNG(image, { preserveTransparentColour: false, compressionTimeAllotment: Number.POSITIVE_INFINITY });
+      const output = writePNG(image, {
+        preserveTransparentColour: false,
+        crushPalette,
+        compressionTimeAllotment: Number.POSITIVE_INFINITY,
+      });
       results.push(output.data.toBytes());
     }
     break;

@@ -1,3 +1,6 @@
+import { pickPalette } from './png/optimisation/pick-palette.mjs';
+import { getImageStats } from './png/optimisation/stats.mjs';
+
 export const BLACK_WHITE = [
   0xFF000000,
   0xFFFFFFFF,
@@ -151,6 +154,15 @@ for (let r = 0; r < 8; ++r) {
   }
 }
 
+/**
+ * @param {number} colours
+ * @return {(image: number[][]) => number[]}
+ */
+export const adaptive = (colours) => (image) => {
+  const stats = getImageStats(image, false, false);
+  return pickPalette(image, stats, colours);
+};
+
 export const PALETTES = [
   { name: 'Black & White', value: BLACK_WHITE },
   { name: 'Greyscale', value: GREYSCALE },
@@ -166,13 +178,14 @@ export const PALETTES = [
   { name: 'Macintosh 8', value: MACINTOSH8 },
   { name: 'RISC OS', value: RISC },
   { name: 'MSX2 Screen 8', value: MSX2_SCREEN8 },
+  { name: 'Adaptive 256', value: adaptive(256) },
+  { name: 'Adaptive 128', value: adaptive(128) },
+  { name: 'Adaptive 64', value: adaptive(64) },
+  { name: 'Adaptive 32', value: adaptive(32) },
+  { name: 'Adaptive 16', value: adaptive(16) },
+  { name: 'Adaptive 8', value: adaptive(8) },
+  { name: 'Adaptive 4', value: adaptive(4) },
+  { name: 'Adaptive 3', value: adaptive(3) },
+  { name: 'Adaptive 2', value: adaptive(2) },
+  { name: 'Average', value: adaptive(1) },
 ];
-
-///**
-// * @param {number[][]} image
-// * @param {number} size
-// * @return {number[]}
-// */
-//export function adaptivePalette(image, size) {
-//  // TODO
-//}

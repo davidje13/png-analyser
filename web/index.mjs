@@ -71,7 +71,11 @@ async function process(data, name) {
         if (!i) {
           opt.setAttribute('selected', 'selected');
         }
-        opt.append(`${PALETTES[i].name} (${PALETTES[i].value.length})`);
+        if (typeof PALETTES[i].value === 'function') {
+          opt.append(PALETTES[i].name);
+        } else {
+          opt.append(`${PALETTES[i].name} (${PALETTES[i].value.length})`);
+        }
         palette.append(opt);
       }
 
@@ -133,13 +137,47 @@ async function process(data, name) {
       options.classList.add('options');
       options.append(palette, colspace, transLabel, matteLabel, amount, diffusion, serpLabel);
       const ditherIn = image;
+      const palettePreviewSize = 20;
+      const paletteOut = makeCanvas(1, 1);
       const ditherOut = makeCanvas(ditherIn[0]?.length ?? 0, ditherIn.length);
-      output.append(options, ditherOut.canvas);
+      output.append(options, paletteOut.canvas, document.createElement('br'), ditherOut.canvas);
 
       function updateDither() {
-        let p = PALETTES[palette.selectedIndex].value;// ?? pickPalette(ditherIn, 8);
-        if (transparent.checked && !p.includes(0)) {
-          p = [0, ...p];
+        const paletteSource = PALETTES[palette.selectedIndex].value;
+        let p = [];
+        if (typeof paletteSource === 'function') {
+          p = paletteSource(ditherIn);
+        } else if (transparent.checked && !paletteSource.includes(0)) {
+          p = [0, ...paletteSource];
+        } else {
+          p = paletteSource;
+        }
+        const pw = Math.min(p.length, 64);
+        paletteOut.canvas.width = pw * palettePreviewSize;
+        paletteOut.canvas.height = Math.ceil(p.length / pw) * palettePreviewSize;
+        paletteOut.ctx.clearRect(0, 0, paletteOut.canvas.width, paletteOut.canvas.height);
+        for (let i = 0; i < p.length; ++i) {
+          const c = p[i];
+          const x = (i % pw) * palettePreviewSize;
+          const y = Math.floor(i / pw) * palettePreviewSize;
+          const w = palettePreviewSize;
+          const hw = palettePreviewSize / 2;
+          const alpha = c >>> 24;
+          if (alpha === 0) {
+            paletteOut.ctx.fillStyle = '#FFFFFF';
+            paletteOut.ctx.fillRect(x, y, w, w);
+            paletteOut.ctx.fillStyle = '#CCCCCC';
+            paletteOut.ctx.fillRect(x + hw, y, hw, hw);
+            paletteOut.ctx.fillRect(x, y + hw, hw, hw);
+          } else if (alpha === 255) {
+            paletteOut.ctx.fillStyle = '#' + (c & 0xFFFFFF).toString(16).padStart(6, '0');
+            paletteOut.ctx.fillRect(x, y, w, w);
+          } else {
+            paletteOut.ctx.fillStyle = '#' + (c & 0xFFFFFF).toString(16).padStart(6, '0');
+            paletteOut.ctx.fillRect(x, y, w, w);
+            paletteOut.ctx.fillStyle = '#' + (alpha * 0x010101).toString(16).padStart(6, '0');
+            paletteOut.ctx.fillRect(x + hw, y + hw, hw, hw);
+          }
         }
         const dithered = quantise(ditherIn, p, {
           colourspaceConversion: COLOURSPACES[colspace.selectedIndex].fromSRGB,
