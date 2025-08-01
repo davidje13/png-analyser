@@ -14,6 +14,7 @@ import { writeICO } from '../src/image/ico/ico-write.mjs';
 /** @type {import('node:fs').PathOrFileDescriptor} */ let outFile = process.stdout.fd;
 /** @type {string[]} */ const flags = [];
 /** @type {number} */ let crushPalette = 0;
+/** @type {number} */ let ditherAmount = 0.85;
 process.stderr.write(`Reading input images\n`);
 let anyInFiles = false;
 for (let i = 2; i < process.argv.length; ++i) {
@@ -23,6 +24,9 @@ for (let i = 2; i < process.argv.length; ++i) {
     ++i;
   } else if (p === '--palette') {
     crushPalette = Number.parseInt(process.argv[i + 1], 10);
+    ++i;
+  } else if (p === '--dither') {
+    ditherAmount = Number.parseFloat(process.argv[i + 1]);
     ++i;
   } else if (p.startsWith('--')) {
     flags.push(p);
@@ -70,6 +74,7 @@ switch (format) {
       const output = writePNG(image, {
         preserveTransparentColour: false,
         crushPalette,
+        ditherAmount,
         compressionTimeAllotment: Number.POSITIVE_INFINITY,
       });
       results.push(output.data.toBytes());
