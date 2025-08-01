@@ -17,7 +17,7 @@ import { isJPEG, isJPEG2000 } from '../jpeg/jpeg.mjs';
  * @typedef {{ images: IconSizeOut[], sub: SubIcons[], name?: string, version?: number }} State
  * @typedef {Omit<State, 'images'> & { images: (IconSizeOut & { type: number; maskType: number | null; used?: boolean })[] }} InnerState
  * @typedef {{ type: string, state: State }} SubIcons
- * @typedef {(state: InnerState, data: DataView, type: number, warnings: string[]) => void} ChunkHandler
+ * @typedef {(state: InnerState, data: DataView, type: number, warnings: string[]) => (Promise<void> | void)} ChunkHandler
  * @typedef {{ handler: ChunkHandler }} Chunk
  */
 
@@ -35,12 +35,12 @@ export function isICNS(data) {
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
- * @return {{
+ * @return {Promise<{
  *   state: State;
  *   warnings: string[];
- * }}
+ * }>}
  */
-export function readICNS(data, { expectHeader = true } = {}) {
+export async function readICNS(data, { expectHeader = true } = {}) {
   /** @type {string[]} */ const warnings = [];
 
   const dv = asDataView(data);
@@ -74,7 +74,7 @@ export function readICNS(data, { expectHeader = true } = {}) {
     const mode = CHUNKS.get(iconType);
     if (mode) {
       /** @type {string[]} */ const w = [];
-      mode.handler(state, iconData, iconType, w);
+      await mode.handler(state, iconData, iconType, w);
       warnings.push(...w.map((warning) => `${printTag(iconType)}: ${warning}`));
     } else {
       warnings.push(`unknown icon type: ${printTag(iconType)}`);
@@ -144,8 +144,8 @@ registerChunk(char32('info'), (state, data, type, warnings) => {
  * @param {string} identifier
  * @return {ChunkHandler}
  */
-const SUBSET_HANDLER = (identifier) => (state, data, type, warnings) => {
-  const sub = readICNS(data, { expectHeader: false });
+const SUBSET_HANDLER = (identifier) => async (state, data, type, warnings) => {
+  const sub = await readICNS(data, { expectHeader: false });
   warnings.push(...sub.warnings.map((warning) => `${identifier} sub-icon: ${warning}`));
   state.sub.push({ type: identifier, state: sub.state });
 };
@@ -169,14 +169,14 @@ registerChunk(0xFDD92FA8, SUBSET_HANDLER('dark'));
  *
  * @return {ChunkHandler}
  */
-const ICON_HANDLER = ({ size = 0, width = size, height = size, scale = 1, bits = 0, mask = 0, maskRef = null, prefix4Zeros = false, jpeg = false, png = false }) => (state, data, type, warnings) => {
+const ICON_HANDLER = ({ size = 0, width = size, height = size, scale = 1, bits = 0, mask = 0, maskRef = null, prefix4Zeros = false, jpeg = false, png = false }) => async (state, data, type, warnings) => {
   if ((png || jpeg || prefix4Zeros) && isPNG(data)) {
     if (!png) {
       warnings.push('unexpected PNG data');
     } else if (png === 'unreliable') {
       warnings.push('PNG format being used in a chunk which does not reliably support PNG');
     }
-    const p = readPNG(data);
+    const p = await readPNG(data);
     warnings.push(...p.warnings);
     const image = p.state.idat?.image;
     if (image) {

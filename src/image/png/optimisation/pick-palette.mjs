@@ -1,8 +1,8 @@
 /** @type {('a'|'r'|'g'|'b')[]} */ const CHANNELS = ['a', 'r', 'g', 'b'];
 
 const ALPHA_FRAC = 1;
-const RGB_FRAC = 1 / (255 * 3);
-const COUNT_FRAC = 1;
+const RGB_FRAC = 1;
+const COUNT_FRAC = 20;
 
 /**
  * @param {number[][]} image
@@ -15,7 +15,7 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
     throw new Error('Cannot pick palette using stats with matte transparency');
   }
   if (colours.size <= maxEntries) {
-    return [...colours.keys()].sort();
+    return [...colours.keys()].sort(niceColourOrder);
   }
   if (maxEntries <= 0) {
     return [];
@@ -52,10 +52,14 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
 
   /** @typedef {{ c: { a: number, r: number, g: number, b: number }, count: number, score: number }} Col */
 
+  const alphaNorm = ALPHA_FRAC / 255;
+  const colourNorm = RGB_FRAC / Math.sqrt(255 * 255 * 3) / 255;
+  const countNorm = COUNT_FRAC / histogram.sum;
+
   /** @type {Col[]} */ const remainingColours = [];
   /** @type {Map<number, Col>} */ const lookup = new Map();
   for (const [col, count] of colours) {
-    const entity = { c: splitARGB(col), count, score: Number.POSITIVE_INFINITY };
+    const entity = { c: splitARGB(col), count, score: ALPHA_FRAC + RGB_FRAC + count * countNorm };
     remainingColours.push(entity);
     lookup.set(col, entity);
   }
@@ -78,34 +82,18 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
       const dr = v.c.r - col.c.r;
       const dg = v.c.g - col.c.g;
       const db = v.c.b - col.c.b;
-      v.score = Math.min(v.score, da * da * ALPHA_FRAC + (dr * dr + dg * dg + db * db) * v.c.a * RGB_FRAC + v.count * COUNT_FRAC);
+      v.score = Math.min(v.score,
+        Math.abs(da) * alphaNorm +
+        Math.sqrt(dr * dr + dg * dg + db * db) * Math.min(v.c.a, col.c.a) * colourNorm +
+        v.count * countNorm,
+      );
     }
   };
 
-  // if colours far outweigh others (greater fraction of the image than fraction of the palette),
-  // add them early and redistribute the remaining space
-  while (remaining > 0) {
-    let changed = false;
-    const evenStep = remainingSum / remaining;
-    for (const col of remainingColours) {
-      if (col.count > evenStep) {
-        addCol(col);
-        changed = true;
-        if (!remaining) {
-          break;
-        }
-      }
-    }
-    if (!changed) {
-      break;
-    }
-  }
-
-  if (!r.length) {
-    const transparent = lookup.get(0);
-    if (transparent) {
-      addCol(transparent);
-    }
+  // if any part of the image is transparent, ensure we keep it
+  const transparent = lookup.get(0);
+  if (transparent) {
+    addCol(transparent);
   }
 
   // keep finding colour which is greatest distance from current colours

@@ -35,12 +35,12 @@ export function isICO(data) {
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
- * @return {{
+ * @return {Promise<{
  *   warnings: string[];
  *   images: IconSizeOut[];
- * }}
+ * }>}
  */
-export function readICO(data) {
+export async function readICO(data) {
   /** @type {string[]} */ const warnings = [];
   const dv = asDataView(data);
   if (dv.getUint16(0, true) !== 0) {
@@ -90,7 +90,7 @@ export function readICO(data) {
     const offset = dv.getUint32(p + 12, true);
     const imageData = subViewLen(dv, offset, byteLength, warnings);
     if (isPNG(imageData)) {
-      const png = readPNG(imageData);
+      const png = await readPNG(imageData);
       if (png.state.ihdr?.colourType !== 6 || png.state.ihdr?.bitDepth !== 8) {
         warnings.push(`image ${i + 1}: PNG not stored as 32-bit ARGB`);
       }

@@ -25,6 +25,7 @@ export function writePNG(image, {
   allowMatteTransparency = true,
   crushPalette = 0,
   compressionTimeAllotment = 2000,
+  ditherAmount = 0.85,
 } = {}) {
   if (!image[0]?.length) {
     throw new Error('Cannot save empty image');
@@ -38,7 +39,7 @@ export function writePNG(image, {
   if (crushPalette && preStats.colours.size > crushPalette) {
     process.stderr.write(`Crushing palette to ${crushPalette} entries...\n`);
     const palette = pickPalette(image, preStats, crushPalette);
-    image = quantise(image, palette, { dither: { diffusion: FLOYD_STEINBERG, amount: 0.5 } });
+    image = quantise(image, palette, { dither: { diffusion: FLOYD_STEINBERG, amount: ditherAmount } });
   }
 
   process.stderr.write('Identifying available encoding modes...\n');

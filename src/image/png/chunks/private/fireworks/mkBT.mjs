@@ -1,5 +1,5 @@
 import { subViewFrom } from '../../../../../data/utils.mjs';
-import { inflate } from '../../../../../data/deflate.mjs';
+import { inflate } from '../../../../../data/inflate.mjs';
 import { asCanvas, printImage } from '../../../../../display/pretty.mjs';
 import { registerChunk } from '../../registry.mjs';
 
@@ -14,7 +14,7 @@ import { registerChunk } from '../../registry.mjs';
  * }} mkBTChunk
  */
 
-registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState} */ state, warnings) => {
+registerChunk('mkBT', {}, async (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState} */ state, warnings) => {
   const marker = chunk.data.getUint32(0);
   if (marker !== 0xFACECAFE) {
     warnings.push(`mkBT marker 0x${marker.toString(16).padStart(8, '0')} does not match 0xFACECAFE (unknown format)`);
@@ -33,7 +33,7 @@ registerChunk('mkBT', {}, (/** @type {mkBTChunk} */ chunk, /** @type {mkBTState}
   // 8-76 is all 0s except the grayscale flag
 
   try {
-    const inflated = inflate(subViewFrom(chunk.data, 76));
+    const inflated = await inflate(subViewFrom(chunk.data, 76));
     if (inflated.byteLength !== 65536) {
       warnings.push(`mkBT uncompressed length ${inflated.byteLength} is not 64kB`);
       return;

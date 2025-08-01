@@ -218,7 +218,7 @@ describe('writePNG', () => {
       expectBitDepth: 8,
       expectChannels: ['red', 'green', 'blue', 'alpha'],
     },
-  ] }, (/** @type {any} */ params) => {
+  ] }, async (/** @type {any} */ params) => {
     const {
       image,
       preserveTransparentColour = false,
@@ -230,7 +230,7 @@ describe('writePNG', () => {
 
     const png = writePNG(image, { preserveTransparentColour, allowMatteTransparency }).data.toBytes();
 
-    const roundtrip = readPNG(png);
+    const roundtrip = await readPNG(png);
     expect(roundtrip.warnings).isEmpty();
 
     expect(roundtrip.state.ihdr?.indexed).toEqual(expectIndexed);

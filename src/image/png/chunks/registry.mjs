@@ -8,11 +8,8 @@
  *   notAfter: number[],
  *   requires: number[],
  *   requiresPost: number[],
- *   read: (chunk: Chunk,
- *   state: State,
- *   warnings: string[]) => void,
- *   post: (state: State,
- *   warnings: string[]) => void,
+ *   read: (chunk: Chunk, state: State, warnings: string[]) => (Promise<void> | void),
+ *   post: (state: State, warnings: string[]) => (Promise<void> | void),
  * }} ChunkMeta
  *
  * @typedef {{
@@ -86,8 +83,8 @@ export const getAllChunkTypes = () => {
  * @param {boolean=} options.allowAfterIEND
  * @param {string[]=} options.requires
  * @param {string[]=} options.requiresPost
- * @param {(chunk: C, state: S, warnings: string[]) => void} read
- * @param {(state: S, warnings: string[]) => void} post
+ * @param {(chunk: C, state: S, warnings: string[]) => (Promise<void> | void)} read
+ * @param {(state: S, warnings: string[]) => (Promise<void> | void)} post
  */
 export function registerChunk(type, {
   min = 0,
@@ -109,8 +106,8 @@ export function registerChunk(type, {
     notAfter: notAfter.map(char32),
     requires: requires.map(char32),
     requiresPost: requiresPost.map(char32),
-    read: /** @type {(chunk: Chunk, state: State, warnings: string[]) => void} */ (read),
-    post: /** @type {(state: State, warnings: string[]) => void} */ (post),
+    read: /** @type {(chunk: Chunk, state: State, warnings: string[]) => (Promise<void> | void)} */ (read),
+    post: /** @type {(state: State, warnings: string[]) => (Promise<void> | void)} */ (post),
   };
   if (!allowBeforeIHDR) {
     data.notBefore.push(char32('IHDR'));

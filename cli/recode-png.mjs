@@ -16,7 +16,7 @@ let largerCount = 0;
 
 if (process.argv.length > 2) {
   for (let i = 2; i < process.argv.length; ++i) {
-    recodeRecur(process.argv[i]);
+    await recodeRecur(process.argv[i]);
   }
   process.stderr.write('Totals:\n');
   process.stderr.write(`  files:             ${align(totalCount)}\n`);
@@ -28,7 +28,7 @@ if (process.argv.length > 2) {
   printAttemptsDist('best attempts', attemptNumbers);
 } else {
   try {
-    const result = recode(process.stdin.fd, process.stdout.fd);
+    const result = await recode(process.stdin.fd, process.stdout.fd);
     process.stderr.write(`Input:  ${align(result.input.byteLength)}\n`);
     process.stderr.write(`Output: ${align(result.output.data.byteLength)}\n`);
     process.stderr.write(`Best encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib configuration: ${result.output.zlibConfig}\n`);
@@ -43,16 +43,16 @@ if (process.argv.length > 2) {
 /**
  * @param {string} path
  */
-function recodeRecur(path) {
+async function recodeRecur(path) {
   if (statSync(path).isDirectory()) {
     for (const f of readdirSync(path)) {
-      recodeRecur(join(path, f));
+      await recodeRecur(join(path, f));
     }
   } else if (path.endsWith('.png') && !path.endsWith('.recoded.png')) {
     const pathOut = path.replace(/\.png$/, '.recoded.png');
     process.stderr.write(`recoding: ${path} to ${pathOut}\n`);
     try {
-      const result = recode(path, pathOut);
+      const result = await recode(path, pathOut);
       process.stderr.write(`- in: ${result.input.byteLength}, out: ${result.output.data.byteLength}, encoding: ${result.output.encoding}, filter picker: ${result.output.filterPicker}, zlib configuration: ${result.output.zlibConfig}, cache misses: ${result.output.idatCacheMisses}\n`);
       ++totalCount;
       sumOut += result.output.data.byteLength;
@@ -75,9 +75,9 @@ function recodeRecur(path) {
  * @param {import('node:fs').PathOrFileDescriptor} inFile
  * @param {import('node:fs').PathOrFileDescriptor} outFile
  */
-function recode(inFile, outFile) {
+async function recode(inFile, outFile) {
   const input = readFileSync(inFile);
-  const png = readPNG(input);
+  const png = await readPNG(input);
   for (const warning of png.warnings) {
     process.stderr.write(`WARN: ${warning}\n`);
   }

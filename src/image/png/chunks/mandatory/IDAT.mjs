@@ -1,4 +1,4 @@
-import { inflate, inflateRaw } from '../../../../data/deflate.mjs';
+import { inflate, inflateRaw } from '../../../../data/inflate.mjs';
 import { asBytes, concat, subViewLen } from '../../../../data/utils.mjs';
 import { registerChunk } from '../registry.mjs';
 import { asCanvas, printImage } from '../../../../display/pretty.mjs';
@@ -59,7 +59,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       );
     },
   });
-}, (state, warnings) => {
+}, async (state, warnings) => {
   if (!state.idats) {
     return;
   }
@@ -83,9 +83,9 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
   let raw = new Uint8Array(0);
   try {
     if (state.isApple) {
-      raw = asBytes(inflateRaw(concat(state.idats.map((c) => c.data))));
+      raw = asBytes(await inflateRaw(concat(state.idats.map((c) => c.data))));
     } else {
-      raw = asBytes(inflate(concat(state.idats.map((c) => c.data))));
+      raw = asBytes(await inflate(concat(state.idats.map((c) => c.data))));
     }
   } catch (e) {
     warnings.push(`idat compressed data is unreadable ${e}`);

@@ -1,4 +1,4 @@
-import { inflate } from '../../../../../data/deflate.mjs';
+import { inflate } from '../../../../../data/inflate.mjs';
 import { asCanvas, printImage, termCol, termReset } from '../../../../../display/pretty.mjs';
 import { registerChunk } from '../../registry.mjs';
 
@@ -14,9 +14,9 @@ import { registerChunk } from '../../registry.mjs';
  * }} prVWChunk
  */
 
-registerChunk('prVW', { max: 1 }, (/** @type {prVWChunk} */ chunk, /** @type {prVWState} */ state, warnings) => {
+registerChunk('prVW', { max: 1 }, async (/** @type {prVWChunk} */ chunk, /** @type {prVWState} */ state, warnings) => {
   try {
-    const inflated = inflate(chunk.data);
+    const inflated = await inflate(chunk.data);
     const marker = inflated.getUint32(0);
     if (marker !== 0xCAFEBEEF) {
       warnings.push(`prVW marker 0x${marker.toString(16).padStart(8, '0')} does not match 0xCAFEBEEF (unknown format)`);

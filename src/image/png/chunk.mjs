@@ -84,9 +84,9 @@ export function writeChunk(buf, type, data) {
 /**
  * @param {Chunk[]} chunks
  * @param {string[]} warnings
- * @return {State}
+ * @return {Promise<State>}
  */
-export function parseChunks(chunks, warnings) {
+export async function parseChunks(chunks, warnings) {
   const types = chunks.map((chunk) => chunk.type);
 
   for (const meta of getAllChunkTypes()) {
@@ -152,11 +152,11 @@ export function parseChunks(chunks, warnings) {
       }
       chunk.toString = () => debugWrite(asBytes(chunk.data));
     } else {
-      meta.read(chunk, state, warnings);
+      await meta.read(chunk, state, warnings);
     }
   }
   for (const meta of getAllChunkTypes()) {
-    meta.post(state, warnings);
+    await meta.post(state, warnings);
   }
 
   return state;

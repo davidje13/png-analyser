@@ -20,7 +20,7 @@ for (let i = 2; i < process.argv.length; ++i) {
 for (const path of paths) {
   process.stdout.write(`--- ${path}\n`);
   const data = readFileSync(path);
-  displayData(readPNG(data));
+  displayData(await readPNG(data));
 }
 
 /**

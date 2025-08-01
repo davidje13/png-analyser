@@ -1,7 +1,8 @@
 export class ByteArrayBuilder {
   constructor(initialCapacity = 1024) {
     /** @type {DataView} */ this.view = new DataView(new ArrayBuffer(initialCapacity));
-    /** @type {number} */ this.byteLength = 0;
+    /** @type {number} */ this.fullByteLength = 0;
+    /** @type {number} */ this.bitsRemaining = 0;
   }
 
   get byteOffset() {
@@ -12,6 +13,10 @@ export class ByteArrayBuilder {
     return this.view.buffer;
   }
 
+  get byteLength() {
+    return this.fullByteLength + (this.bitsRemaining ? 1 : 0);
+  }
+
   /**
    * @param {number} length
    */
@@ -19,7 +24,8 @@ export class ByteArrayBuilder {
     if (length < 0 || length > this.byteLength) {
       throw new Error('invalid truncation length');
     }
-    this.byteLength = length;
+    this.fullByteLength = length;
+    this.bitsRemaining = 0;
   }
 
   toBytes() {
@@ -29,8 +35,13 @@ export class ByteArrayBuilder {
   /**
    * @private
    * @param {number} bytes
+   * @param {boolean} padToByte
    */
-  _ensureCapacity(bytes) {
+  _ensureCapacity(bytes, padToByte = true) {
+    if (padToByte && this.bitsRemaining) {
+      ++this.fullByteLength;
+      this.bitsRemaining = 0;
+    }
     const capacity = this.view.byteLength;
     const required = this.byteLength + bytes;
     if (capacity < required) {
@@ -54,9 +65,9 @@ export class ByteArrayBuilder {
     const src = (b instanceof ByteArrayBuilder || ArrayBuffer.isView(b))
       ? new Uint8Array(b.buffer, b.byteOffset + offset, size)
       : new Uint8Array(b, offset, size);
-    new Uint8Array(this.view.buffer, this.view.byteOffset + this.byteLength, size)
+    new Uint8Array(this.view.buffer, this.view.byteOffset + this.fullByteLength, size)
       .set(src);
-    this.byteLength += size;
+    this.fullByteLength += size;
   }
 
   /**
@@ -64,10 +75,23 @@ export class ByteArrayBuilder {
    */
   padTo(bytePosition) {
     if (this.byteLength > bytePosition) {
-      throw new Error(`Already past position ${bytePosition} (at ${this.byteLength})`);
+      if (this.bitsRemaining) {
+        throw new Error(`Already past position ${bytePosition} (at ${this.fullByteLength}.${8 - this.bitsRemaining})`);
+      } else {
+        throw new Error(`Already past position ${bytePosition} (at ${this.fullByteLength})`);
+      }
     }
-    if (bytePosition > this.byteLength) {
-      this.appendMutableBytes(bytePosition - this.byteLength);
+    if (this.bitsRemaining && bytePosition === this.fullByteLength + 1) {
+      this.padToByte();
+    } else {
+      this.appendMutableBytes(bytePosition - this.fullByteLength);
+    }
+  }
+
+  padToByte() {
+    if (this.bitsRemaining) {
+      ++this.fullByteLength;
+      this.bitsRemaining = 0;
     }
   }
 
@@ -76,9 +100,9 @@ export class ByteArrayBuilder {
    */
   appendMutableBytes(length) {
     this._ensureCapacity(length);
-    const view = new Uint8Array(this.view.buffer, this.view.byteOffset + this.byteLength, length);
+    const view = new Uint8Array(this.view.buffer, this.view.byteOffset + this.fullByteLength, length);
     view.fill(0);
-    this.byteLength += length;
+    this.fullByteLength += length;
     return view;
   }
 
@@ -87,8 +111,8 @@ export class ByteArrayBuilder {
    */
   uint8(v) {
     this._ensureCapacity(1);
-    this.view.setUint8(this.byteLength, v);
-    this.byteLength += 1;
+    this.view.setUint8(this.fullByteLength, v);
+    this.fullByteLength += 1;
   }
 
   /**
@@ -96,8 +120,8 @@ export class ByteArrayBuilder {
    */
   int8(v) {
     this._ensureCapacity(1);
-    this.view.setInt8(this.byteLength, v);
-    this.byteLength += 1;
+    this.view.setInt8(this.fullByteLength, v);
+    this.fullByteLength += 1;
   }
 
   /**
@@ -106,7 +130,7 @@ export class ByteArrayBuilder {
    * @param {number} length
    */
   _ensureExisting(pos, length) {
-    if (pos + length > this.byteLength) {
+    if (pos + length > this.fullByteLength) {
       throw new Error('invalid replacement index');
     }
   }
@@ -134,8 +158,8 @@ export class ByteArrayBuilder {
    */
   uint16BE(v) {
     this._ensureCapacity(2);
-    this.view.setUint16(this.byteLength, v, false);
-    this.byteLength += 2;
+    this.view.setUint16(this.fullByteLength, v, false);
+    this.fullByteLength += 2;
   }
 
   /**
@@ -143,8 +167,8 @@ export class ByteArrayBuilder {
    */
   uint16LE(v) {
     this._ensureCapacity(2);
-    this.view.setUint16(this.byteLength, v, true);
-    this.byteLength += 2;
+    this.view.setUint16(this.fullByteLength, v, true);
+    this.fullByteLength += 2;
   }
 
   /**
@@ -152,8 +176,8 @@ export class ByteArrayBuilder {
    */
   int16BE(v) {
     this._ensureCapacity(2);
-    this.view.setInt16(this.byteLength, v, false);
-    this.byteLength += 2;
+    this.view.setInt16(this.fullByteLength, v, false);
+    this.fullByteLength += 2;
   }
 
   /**
@@ -161,8 +185,8 @@ export class ByteArrayBuilder {
    */
   int16LE(v) {
     this._ensureCapacity(2);
-    this.view.setInt16(this.byteLength, v, true);
-    this.byteLength += 2;
+    this.view.setInt16(this.fullByteLength, v, true);
+    this.fullByteLength += 2;
   }
 
   /**
@@ -188,10 +212,10 @@ export class ByteArrayBuilder {
    */
   uint24BE(v) {
     this._ensureCapacity(3);
-    this.view.setUint8(this.byteLength, v >>> 16);
-    this.view.setUint8(this.byteLength + 1, (v >>> 8) & 0xFF);
-    this.view.setUint8(this.byteLength + 2, v & 0xFF);
-    this.byteLength += 3;
+    this.view.setUint8(this.fullByteLength, v >>> 16);
+    this.view.setUint8(this.fullByteLength + 1, (v >>> 8) & 0xFF);
+    this.view.setUint8(this.fullByteLength + 2, v & 0xFF);
+    this.fullByteLength += 3;
   }
 
   /**
@@ -199,10 +223,10 @@ export class ByteArrayBuilder {
    */
   int24BE(v) {
     this._ensureCapacity(3);
-    this.view.setInt8(this.byteLength, v >> 16);
-    this.view.setUint8(this.byteLength + 1, (v >> 8) & 0xFF);
-    this.view.setUint8(this.byteLength + 2, v & 0xFF);
-    this.byteLength += 3;
+    this.view.setInt8(this.fullByteLength, v >> 16);
+    this.view.setUint8(this.fullByteLength + 1, (v >> 8) & 0xFF);
+    this.view.setUint8(this.fullByteLength + 2, v & 0xFF);
+    this.fullByteLength += 3;
   }
 
   /**
@@ -210,8 +234,8 @@ export class ByteArrayBuilder {
    */
   uint32BE(v) {
     this._ensureCapacity(4);
-    this.view.setUint32(this.byteLength, v, false);
-    this.byteLength += 4;
+    this.view.setUint32(this.fullByteLength, v, false);
+    this.fullByteLength += 4;
   }
 
   /**
@@ -219,8 +243,8 @@ export class ByteArrayBuilder {
    */
   uint32LE(v) {
     this._ensureCapacity(4);
-    this.view.setUint32(this.byteLength, v, true);
-    this.byteLength += 4;
+    this.view.setUint32(this.fullByteLength, v, true);
+    this.fullByteLength += 4;
   }
 
   /**
@@ -228,8 +252,8 @@ export class ByteArrayBuilder {
    */
   int32BE(v) {
     this._ensureCapacity(4);
-    this.view.setInt32(this.byteLength, v, false);
-    this.byteLength += 4;
+    this.view.setInt32(this.fullByteLength, v, false);
+    this.fullByteLength += 4;
   }
 
   /**
@@ -237,8 +261,8 @@ export class ByteArrayBuilder {
    */
   int32LE(v) {
     this._ensureCapacity(4);
-    this.view.setInt32(this.byteLength, v, true);
-    this.byteLength += 4;
+    this.view.setInt32(this.fullByteLength, v, true);
+    this.fullByteLength += 4;
   }
 
   /**
@@ -273,8 +297,8 @@ export class ByteArrayBuilder {
    */
   uint64BE(v) {
     this._ensureCapacity(8);
-    this.view.setBigUint64(this.byteLength, v, false);
-    this.byteLength += 8;
+    this.view.setBigUint64(this.fullByteLength, v, false);
+    this.fullByteLength += 8;
   }
 
   /**
@@ -282,8 +306,8 @@ export class ByteArrayBuilder {
    */
   int64BE(v) {
     this._ensureCapacity(8);
-    this.view.setBigInt64(this.byteLength, v, false);
-    this.byteLength += 8;
+    this.view.setBigInt64(this.fullByteLength, v, false);
+    this.fullByteLength += 8;
   }
 
   /**
@@ -310,9 +334,9 @@ export class ByteArrayBuilder {
       if (code > 0x7F) {
         throw new Error(`String not representable in ASCII: '${v}'`);
       }
-      this.view.setUint8(this.byteLength + i, code);
+      this.view.setUint8(this.fullByteLength + i, code);
     }
-    this.byteLength += v.length;
+    this.fullByteLength += v.length;
   }
 
   /**
@@ -325,9 +349,9 @@ export class ByteArrayBuilder {
       if (code > 0xFF) {
         throw new Error(`String not representable in latin1: '${v}'`);
       }
-      this.view.setUint8(this.byteLength + i, code);
+      this.view.setUint8(this.fullByteLength + i, code);
     }
-    this.byteLength += v.length;
+    this.fullByteLength += v.length;
   }
 
   /**
@@ -343,10 +367,81 @@ export class ByteArrayBuilder {
   utf16BE(v) {
     this._ensureCapacity(v.length * 2);
     for (let i = 0; i < v.length; ++i) {
-      this.view.setUint16(this.byteLength + i * 2, v.charCodeAt(i), false);
+      this.view.setUint16(this.fullByteLength + i * 2, v.charCodeAt(i), false);
     }
-    this.byteLength += v.length * 2;
+    this.fullByteLength += v.length * 2;
   }
+
+  /**
+   * Appends `bits` bits of `value`. The value will be appended to the lowest
+   * available part of the current byte (i.e. if a value with 1 bit is pushed,
+   * it will set the lowest bit index).
+   * The value itself will be added as little endian.
+   *
+   * Note that this should not be mixed with calls to `pushHighBits*` unless the
+   * content is known to be byte-aligned (e.g. a byte value has been added, or
+   * `padToByte` has been called)
+   *
+   * @param {number} value
+   * @param {number} bits
+   */
+  pushLowBitsLE(value, bits) {
+    const advanceBytes = (bits - this.bitsRemaining + 7) >>> 3;
+    this._ensureCapacity(advanceBytes + 1, false);
+    if (value) {
+      const rawBytes = new Uint8Array(this.view.buffer, this.view.byteOffset);
+      if (this.bitsRemaining) {
+        rawBytes[this.fullByteLength - 1] |= (value >>> (bits - this.bitsRemaining)) << (8 - this.bitsRemaining);
+        bits -= this.bitsRemaining;
+      }
+      for (let i = 0; i * 8 <= bits; ++i) {
+        rawBytes[this.fullByteLength + i] = (value >>> (i * 8)) & 0xFF;
+      }
+    }
+    this.bitsRemaining = (this.bitsRemaining - bits) & 7;
+    this.fullByteLength += advanceBytes;
+  }
+
+  /**
+   * Appends `bits` bits of `value`. The value will be appended to the lowest
+   * available part of the current byte (i.e. if a value with 1 bit is pushed,
+   * it will set the lowest bit index).
+   * The value itself will be added as big endian.
+   *
+   * Note that this should not be mixed with calls to `pushHighBits*` unless the
+   * content is known to be byte-aligned (e.g. a byte value has been added, or
+   * `padToByte` has been called)
+   *
+   * @param {number} value
+   * @param {number} bits
+   */
+  pushLowBitsBE(value, bits) {
+    if (bits > 1 && value) {
+      return this.pushLowBitsLE(reverseBits(value, bits), bits);
+    } else {
+      return this.pushLowBitsLE(value, bits);
+    }
+  }
+}
+
+/**
+ * @param {number} value
+ */
+function reverseBits32(value) {
+  value = ((value & 0xAAAAAAAA) >>> 1) | ((value & 0x55555555) << 1);
+  value = ((value & 0xCCCCCCCC) >>> 2) | ((value & 0x33333333) << 2);
+  value = ((value & 0xF0F0F0F0) >>> 4) | ((value & 0x0F0F0F0F) << 4);
+  value = ((value & 0xFF00FF00) >>> 8) | ((value & 0x00FF00FF) << 8);
+  value = (value >>> 16) | ((value & 0x0000FFFF) << 16);
+  return value >>> 0;
+}
+
+/**
+ * @param {number} value
+ * @param {number} bits
+ */
+function reverseBits(value, bits) {
+  return reverseBits32(value) >>> (32 - bits);
 }
 
 /**

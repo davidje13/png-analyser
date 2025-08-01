@@ -17,7 +17,7 @@ async function process(data, name) {
   output.append(header);
 
   try {
-    const png = readPNG(data);
+    const png = await readPNG(data);
 
     if (png.warnings.length > 0) {
       const oDetails = document.createElement('details');
@@ -106,7 +106,7 @@ async function process(data, name) {
       amount.setAttribute('min', '0');
       amount.setAttribute('max', '1');
       amount.setAttribute('step', 'any');
-      amount.setAttribute('value', '1');
+      amount.setAttribute('value', '0.85');
 
       const diffusion = document.createElement('select');
       for (let i = 0; i < DIFFUSION_TYPES.length; ++i) {

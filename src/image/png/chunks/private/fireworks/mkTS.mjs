@@ -1,4 +1,4 @@
-import { inflate } from '../../../../../data/deflate.mjs';
+import { inflate } from '../../../../../data/inflate.mjs';
 import { registerChunk } from '../../registry.mjs';
 import { parse } from './tree/parser.mjs';
 import { tokenise } from './tree/tokeniser.mjs';
@@ -13,9 +13,9 @@ import { tokenise } from './tree/tokeniser.mjs';
  * }} mkTSChunk
  */
 
-registerChunk('mkTS', {}, (/** @type {mkTSChunk} */ chunk, /** @type {mkTSState} */ state, warnings) => {
+registerChunk('mkTS', {}, async (/** @type {mkTSChunk} */ chunk, /** @type {mkTSState} */ state, warnings) => {
   try {
-    const inflated = inflate(chunk.data);
+    const inflated = await inflate(chunk.data);
     chunk.raw = tokenise(inflated, warnings);
     state.mkts = chunk;
   } catch (e) {

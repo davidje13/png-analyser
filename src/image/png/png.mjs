@@ -18,9 +18,9 @@ export const isPNG = isPerfectPNGHeader;
 
 /**
  * @param {ArrayBuffer | ArrayBufferView} data
- * @return {PNGResult}
+ * @return {Promise<PNGResult>}
  */
-export function readPNG(data) {
+export async function readPNG(data) {
   /** @type {PNGResult} */ const result = { warnings: [], chunks: [], state: {}, bitDepth: 0 };
   const body = checkHeader(data, result.warnings);
   if (!body) {
@@ -31,7 +31,7 @@ export function readPNG(data) {
     result.chunks.push(chunk);
     p += chunk.advance;
   }
-  result.state = parseChunks(result.chunks, result.warnings);
+  result.state = await parseChunks(result.chunks, result.warnings);
   result.bitDepth = result.state.ihdr?.bitDepth ?? 0;
 
   return result;

@@ -1,9 +1,9 @@
 import { findIndex, getLatin1, getUTF8, subViewFrom } from '../../../../data/utils.mjs';
-import { inflate } from '../../../../data/deflate.mjs';
+import { inflate } from '../../../../data/inflate.mjs';
 import { registerChunk } from '../registry.mjs';
 import { textDisplay, textWrite } from './shared_text.mjs';
 
-registerChunk('iTXt', {}, (
+registerChunk('iTXt', {}, async (
   /** @type {import('./shared_text.mjs').textChunk} */ chunk,
   /** @type {import('./shared_text.mjs').textState} */ state,
   warnings,
@@ -42,7 +42,7 @@ registerChunk('iTXt', {}, (
   let uncompressedValue = rawValue;
   if (chunk.isCompressed) {
     try {
-      uncompressedValue = inflate(rawValue);
+      uncompressedValue = await inflate(rawValue);
     } catch (e) {
       warnings.push(`iTXt compressed data is unreadable ${e}`);
       uncompressedValue = new DataView(rawValue.buffer, 0, 0);

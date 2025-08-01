@@ -28,6 +28,7 @@ export function zlibCrc32(crc, bytes, length, start) {
 export class CRC {
   constructor(crc = ~0) {
     /** @type {number} */ this.crc = crc;
+    /** @type {number} */ this.length = 0;
   }
 
   /**
@@ -39,7 +40,16 @@ export class CRC {
     for (let n = 0; n < bytes.byteLength; ++n) {
       this.crc = CRC_TABLE[(this.crc ^ bytes[n]) & 0xff] ^ (this.crc >>> 8);
     }
+    this.length += bytes.byteLength;
     return this;
+  }
+
+  /**
+   * @param {number} v
+   */
+  updateByte(v) {
+    this.crc = CRC_TABLE[(this.crc ^ v) & 0xff] ^ (this.crc >>> 8);
+    ++this.length;
   }
 
   /**

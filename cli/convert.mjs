@@ -28,11 +28,11 @@ for (let i = 2; i < process.argv.length; ++i) {
     flags.push(p);
   } else {
     anyInFiles = true;
-    images.push(...readImage(p === '-' ? process.stdin.fd : p));
+    images.push(...await readImage(p === '-' ? process.stdin.fd : p));
   }
 }
 if (!anyInFiles) {
-  images.push(...readImage(process.stdin.fd));
+  images.push(...await readImage(process.stdin.fd));
 }
 
 process.stderr.write(`Found ${images.length} image${images.length === 1 ? '' : 's'}\n`);
@@ -116,11 +116,11 @@ function addIndex(path, index) {
 /**
  * @param {import('node:fs').PathOrFileDescriptor} path
  */
-function readImage(path) {
+async function readImage(path) {
   const input = readFileSync(path);
   if (isPNG(input)) {
     process.stderr.write(`- reading: ${path} as PNG\n`);
-    const png = readPNG(input);
+    const png = await readPNG(input);
     for (const warning of png.warnings) {
       process.stderr.write(`  WARN: ${warning}\n`);
     }
@@ -143,7 +143,7 @@ function readImage(path) {
     return [];
   } else if (isICNS(input)) {
     process.stderr.write(`- reading: ${path} as ICNS\n`);
-    const icns = readICNS(input);
+    const icns = await readICNS(input);
     for (const warning of icns.warnings) {
       process.stderr.write(`  WARN: ${warning}\n`);
     }
@@ -166,7 +166,7 @@ function readImage(path) {
     return allImages;
   } else if (isICO(input)) {
     process.stderr.write(`- reading: ${path} as ICO / CUR\n`);
-    const ico = readICO(input);
+    const ico = await readICO(input);
     for (const warning of ico.warnings) {
       process.stderr.write(`  WARN: ${warning}\n`);
     }
