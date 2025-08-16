@@ -5,7 +5,7 @@
   "private": true,
   "bin": "./cli/png.mjs",
   "scripts": {
-    "start": "static-server --index index.html --port 8080",
+    "start": "python3 -m http.server -b 127.0.0.1 -d . 8080",
     "lint": "tsc",
     "test": "lean-test"
   },
@@ -25,7 +25,6 @@
   "devDependencies": {
     "@types/node": "20.x",
     "lean-test": "2.x",
-    "static-server": "2.x",
     "typescript": "5.8.x"
   }
 }

@@ -46,6 +46,7 @@ function drawChart(w, h, pad, fn) {
   const chart = makeCanvas(w + pad * 2, h + pad * 2);
   chart.ctx.lineWidth = 1;
   chart.ctx.strokeStyle = '#000000';
+  chart.ctx.beginPath();
   chart.ctx.moveTo(pad, (1 - fn(0)) * h + pad);
   for (let x = 1; x <= w; ++x) {
     chart.ctx.lineTo(x + pad, (1 - fn(x / w)) * h + pad);
