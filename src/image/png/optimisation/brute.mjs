@@ -1,4 +1,4 @@
-import { deflateSync, constants } from 'node:zlib'; // https://www.ietf.org/rfc/rfc1950.txt / https://www.ietf.org/rfc/rfc1951.txt
+import { deflateSync, constants, deflateRawSync } from 'node:zlib'; // https://www.ietf.org/rfc/rfc1950.txt / https://www.ietf.org/rfc/rfc1951.txt
 import { applyFilters, makeFilterTargets } from './filters.mjs';
 import { ByteArrayBuilder } from '../../../data/builder.mjs';
 
@@ -155,7 +155,8 @@ function compress(idat, plte, trns, zlibConfig) {
   while (windowBits < 15 && (1 << windowBits) < idat.byteLength) { // window size <= 32kB
     ++windowBits;
   }
-  const compressed = deflateSync(idat, { // method=8, no dictionary
+  const compressor = zlibConfig.raw ? deflateRawSync : deflateSync;
+  const compressed = compressor(idat, { // method=8, no dictionary
     windowBits,
     level: zlibConfig.level,
     memLevel: zlibConfig.memLevel,

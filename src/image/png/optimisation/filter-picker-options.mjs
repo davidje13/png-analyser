@@ -11,6 +11,9 @@ import { applyFilters } from './filters.mjs';
  * }} FilterPickerOption
  */
 
+/** @type {FilterPickerOption} */ export const FILTER_PICKER_0 = { id: 'all 0', weight: 27, picker: filterPicker_static(0) };
+/** @type {FilterPickerOption} */ export const FILTER_PICKER_1 = { id: 'all 1', weight: 28, picker: filterPicker_static(1) };
+
 /** @type {FilterPickerOption[]} */ export const FILTER_PICKER_OPTIONS = [
   // http://www.libpng.org/pub/png/book/chapter09.html
   { id: 'min-sum-abs w=1', weight: 107, picker: filterPicker_minSumAbs(1) },
@@ -20,8 +23,8 @@ import { applyFilters } from './filters.mjs';
   { id: 'dynamic w=1', weight: 142, picker: filterPicker_dynamic(1) },
   { id: 'dynamic w=0.95', weight: 125, picker: filterPicker_dynamic(0.95) },
 
-  { id: 'all 0', weight: 27, picker: filterPicker_static(0) },
-  { id: 'all 1', weight: 28, picker: filterPicker_static(1) },
+  FILTER_PICKER_0,
+  FILTER_PICKER_1,
   { id: 'all 2', weight: 8, picker: filterPicker_static(2) },
   { id: 'all 3', weight: 1, picker: filterPicker_static(3) },
   { id: 'all 4', weight: 9, picker: filterPicker_static(4) },

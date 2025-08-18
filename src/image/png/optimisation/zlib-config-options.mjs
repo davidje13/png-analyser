@@ -4,6 +4,7 @@ import { constants } from 'node:zlib';
  * @typedef {{
  *   id: string,
  *   level: number,
+ *   raw?: boolean,
  *   memLevel: number,
  *   chunkSize: number,
  *   strategy: number,
