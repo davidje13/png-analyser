@@ -15,7 +15,14 @@ import { asCanvas, printImage } from '../../../../display/pretty.mjs';
  *   idot?: import('../private/apple/iDOT.mjs').iDOTChunk,
  *   idat?: { raw: ArrayBufferView, image: number[][], levels: SubImage[] },
  *   idats?: import('../registry.mjs').Chunk[],
- *   isApple?: boolean,
+ *   isRawZlib?: boolean,
+ *   customLookup?: (info: {
+ *     bits: number,
+ *     indexed: boolean,
+ *     rgb: boolean,
+ *     alpha: boolean,
+ *     gammaLookupTables: number[][],
+ *   }) => (((channels: number[]) => number) | null),
  * }} IDATState
  */
 
@@ -80,9 +87,9 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     }
   }
 
-  let raw = new Uint8Array(0);
+  /** @type {Uint8Array<ArrayBufferLike>} */ let raw = new Uint8Array(0);
   try {
-    if (state.isApple) {
+    if (state.isRawZlib) {
       raw = asBytes(await inflateRaw(concat(state.idats.map((c) => c.data))));
     } else {
       raw = asBytes(await inflate(concat(state.idats.map((c) => c.data))));
@@ -151,28 +158,12 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     }
     lookup = ([i]) => lookupPalette[i];
   } else if (rgb && alpha) {
-    if (state.isApple) { // RGBA is flipped to BGRA and premultiplied by alpha
-      const max = (1 << bits) - 1;
-      lookup = ([b, g, r, a]) => {
-        if (!a) {
-          return 0;
-        }
-        const m = max / a;
-        return (
-          (lookupTables[3][a] << 24) |
-          (lookupTables[0][(r * m)|0] << 16) |
-          (lookupTables[1][(g * m)|0] << 8) |
-          lookupTables[2][(b * m)|0]
-        );
-      };
-    } else {
-      lookup = ([r, g, b, a]) => (
-        (lookupTables[3][a] << 24) |
-        (lookupTables[0][r] << 16) |
-        (lookupTables[1][g] << 8) |
-        lookupTables[2][b]
-      );
-    }
+    lookup = ([r, g, b, a]) => (
+      (lookupTables[3][a] << 24) |
+      (lookupTables[0][r] << 16) |
+      (lookupTables[1][g] << 8) |
+      lookupTables[2][b]
+    );
   } else if (rgb) {
     let transR = -1;
     let transG = -1;
@@ -200,6 +191,14 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       (lookupTables[0][l] * 0x010101)
     );
   }
+
+  lookup = state.customLookup?.({
+    bits,
+    indexed,
+    rgb,
+    alpha,
+    gammaLookupTables: lookupTables,
+  }) ?? lookup;
 
   if (filterMethod !== 0) {
     warnings.push(`Filter method ${filterMethod} is not supported`);

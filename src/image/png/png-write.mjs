@@ -81,6 +81,7 @@ export function writePNG(image, {
  * @param {number} options.bitDepth
  * @param {number} options.colourType
  * @param {ArrayBufferView[]} options.idats
+ * @param {(number | undefined)=} options.cgbi
  * @param {({ start: number, height: number, idat: number }[] | undefined)=} options.idot
  * @param {(ArrayBufferView | undefined)=} options.plte
  * @param {(ArrayBufferView | undefined)=} options.trns
@@ -92,6 +93,7 @@ export function writeRawPNG({
   bitDepth,
   colourType,
   idats,
+  cgbi,
   idot,
   plte = undefined,
   trns = undefined,
@@ -99,6 +101,12 @@ export function writeRawPNG({
 }) {
   const buf = new ByteArrayBuilder();
   buf.append(PNG_HEADER);
+
+  if (cgbi !== undefined) {
+    const bCgBI = new ByteArrayBuilder();
+    bCgBI.int32BE(cgbi);
+    writeChunk(buf, 'CgBI', bCgBI);
+  }
 
   const bIHDR = new ByteArrayBuilder();
   bIHDR.uint32BE(width);
