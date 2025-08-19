@@ -64,30 +64,32 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
     lookup.set(col, entity);
   }
   let remaining = maxEntries;
-  let remainingSum = histogram.sum;
 
   /** @type {number[]} */ const r = [];
   /** @type {(col: Col) => void} */
   const addCol = (col) => {
     r.push(argb(col.c.a, col.c.r, col.c.g, col.c.b));
-    remainingSum -= col.count;
     --remaining;
-    col.count = 0;
-    col.score = 0;
-    for (const v of remainingColours) {
-      if (!v.score) {
-        continue;
+    for (let i = 0, e = remainingColours.length, del = false; i < e; ++i) {
+      const v = remainingColours[i];
+      if (v === col) {
+        del = true;
+      } else {
+        const da = v.c.a - col.c.a;
+        const dr = v.c.r - col.c.r;
+        const dg = v.c.g - col.c.g;
+        const db = v.c.b - col.c.b;
+        v.score = Math.min(v.score,
+          Math.abs(da) * alphaNorm +
+          Math.sqrt(dr * dr + dg * dg + db * db) * Math.min(v.c.a, col.c.a) * colourNorm +
+          v.count * countNorm,
+        );
+        if (del) {
+          remainingColours[i - 1] = v;
+        }
       }
-      const da = v.c.a - col.c.a;
-      const dr = v.c.r - col.c.r;
-      const dg = v.c.g - col.c.g;
-      const db = v.c.b - col.c.b;
-      v.score = Math.min(v.score,
-        Math.abs(da) * alphaNorm +
-        Math.sqrt(dr * dr + dg * dg + db * db) * Math.min(v.c.a, col.c.a) * colourNorm +
-        v.count * countNorm,
-      );
     }
+    --remainingColours.length;
   };
 
   // if any part of the image is transparent, ensure we keep it
