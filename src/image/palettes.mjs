@@ -1,5 +1,4 @@
-import { pickPalette } from './png/optimisation/pick-palette.mjs';
-import { getImageStats } from './png/optimisation/stats.mjs';
+import { pickPalette } from './actions/pick-palette.mjs';
 
 export const BLACK_WHITE = [
   0xFF000000,
@@ -156,11 +155,10 @@ for (let r = 0; r < 8; ++r) {
 
 /**
  * @param {number} colours
- * @return {(image: number[][]) => number[]}
+ * @return {(image: number[][], weights: number[][]) => number[]}
  */
-export const adaptive = (colours) => (image) => {
-  const stats = getImageStats(image, false, false);
-  return pickPalette(image, stats, colours);
+export const adaptive = (colours) => (image, weights) => {
+  return pickPalette(image, weights, colours);
 };
 
 export const PALETTES = [

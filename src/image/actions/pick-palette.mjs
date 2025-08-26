@@ -1,19 +1,36 @@
 /** @type {('a'|'r'|'g'|'b')[]} */ const CHANNELS = ['a', 'r', 'g', 'b'];
 
+// target:
+// - always include extremes
+//   - all input colours must be within the convex hull formed by the output colours (for target palette sizes < 9 this may not be possible in all cases)
+//   - in 1D this is easy: include max & min
+//   - in 2D+ this could mean including colours which are not in the original image
+// - the RGB value of "transparent" is irrelevant (and relevance of RGB decreases as the colour approaches transparent)
+//   - effectively means look at "premultiplied alpha" space, but also need to scale differences by alpha
+// - errors have different "costs" depending on how "flat" the colour is
+//   - dithering shows up more obviously in large areas of flat or slowly changing colour
+//   - take abs(c5-c2)+abs(c5-c4)+abs(c5-c6)+abs(c5-c8) as the relative "flatness" (0 = flat, 4*range = steep)
+//   - extracted into scoreFlatness (passed through as weights here)
+// - be invariant to:
+//   - image scale (e.g. pixel count / total area, distance / sqrt(total area))
+//   - number of colours / bit depth in source palette (e.g. cumulative distribution)
+// - never produce duplicate palette entries
+// - minimise sum(min(delta) * flatness cost)
+//   - can precompute sum(flatness cost) for each colour value
+//   - in 1D: can calculate cumulative histogram of this to speed up search
+
 const ALPHA_FRAC = 1;
 const RGB_FRAC = 1;
-const COUNT_FRAC = 20;
+const COUNT_FRAC = 50;
 
 /**
  * @param {number[][]} image
- * @param {import('./stats.mjs').Stats} stats
+ * @param {number[][]} weights - use scoreFlatness(image)
  * @param {number} maxEntries
  * @return {number[]}
  */
-export function pickPalette(image, { colours, allGreyscale, allowMatteTransparency }, maxEntries) {
-  if (allowMatteTransparency) {
-    throw new Error('Cannot pick palette using stats with matte transparency');
-  }
+export function pickPalette(image, weights, maxEntries) {
+  const colours = getImagePaletteStats(image, weights);
   if (colours.size <= maxEntries) {
     return [...colours.keys()].sort(niceColourOrder);
   }
@@ -29,9 +46,9 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
   const stats = Object.fromEntries(CHANNELS.map((c) => [c, getHistogramStats(histogram[c])]));
 
   // grayscale
-  if (allGreyscale && stats.a.singular) {
+  if (isAllGreyscale(colours.keys()) && stats.a.singular) {
     const alpha = stats.a.max;
-    return distribute1D(histogram.r, maxEntries).map((l) => argb(alpha, l, l, l));
+    return distribute1D(histogram.r, maxEntries).map((l) => argb(alpha, l, l, l)).sort(niceColourOrder);
   }
 
   const channelCount = CHANNELS.map((c) => Number(stats[c].singular ? 0 : 1)).reduce((a, b) => a + b, 0);
@@ -45,7 +62,7 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
         return distribute1D(histogram[c], maxEntries).map((v) => {
           base[i] = v;
           return argb(...base);
-        });
+        }).sort(niceColourOrder);
       }
     }
   }
@@ -63,6 +80,25 @@ export function pickPalette(image, { colours, allGreyscale, allowMatteTransparen
     remainingColours.push(entity);
     lookup.set(col, entity);
   }
+
+  //// blur count a little into nearby colours so that colours within smooth gradients are favoured over random outliers
+  //// - removed: turns out to be slow and gives poor results
+  ///** @type {RGBABuckets<Col>} */ const buckets = new RGBABuckets(16);
+  //for (const col of remainingColours) {
+  //  buckets.add(col.c, col);
+  //}
+  //buckets.runNearby(1, (a, b) => {
+  //  const dr = a.c.r - b.c.r;
+  //  const dg = a.c.g - b.c.g;
+  //  const db = a.c.b - b.c.b;
+  //  const da = a.c.a - b.c.a;
+  //  const d = Math.sqrt(dr * dr + dg * dg + db * db + da * da);
+  //  a.blurCount += b.count / (d + 1);
+  //});
+  //for (const col of remainingColours) {
+  //  col.score = ALPHA_FRAC + RGB_FRAC + col.count * countNorm;
+  //}
+
   let remaining = maxEntries;
 
   /** @type {number[]} */ const r = [];
@@ -172,94 +208,66 @@ function getHistogramStats(histogram) {
 /**
  * @param {number[]} histogram
  * @param {number} maxEntries
- * @param {boolean} includeStart
- * @param {boolean} includeEnd
- * @return {number[]}
- */
-function distribute1DSimple(histogram, maxEntries, includeStart, includeEnd) {
-  if (maxEntries === 0) {
-    return [];
-  }
-
-  const { sum, min, max } = getHistogramStats(histogram);
-
-  // evenly allocate all space according to frequency of use
-  // note: this can result in duplicates, proportional to the frequency of the colour
-  const r = [];
-  const evenStep = sum / (maxEntries + 1 - Number(includeStart) - Number(includeEnd));
-  let next = includeStart ? 0 : evenStep;
-  for (let i = min, p = 0; i <= max; ++i) {
-    p += histogram[i];
-    while (p > next && r.length < maxEntries) {
-      r.push(i);
-      next += evenStep;
-    }
-  }
-  // due to numerical precision, we cannot be sure if the last entry has been added or not, so check
-  if (includeEnd && r.length < maxEntries) {
-    r.push(max);
-  }
-
-  return r;
-}
-
-/**
- * @param {number[]} histogram
- * @param {number} maxEntries
  * @return {number[]}
  */
 function distribute1D(histogram, maxEntries) {
-  if (maxEntries < 2) {
-    return distribute1DSimple(histogram, maxEntries, false, false);
+  const { min, max } = getHistogramStats(histogram);
+  /** @type {number[]} */ const cumulative = [];
+  let n = 0;
+  for (const v of histogram) {
+    n += v;
+    cumulative.push(n);
   }
-
-  let { count, sum, min, max } = getHistogramStats(histogram);
-
-  const r = [];
-  if (count <= maxEntries) {
-    // enough spaces for everything; no need to quantise at all
-    for (let i = 0; i < histogram.length; ++i) {
-      if (histogram[i] > 0) {
-        r.push(i);
+  const output = [{ value: min, done: true }, { value: max, done: true }];
+  function findOptimalPosition() {
+    let index = 1;
+    let lower = output[index - 1].value;
+    let upper = output[index].value;
+    let score = 0;
+    let best = { index: 0, value: 0, score: -1, count: 0 };
+    for (let v = min + 1; v < max; ++v) {
+      const pos = v - 1;
+      score += cumulative[(pos + lower) >>> 1] + cumulative[(pos + upper) >>> 1] - cumulative[pos] * 2;
+      if (score > best.score || (score === best.score && histogram[v] > best.count)) {
+        best = { index, value: v, score, count: histogram[v] };
+      }
+      if (v === upper) {
+        lower = upper;
+        upper = output[++index].value;
       }
     }
-    return r;
+    return best;
   }
-
-  const h = [...histogram];
-  // first and last must always be included, else dither pattern can bleed
-  r.push(min, max);
-  sum -= h[min];
-  sum -= h[max];
-  h[min] = 0;
-  h[max] = 0;
-
-  // if values far outweigh others (to the point where they would be included multiple times),
-  // add them early and redistribute the remaining space
-  let remaining = maxEntries - 2;
-  while (remaining > 0) {
+  for (let i = 2; i < maxEntries; ++i) {
+    const best = findOptimalPosition();
+    output.splice(best.index, 0, { value: best.value, done: true });
+  }
+  if (maxEntries < 4) {
+    return output.map(({ value }) => value);
+  }
+  for (let iteration = 0; iteration < 4; ++iteration) { // 1-3 iterations are normally enough to reach the optimal palette
+    for (const o of output) {
+      o.done = false;
+    }
     let changed = false;
-    const evenStep = sum / (remaining + 1);
-    for (let i = 0; i < h.length; ++i) {
-      if (h[i] > evenStep) {
-        r.push(i);
-        sum -= h[i];
-        --remaining;
-        h[i] = 0;
-        changed = true;
-        if (!remaining) {
-          break;
-        }
+    for (let i = 1; i < maxEntries - 1;) {
+      if (output[i].done) {
+        ++i;
+        continue;
       }
+      const current = output.splice(i, 1)[0];
+      const updated = findOptimalPosition();
+      output.splice(updated.index, 0, { value: updated.value, done: true });
+      if (updated.index <= i) {
+        ++i;
+      }
+      changed ||= updated.value !== current.value;
     }
     if (!changed) {
       break;
     }
   }
-
-  // evenly allocate remaining space according to frequency of use
-  r.push(...distribute1DSimple(h, remaining, false, false));
-  return r.sort(niceColourOrder);
+  return output.map(({ value }) => value);
 }
 
 /**
@@ -319,12 +327,56 @@ function niceColourOrder(c1, c2) {
   const a = splitARGB(c1);
   const b = splitARGB(c2);
   if (a.a !== b.a) {
+    // put transparent colours first so that tRNS PNG chunk can omit solid colours
     return a.a - b.a;
   }
+  // sort by luminosity (having similar colours nearby can improve compression)
   const la = a.r + a.g + a.b;
   const lb = b.r + b.g + b.b;
   if (la !== lb) {
     return la - lb;
   }
   return c1 - c2;
+}
+
+/**
+ * @param {number[][]} image
+ * @param {number[][]} weights
+ */
+function getImagePaletteStats(image, weights) {
+  /** @type {Map<number, number>} */ const colours = new Map();
+  const h = image.length;
+  if (!h) {
+    return colours;
+  }
+  const w = image[0].length;
+  for (let y = 0; y < h; ++y) {
+    const row = image[y];
+    const weightRow = weights[y] ?? [];
+    for (let x = 0; x < w; ++x) {
+      const c = row[x];
+      const weight = weightRow[x] ?? 1;
+      const key = (c >>> 24) ? c : 0;
+      colours.set(key, (colours.get(key) ?? 0) + weight);
+    }
+  }
+  return colours;
+}
+
+/**
+ * @param {Iterable<number>} colours
+ */
+function isAllGreyscale(colours) {
+  for (const c of colours) {
+    const alpha = c >>> 24;
+    if (alpha) {
+      const red = (c >>> 16) & 0xFF;
+      const green = (c >>> 8) & 0xFF;
+      const blue = c & 0xFF;
+      if (red !== green || green !== blue) {
+        return false;
+      }
+    }
+  }
+  return true;
 }

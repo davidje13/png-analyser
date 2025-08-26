@@ -1,5 +1,7 @@
 import { COLOURSPACES } from '../src/image/colour.mjs';
 import { DIFFUSION_TYPES } from '../src/image/diffusions.mjs';
+import { falseColour, SPECTRUM_RED } from '../src/image/actions/false-colour.mjs';
+import { scoreFlatness } from '../src/image/actions/score-flatness.mjs';
 import { quantise } from '../src/image/actions/dither.mjs';
 import { PALETTES } from '../src/image/palettes.mjs';
 import { readPNG } from '../src/image/png/png.mjs';
@@ -65,12 +67,19 @@ async function process(data, name) {
 
     const image = png.state.idat?.image;
     if (image) {
+      const weights = scoreFlatness(image);
+
+      //const weightsOut = makeCanvas(weights[0]?.length ?? 0, weights.length);
+      //weightsOut.ctx.putImageData(asImageData(falseColour(weights, SPECTRUM_RED, 0, 1), false), 0, 0);
+      //output.append(weightsOut.canvas);
+
       const palette = document.createElement('select');
+      const optNone = document.createElement('option');
+      optNone.setAttribute('selected', 'selected');
+      optNone.append('none');
+      palette.append(optNone);
       for (let i = 0; i < PALETTES.length; ++i) {
         const opt = document.createElement('option');
-        if (!i) {
-          opt.setAttribute('selected', 'selected');
-        }
         if (typeof PALETTES[i].value === 'function') {
           opt.append(PALETTES[i].name);
         } else {
@@ -141,23 +150,50 @@ async function process(data, name) {
       const paletteOut = makeCanvas(1, 1);
       const ditherOut = makeCanvas(ditherIn[0]?.length ?? 0, ditherIn.length);
       output.append(options, paletteOut.canvas, document.createElement('br'), ditherOut.canvas);
+      /** @type {number[][] | null} */ let ditheredData = null;
+      /** @type {{ from: number, to: number } | null} */ let highlight = null;
+      /** @type {number[]} */ let chosenPalette = [];
 
-      function updateDither() {
-        const paletteSource = PALETTES[palette.selectedIndex].value;
-        let p = [];
-        if (typeof paletteSource === 'function') {
-          p = paletteSource(ditherIn);
-        } else if (transparent.checked && !paletteSource.includes(0)) {
-          p = [0, ...paletteSource];
-        } else {
-          p = paletteSource;
+      paletteOut.canvas.addEventListener('mouseleave', () => {
+        if (highlight) {
+          highlight = null;
+          redrawPalette();
+          redrawImage();
         }
-        const pw = Math.min(p.length, 64);
+      });
+      paletteOut.canvas.addEventListener('mousemove', (e) => {
+        const { top, left } = paletteOut.canvas.getBoundingClientRect();
+        const x = Math.floor((e.clientX - left) / palettePreviewSize);
+        const y = Math.floor((e.clientY - top) / palettePreviewSize);
+        const n = x + y * 64;
+        const c = chosenPalette[n];
+        if (c === undefined) {
+          if (highlight) {
+            highlight = null;
+            redrawPalette();
+            redrawImage();
+          }
+        } else if (highlight?.from !== c) {
+          highlight = {
+            from: c,
+            to: makeContrastingColour(c),
+          };
+          redrawPalette();
+          redrawImage();
+        }
+      });
+
+      function redrawPalette() {
+        if (!chosenPalette.length) {
+          paletteOut.canvas.width = 1;
+          paletteOut.canvas.height = 1;
+        }
+        const pw = Math.min(chosenPalette.length, 64);
         paletteOut.canvas.width = pw * palettePreviewSize;
-        paletteOut.canvas.height = Math.ceil(p.length / pw) * palettePreviewSize;
+        paletteOut.canvas.height = Math.ceil(chosenPalette.length / pw) * palettePreviewSize;
         paletteOut.ctx.clearRect(0, 0, paletteOut.canvas.width, paletteOut.canvas.height);
-        for (let i = 0; i < p.length; ++i) {
-          const c = p[i];
+        for (let i = 0; i < chosenPalette.length; ++i) {
+          const c = chosenPalette[i];
           const x = (i % pw) * palettePreviewSize;
           const y = Math.floor(i / pw) * palettePreviewSize;
           const w = palettePreviewSize;
@@ -178,8 +214,44 @@ async function process(data, name) {
             paletteOut.ctx.fillStyle = '#' + (alpha * 0x010101).toString(16).padStart(6, '0');
             paletteOut.ctx.fillRect(x + hw, y + hw, hw, hw);
           }
+          if (c === highlight?.from) {
+            paletteOut.ctx.fillStyle = '#' + (makeContrastingColour(c) & 0xFFFFFF).toString(16).padStart(6, '0');
+            paletteOut.ctx.fillRect(x + w / 4, y + w / 4, hw, hw);
+          }
         }
-        const dithered = quantise(ditherIn, p, {
+      }
+
+      function redrawImage() {
+        if (!ditheredData) {
+          ditherOut.ctx.clearRect(0, 0, ditherIn[0]?.length ?? 0, ditherIn.length);
+          return;
+        }
+        const h = highlight;
+        if (h) {
+          const highlighted = ditheredData.map((row) => row.map((c) => c === h.from ? h.to : c));
+          ditherOut.ctx.putImageData(asImageData(highlighted, true), 0, 0);
+        } else {
+          ditherOut.ctx.putImageData(asImageData(ditheredData, true), 0, 0);
+        }
+      }
+
+      function updateDither() {
+        if (palette.selectedIndex === 0) {
+          chosenPalette = [];
+          ditheredData = null;
+          redrawPalette();
+          redrawImage();
+          return;
+        }
+        const paletteSource = PALETTES[palette.selectedIndex-1].value;
+        if (typeof paletteSource === 'function') {
+          chosenPalette = paletteSource(ditherIn, weights);
+        } else if (transparent.checked && !paletteSource.includes(0)) {
+          chosenPalette = [0, ...paletteSource];
+        } else {
+          chosenPalette = paletteSource;
+        }
+        ditheredData = quantise(ditherIn, chosenPalette, {
           colourspaceConversion: COLOURSPACES[colspace.selectedIndex].fromSRGB,
           dither: {
             matte: transparent.checked ? -1 : Number.parseInt(matte.value.substring(1), 16),
@@ -188,7 +260,8 @@ async function process(data, name) {
             serpentine: serpentine.checked,
           },
         });
-        ditherOut.ctx.putImageData(asImageData(dithered, true), 0, 0);
+        redrawPalette();
+        redrawImage();
       }
       setTimeout(updateDither, 0);
     }
@@ -201,6 +274,14 @@ async function process(data, name) {
     console.error(e);
   }
   out.append(output);
+}
+
+/** @param {number} c */
+function makeContrastingColour(c) {
+  if (((c >> 16) & 0xFF) >= 0x80 && ((c >> 8) & 0xFF) < 0x80 && (c & 0xFF) < 0x80) {
+    return 0xFF0000FF;
+  }
+  return 0xFFFF0000;
 }
 
 /**

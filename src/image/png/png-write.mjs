@@ -1,4 +1,6 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
+import { scoreFlatness } from '../actions/score-flatness.mjs';
+import { pickPalette } from '../actions/pick-palette.mjs';
 import { quantise } from '../actions/dither.mjs';
 import { FLOYD_STEINBERG } from '../diffusions.mjs';
 import { writeChunk } from './chunk.mjs';
@@ -7,7 +9,6 @@ import { FILTER_PICKER_OPTIONS } from './optimisation/filter-picker-options.mjs'
 import { ZLIB_CONFIG_OPTIONS } from './optimisation/zlib-config-options.mjs';
 import { findOptimalCompression } from './optimisation/brute.mjs';
 import { getImageStats } from './optimisation/stats.mjs';
-import { pickPalette } from './optimisation/pick-palette.mjs';
 
 const PNG_HEADER = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const VOID = new Uint8Array(0);
@@ -38,7 +39,8 @@ export function writePNG(image, {
 
   if (crushPalette && preStats.colours.size > crushPalette) {
     process.stderr.write(`Crushing palette to ${crushPalette} entries...\n`);
-    const palette = pickPalette(image, preStats, crushPalette);
+    const weights = scoreFlatness(image);
+    const palette = pickPalette(image, weights, crushPalette);
     image = quantise(image, palette, { dither: { diffusion: FLOYD_STEINBERG, amount: ditherAmount } });
   }
 
