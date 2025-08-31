@@ -1,5 +1,5 @@
 import { ByteArrayBuilder } from '../../data/builder.mjs';
-import { asDataView, getLatin1, subViewLen } from '../../data/utils.mjs';
+import { asBytes, asDataView, getLatin1, subViewLen } from '../../data/utils.mjs';
 import { getImageStats } from './optimisation/stats.mjs';
 
 // https://en.wikipedia.org/wiki/BMP_file_format
@@ -29,9 +29,14 @@ const BI_CMYKRLE4 = 13;
 /**
  * @typedef {{
  *   warnings: string[],
+ *   type?: string,
  *   hotspot?: { x: number, y: number },
  *   image: number[][],
- *   bitDepth: number;
+ *   andMask?: boolean[][],
+ *   planes: number,
+ *   topToBottom: boolean,
+ *   bitDepth: number,
+ *   compressionMethod: string,
  * }} BMPResult
  */
 
@@ -57,32 +62,206 @@ export function isBMP(data) {
  * @return {BMPResult}
  */
 export function readBMP(data, { expectHeader = true, andMask = false } = {}) {
-  /** @type {BMPResult} */ const result = { warnings: [], image: [], bitDepth: 0 };
+  /** @type {BMPResult} */ const result = { warnings: [], image: [], planes: 0, topToBottom: false, bitDepth: 0, compressionMethod: '' };
   const dv = asDataView(data);
+  const byteData = asBytes(data);
 
-  const type = getLatin1(dv, 0, 2, result.warnings);
-  const s0 = dv.getUint32(2, true);
-  const s1 = dv.getUint32(14, true);
-  const hasHeader = s0 > 14 && s0 > s1;
-  if (expectHeader && !hasHeader) {
-    result.warnings.push('Missing bitmap header');
-  } else if (!expectHeader && hasHeader) {
-    result.warnings.push('Unexpected bitmap header present');
-  }
+  const hasHeader = expectHeader;//s0 > 14 && s0 > s1;
+  //if (expectHeader && !hasHeader) {
+  //  result.warnings.push('Missing bitmap header');
+  //} else if (!expectHeader && hasHeader) {
+  //  result.warnings.push('Unexpected bitmap header present');
+  //}
+
+  let p = 0;
+  let pixelOffset = 0;
   if (hasHeader) {
+    const bmpHeader = subViewLen(dv, 0, 14, result.warnings);
+    result.type = getLatin1(bmpHeader, 0, 2, result.warnings);
+    const totalSize = bmpHeader.getUint32(2, true);
+    if (totalSize !== dv.byteLength) {
+      result.warnings.push('Bitmap length does not match data length');
+    }
     const hotspot = {
-      x: dv.getInt16(6, true),
-      y: dv.getInt16(8, true),
+      x: bmpHeader.getInt16(6, true),
+      y: bmpHeader.getInt16(8, true),
     };
     if (hotspot.x !== 0 || hotspot.y !== 0) {
       result.warnings.push('Bitmap contains hotspot coordinate extension');
     }
     result.hotspot = hotspot;
+    pixelOffset = bmpHeader.getUint32(10, true);
+    p += 14;
   }
-  const dibHeader = subViewLen(dv, (hasHeader ? 14 : 0) + 4, (hasHeader ? s1 : s0) - 4, result.warnings);
 
-  result.bitDepth = 0; // TODO
-  throw new Error('TODO');
+  const dibHeaderLength = dv.getUint32(p, true);
+  if (dibHeaderLength < 12) {
+    result.warnings.push('DIB header is truncated');
+  }
+  const dibHeader = subViewLen(dv, p + 4, dibHeaderLength, result.warnings);
+  const w = dibHeader.getInt32(0, true);
+  const rawHeight = dibHeader.getInt32(4, true);
+  const topToBottom = rawHeight < 0;
+  const h = (topToBottom ? rawHeight * -1 : rawHeight) / (andMask ? 2 : 1);
+  const planes = dibHeader.getUint16(8, true);
+  const bitCount = dibHeader.getUint16(10, true);
+  const strideXOR = ((w * bitCount + 31) >>> 5) * 4;
+  const strideAND = ((w + 31) >>> 5) * 4;
+
+  result.topToBottom = topToBottom;
+  result.planes = planes;
+  result.bitDepth = bitCount;
+
+  let compressionMethod = BI_RGB;
+  if (dibHeader.byteLength >= 16) {
+    compressionMethod = dibHeader.getUint32(12, true);
+  }
+  switch (compressionMethod) {
+    case BI_RGB: result.compressionMethod = 'BI_RGB'; break;
+    case BI_RLE8: result.compressionMethod = 'BI_RLE8'; break;
+    case BI_RLE4: result.compressionMethod = 'BI_RLE4'; break;
+    case BI_BITFIELDS: result.compressionMethod = 'BI_BITFIELDS'; break;
+    case BI_JPEG: result.compressionMethod = 'BI_JPEG'; break;
+    case BI_PNG: result.compressionMethod = 'BI_PNG'; break;
+    case BI_ALPHABITFIELDS: result.compressionMethod = 'BI_ALPHABITFIELDS'; break;
+    case BI_CMYK: result.compressionMethod = 'BI_CMYK'; break;
+    case BI_CMYKRLE8: result.compressionMethod = 'BI_CMYKRLE8'; break;
+    case BI_CMYKRLE4: result.compressionMethod = 'BI_CMYKRLE4'; break;
+  }
+  if (dibHeader.byteLength >= 20) {
+    const rawDataSize = dibHeader.getUint32(16, true);
+    if (rawDataSize !== strideXOR * h) {
+      result.warnings.push('Bitmap raw data size does not match expectation');
+    }
+  }
+  let ppmX = 2835;
+  let ppmY = 2835;
+  if (dibHeader.byteLength >= 24) {
+    ppmX = dibHeader.getUint32(20, true);
+  }
+  if (dibHeader.byteLength >= 28) {
+    ppmY = dibHeader.getUint32(24, true);
+  }
+  let paletteSize = bitCount > 8 ? 0 : (1 << bitCount);
+  if (dibHeader.byteLength >= 32) {
+    paletteSize = dibHeader.getUint32(28, true);
+  }
+  let importantColours = 0;
+  if (dibHeader.byteLength >= 36) {
+    importantColours = dibHeader.getUint32(32, true);
+  }
+
+  p += dibHeaderLength;
+  if (hasHeader && pixelOffset < p) {
+    result.warnings.push('Bitmap pixel data overlaps headers');
+  }
+
+  result.image = [];
+  /** @type {number[]} */ const palette = [];
+  const alphaPalette = dibHeaderLength > 12;
+  if (alphaPalette) {
+    for (let i = 0; i < paletteSize; ++i) {
+      const b = byteData[p];
+      const g = byteData[p + 1];
+      const r = byteData[p + 2];
+      const a = byteData[p + 3] || 0xFF; // TODO: how to detect if alpha is to be used or ignored?
+      palette.push(((a << 24) | (r << 16) | (g << 8) | b) >>> 0);
+      p += 4;
+    }
+  } else {
+    for (let i = 0; i < paletteSize; ++i) {
+      const b = byteData[p];
+      const g = byteData[p + 1];
+      const r = byteData[p + 2];
+      palette.push((0xFF000000 | (r << 16) | (g << 8) | b) >>> 0);
+      p += 3;
+    }
+  }
+
+  if (hasHeader) {
+    p = pixelOffset;
+  }
+
+  switch (compressionMethod) {
+    case BI_RGB:
+      switch (bitCount) {
+        case 1:
+        case 2:
+        case 4:
+        case 8: // palette
+          const shift = Math.log2(8 / bitCount)|0;
+          const mask = (1 << bitCount) - 1;
+          for (let y = 0; y < h; ++y) {
+            /** @type {number[]} */ const row = [];
+            for (let x = 0; x < w; ++x) {
+              const v = (byteData[p + (x >>> shift)] >>> ((8 - (x + 1) * bitCount) & 7)) & mask;
+              if (v >= paletteSize) {
+                result.warnings.push('invalid palette entry: ' + v);
+                row.push(0);
+              } else {
+                row.push(palette[v]);
+              }
+            }
+            result.image.push(row);
+            p += strideXOR;
+          }
+          break;
+        case 16:
+          throw new Error('TODO: bitmap with 16bpp - ' + JSON.stringify(result));
+        case 24: // bgr
+          for (let y = 0; y < h; ++y) {
+            /** @type {number[]} */ const row = [];
+            for (let x = 0; x < w; ++x) {
+              const b = byteData[p + x * 3];
+              const g = byteData[p + x * 3 + 1];
+              const r = byteData[p + x * 3 + 2];
+              row.push((0xFF000000 | (r << 16) | (g << 8) | b) >>> 0);
+            }
+            result.image.push(row);
+            p += strideXOR;
+          }
+          break;
+        case 32: // bgra
+          for (let y = 0; y < h; ++y) {
+            /** @type {number[]} */ const row = [];
+            for (let x = 0; x < w; ++x) {
+              const b = byteData[p + x * 4];
+              const g = byteData[p + x * 4 + 1];
+              const r = byteData[p + x * 4 + 2];
+              const a = byteData[p + x * 4 + 3];
+              row.push(((a << 24) | (r << 16) | (g << 8) | b) >>> 0);
+            }
+            result.image.push(row);
+            p += strideXOR;
+          }
+          break;
+        default:
+          throw new Error('TODO: bitmap with unknown bit depth - ' + JSON.stringify(result));
+      }
+      break;
+    default:
+      throw new Error('TODO: bitmap with compression - ' + JSON.stringify(result));
+  }
+
+  if (andMask) {
+    result.andMask = [];
+    for (let y = 0; y < h; ++y) {
+      /** @type {boolean[]} */ const row = [];
+      for (let x = 0; x < w; ++x) {
+        const v = Boolean((byteData[p + (x >>> 3)] >>> (7 - (x & 7))) & 1);
+        if (v) {
+          result.image[y][x] &= 0x00FFFFFF;
+        }
+        row.push(v);
+      }
+      result.andMask.push(row);
+      p += strideAND;
+    }
+  }
+
+  if (!topToBottom) {
+    result.image?.reverse();
+  }
 
   return result;
 }
