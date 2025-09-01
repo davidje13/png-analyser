@@ -85,7 +85,10 @@ async function recode(inFile, outFile) {
   if (!image) {
     throw new Error('Failed to read PNG\n');
   }
-  const output = writePNG(image, { preserveTransparentColour: false, compressionTimeAllotment: Number.POSITIVE_INFINITY });
+  const output = writePNG(image, (m) => process.stderr.write(m), {
+    preserveTransparentColour: false,
+    compressionTimeAllotment: Number.POSITIVE_INFINITY,
+  });
   writeFileSync(outFile, output.data.toBytes());
   return { input, output };
 }

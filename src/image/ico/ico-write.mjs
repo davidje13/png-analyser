@@ -33,7 +33,7 @@ export function writeICO(sizes, {
     let img = bmp.data;
     let bitCount = bmp.bitCount;
     if (allowPNG && !Array.isArray(andMask)) {
-      const png = writePNG(image, {
+      const png = writePNG(image, (m) => process.stderr.write(m), {
         forceRGBA: true,
         compressionTimeAllotment: compressionTimeAllotment / countPossiblePNGs,
       });

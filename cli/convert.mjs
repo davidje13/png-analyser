@@ -71,7 +71,7 @@ process.stderr.write(`Writing converted image(s)\n`);
 switch (format) {
   case 'png':
     for (const image of images) {
-      const output = writePNG(image, {
+      const output = writePNG(image, (m) => process.stderr.write(m), {
         preserveTransparentColour: false,
         crushPalette,
         ditherAmount,

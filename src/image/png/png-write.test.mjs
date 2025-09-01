@@ -228,7 +228,7 @@ describe('writePNG', () => {
       expectChannels,
     } = /** @type {RoundTripParams} */ (params);
 
-    const png = writePNG(image, { preserveTransparentColour, allowMatteTransparency }).data.toBytes();
+    const png = writePNG(image, console.log, { preserveTransparentColour, allowMatteTransparency }).data.toBytes();
 
     const roundtrip = await readPNG(png);
     expect(roundtrip.warnings).isEmpty();

@@ -19,8 +19,9 @@ const VOID = new Uint8Array(0);
 
 /**
  * @param {number[][]} image
+ * @param {(message: string) => void} log
  */
-export function writePNG(image, {
+export function writePNG(image, log, {
   forceRGBA = false,
   preserveTransparentColour = false,
   allowMatteTransparency = true,
@@ -35,19 +36,19 @@ export function writePNG(image, {
   const timeout = Date.now() + compressionTimeAllotment;
 
   const preStats = getImageStats(image, preserveTransparentColour, false);
-  process.stderr.write(`Colours: ${preStats.colours.size}${preStats.allGreyscale ? ' (grayscale)' : ''}${preStats.needsAlpha ? ' with alpha' : ' no alpha'}\n`);
+  log(`Colours: ${preStats.colours.size}${preStats.allGreyscale ? ' (grayscale)' : ''}${preStats.needsAlpha ? ' with alpha' : ' no alpha'}\n`);
 
   if (crushPalette && preStats.colours.size > crushPalette) {
-    process.stderr.write(`Crushing palette to ${crushPalette} entries...\n`);
+    log(`Crushing palette to ${crushPalette} entries...\n`);
     const weights = scoreFlatness(image);
     const palette = pickPalette(image, weights, crushPalette);
     image = quantise(image, palette, { dither: { diffusion: FLOYD_STEINBERG, amount: ditherAmount } });
   }
 
-  process.stderr.write('Identifying available encoding modes...\n');
+  log('Identifying available encoding modes...\n');
   const stats = getImageStats(image, preserveTransparentColour, allowMatteTransparency);
   const encodingOptions = forceRGBA ? [RGBA_ENCODING] : getEncodingOptions(stats);
-  process.stderr.write('Compressing...\n');
+  log('Compressing...\n');
   const { choice, totalAttempts, idatCacheMisses } = findOptimalCompression(
     image,
     encodingOptions,

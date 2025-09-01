@@ -2,9 +2,9 @@
 
 // This generates a 0-9 font based on the Minesweeper game's digits
 
+import { Readable } from 'node:stream';
 import { Font } from './font.mjs';
 import { OpenTypeFont } from './off/off.mjs';
-import { bytesToStream } from '../data/node/stream.mjs';
 import { vectorisePixelated } from '../image/actions/vectorise.mjs';
 import { bitmapOr, extractValue, toSVGPath, toType2Instructions, translate, scale, upscaleBitmap } from './generation.mjs';
 
@@ -178,5 +178,18 @@ font.addGlyph(' ', 'space',        make7Seg(0, 0, 0, 0, 0, 0, 0));
 //font.addGlyph('u', 'u', make7Seg(0, 0, 0, 0, 1, 1, 1));
 //font.addGlyph('U', 'U', make7Seg(0, 1, 1, 0, 1, 1, 1));
 //font.addGlyph('y', 'y', make7Seg(0, 1, 1, 1, 0, 1, 1));
+
+/**
+ * @param {Uint8Array} bytes
+ * @return {Readable}
+ */
+function bytesToStream(bytes) {
+  const readable = new Readable();
+  readable._read = () => {
+    readable.push(bytes);
+    readable.push(null);
+  };
+  return readable;
+}
 
 bytesToStream(new OpenTypeFont(font).writeOTF().toBytes()).pipe(process.stdout);

@@ -1,6 +1,26 @@
-import { deflateSync, constants, deflateRawSync } from 'node:zlib'; // https://www.ietf.org/rfc/rfc1950.txt / https://www.ietf.org/rfc/rfc1951.txt
+import { deflate as deflatePako, deflateRaw as deflateRawPako } from '../../../third-party/pako-deflate.min.mjs';
 import { applyFilters, makeFilterTargets } from './filters.mjs';
 import { ByteArrayBuilder } from '../../../data/builder.mjs';
+
+/**
+ * @typedef {{
+ *   level?: -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | undefined;
+ *   windowBits?: number | undefined;
+ *   memLevel?: number | undefined;
+ *   strategy?: number | undefined;
+ * }} DeflateFunctionOptions
+ *
+ * @typedef {(data: Uint8Array, opts: DeflateFunctionOptions) => (ArrayBufferView | undefined)} DeflateFn
+ */
+
+/** @type {DeflateFn} */ let deflate = deflatePako;
+/** @type {DeflateFn} */ let deflateRaw = deflateRawPako;
+
+if (typeof process !== 'undefined') {
+  const { deflateSync, deflateRawSync } = await import('node:zlib');
+  deflate = deflateSync;
+  deflateRaw = deflateRawSync;
+}
 
 /**
  * @typedef {import('./encoding-options.mjs').EncodingOption} EncodingOption
@@ -104,7 +124,7 @@ export function findOptimalCompression(image, encodingOptions, filterPickerOptio
         idat = new ByteArrayBuilder();
       }
 
-      let prev = VOID_ROW;
+      /** @type {Uint8Array} */ let prev = VOID_ROW;
       for (let r = 0; r < encState.mapped.length; ++r) {
         const row = encState.mapped[r];
         const rowFilterType = filterState.rowFilters[r];
@@ -149,20 +169,23 @@ export function findOptimalCompression(image, encodingOptions, filterPickerOptio
  * @param {ArrayBufferView | undefined} plte
  * @param {ArrayBufferView | undefined} trns
  * @param {ZLibConfigOption} zlibConfig
+ * @return {{ compressed: ArrayBufferView, size: number }}
  */
 function compress(idat, plte, trns, zlibConfig) {
-  let windowBits = constants.Z_MIN_WINDOWBITS;
+  let windowBits = 8; // Z_MIN_WINDOWBITS
   while (windowBits < 15 && (1 << windowBits) < idat.byteLength) { // window size <= 32kB
     ++windowBits;
   }
-  const compressor = zlibConfig.raw ? deflateRawSync : deflateSync;
+  const compressor = zlibConfig.raw ? deflateRaw : deflate;
   const compressed = compressor(idat, { // method=8, no dictionary
     windowBits,
     level: zlibConfig.level,
     memLevel: zlibConfig.memLevel,
-    chunkSize: zlibConfig.chunkSize,
     strategy: zlibConfig.strategy,
   });
+  if (!compressed) {
+    throw new Error('unable to compress');
+  }
   const size = (
     compressed.byteLength +
     (plte?.byteLength ? 12 + plte.byteLength : 0) +

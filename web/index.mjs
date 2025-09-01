@@ -6,12 +6,13 @@ import { quantise } from '../src/image/actions/dither.mjs';
 import { PALETTES } from '../src/image/palettes.mjs';
 import { readPNG } from '../src/image/png/png.mjs';
 import { asImageData, makeCanvas } from '../src/display/pretty.mjs';
+import { writePNG } from '../src/image/png/png-write.mjs';
 
 /**
  * @param {ArrayBuffer} data
  * @param {string} name
  */
-async function process(data, name) {
+async function processFile(data, name) {
   const output = document.createElement('section');
   output.classList.add('output');
   const header = document.createElement('h2');
@@ -141,10 +142,14 @@ async function process(data, name) {
       diffusion.addEventListener('change', updateDither);
       serpentine.addEventListener('change', updateDither);
 
+      const save = document.createElement('button');
+      save.setAttribute('type', 'button');
+      save.innerText = 'Save';
+
       const options = document.createElement('form');
       options.setAttribute('action', '#');
       options.classList.add('options');
-      options.append(palette, colspace, transLabel, matteLabel, amount, diffusion, serpLabel);
+      options.append(palette, colspace, transLabel, matteLabel, amount, diffusion, serpLabel, save);
       const ditherIn = image;
       const palettePreviewSize = 20;
       const paletteOut = makeCanvas(1, 1);
@@ -234,6 +239,29 @@ async function process(data, name) {
           ditherOut.ctx.putImageData(asImageData(ditheredData, true), 0, 0);
         }
       }
+
+      save.addEventListener('click', () => {
+        save.setAttribute('disabled', 'disabled');
+        save.innerText = 'Compressing...';
+
+        setTimeout(() => {
+          const output = writePNG(ditheredData ?? image, console.log, {
+            preserveTransparentColour: false,
+            compressionTimeAllotment: 20000,
+          });
+          const blob = new Blob([output.data.toBytes()], { type: 'image/png' });
+          const download = document.createElement('a');
+          const url = URL.createObjectURL(blob);
+          download.setAttribute('href', url);
+          download.setAttribute('download', name);
+          download.click();
+          // not sure when it's safe to revoke the URL, but this works...
+          setTimeout(() => URL.revokeObjectURL(url), 0);
+
+          save.removeAttribute('disabled');
+          save.innerText = 'Save';
+        }, 0);
+      });
 
       function updateDither() {
         if (palette.selectedIndex === 0) {
@@ -340,7 +368,7 @@ window.addEventListener('drop', (e) => {
   if (e.dataTransfer?.items) {
     for (let i = 0; i < e.dataTransfer.items.length; ++i) {
       const file = e.dataTransfer.items[i].getAsFile();
-      file?.arrayBuffer().then((d) => process(d, file.name));
+      file?.arrayBuffer().then((d) => processFile(d, file.name));
       if (file && e.dataTransfer.items.length === 1) {
         document.title = `${file.name} \u2014 PNG Analyser`;
       }

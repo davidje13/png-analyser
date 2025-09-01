@@ -5,6 +5,7 @@
   "private": true,
   "bin": "./cli/png.mjs",
   "scripts": {
+    "minify-dependencies": "rollup --config rollup.deps.config.mjs",
     "start": "python3 -m http.server -b 127.0.0.1 -d . 8080",
     "lint": "tsc",
     "test": "lean-test"
@@ -23,8 +24,13 @@
   },
   "homepage": "https://github.com/davidje13/png-analyser#readme",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "16.x",
+    "@rollup/plugin-terser": "0.4.x",
     "@types/node": "20.x",
+    "@types/pako": "2.x",
     "lean-test": "2.x",
+    "pako": "2.1.0",
+    "rollup": "4.x",
     "typescript": "5.8.x"
   }
 }
