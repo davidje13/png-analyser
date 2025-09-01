@@ -1,0 +1,9 @@
+{
+	"editor.tabSize": 2,
+	"editor.insertSpaces": false,
+	"files.exclude": {
+		"node_modules": true
+	},
+	"javascript.preferences.quoteStyle": "single",
+	"typescript.preferences.quoteStyle": "single"
+}
