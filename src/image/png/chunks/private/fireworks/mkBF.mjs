@@ -3,7 +3,7 @@ import { registerChunk } from '../../registry.mjs';
 
 /**
  * @typedef {import('../../registry.mjs').Chunk & {
- *   testData?: ArrayBufferView,
+ *   raw?: ArrayBufferView,
  * }} mkBFChunk
  */
 
@@ -16,7 +16,7 @@ registerChunk('mkBF', {}, (/** @type {mkBFChunk} */ chunk, state, warnings) => {
     warnings.push(`mkBF marker 0x${marker.toString(16).padStart(8, '0')} does not match 0xFADECAFE (unknown format)`);
     return;
   }
-  chunk.testData = subViewFrom(chunk.data, 4); // debug
+  chunk.raw = subViewFrom(chunk.data, 4); // debug
   // TODO: always seems to be 00000004 then all 0s ?
-  // maybe relates to pages or animations?
+  // possibly a format version identifier? Seen files from Fireworks 8 & Fireworks CS4, both have same value here
 });

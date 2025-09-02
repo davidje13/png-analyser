@@ -43,7 +43,7 @@ registerChunk('prVW', { max: 1 }, async (/** @type {prVWChunk} */ chunk, /** @ty
     //chunk.unknownData = inflated.subarray(p, gridBegin); // TODO: what is stored here? seems unlikely to be all random garbage
 
     /** @type {number[][]} */ const image = [];
-    // data seems to contain unitialised garbage in the 128x128 grid outside the image area (likely random program memory)
+    // data seems to contain uninitialised garbage in the 128x128 grid outside the image area (likely random program memory)
     for (let y = 0; y < chunk.previewHeight; ++y) {
       const row = [];
       for (let x = 0; x < chunk.previewWidth; ++x) {
