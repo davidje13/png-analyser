@@ -368,3 +368,48 @@ registerNode('JSS', 's', {
     target.toString = () => `script:\n${value}`;
   },
 });
+
+registerNode('WID', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `width: ${value}`;
+  },
+});
+
+registerNode('HIT', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `height: ${value}`;
+  },
+});
+
+registerNode('RES', 'f', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => `resolution: ${value} pixels per inch`;
+  },
+});
+
+registerNode('LNM', 's', { // Layer NaMe
+  read: (target, value) => {
+    target.toString = () => `layer name: ${JSON.stringify(value)}`;
+  },
+});
+
+registerNode('PID', 's', { // Page ID
+  read: (target, value) => {
+    target.toString = () => `page ID: ${JSON.stringify(value)}`;
+  },
+});
+
+registerNode('PGN', 's', { // PaGe Name
+  read: (target, value) => {
+    target.toString = () => `page name: ${JSON.stringify(value)}`;
+  },
+});
+
+registerNode('ISP', 'b', { // IS Primary
+  read: (target, value) => {
+    target.toString = () => value ? 'primary' : 'not primary';
+  },
+});
