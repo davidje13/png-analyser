@@ -10,7 +10,7 @@ const ANTIALIAS = [
   'smooth / none',
   'crisp',
   'strong',
-  null, // TODO
+  'system',
   'custom',
 ];
 
@@ -75,7 +75,6 @@ registerNode('TXT', 'v', { // TeXT
         case 'FCLi': fontState.fillColour = nodeBasicValue(part, 'FCL', 'i'); break;
         //case 'FOTb': fontState.fillOnTop = nodeBasicValue(part, 'FOT', 'b') ?? false; break;
         case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
-        case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
         case 'PTSf': fontState.pointSize = nodeBasicValue(part, 'PTS', 'f'); break;
         case 'BOLb': fontState.bold = nodeBasicValue(part, 'BOL', 'b'); break;
         case 'ITLb': fontState.italic = nodeBasicValue(part, 'ITL', 'b'); break;
@@ -117,6 +116,7 @@ registerNode('TXT', 'v', { // TeXT
       visited: true,
       toString: () => JSON.stringify(strings.map((s) => s.text).join('')),
       display: (summary, content) => {
+        content.append(JSON.stringify(strings, undefined, 2) + '\n');
         const oStr = document.createElement('div');
         oStr.style.width = `${right - left}px`;
         oStr.style.height = `${bottom - top}px`;
