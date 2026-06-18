@@ -175,3 +175,64 @@ export function toType2Instructions(loops) {
   }
   return instructions;
 }
+
+/**
+ * @param {{ x: number, y: number, r: number }[]} points
+ * @return {Instruction[]}
+ */
+export function makeType2CurvedPolygon(points) {
+  let x = points[0].x;
+  let y = points[0].y;
+
+  /**
+   * @param {number} absX
+   * @param {number} absY
+   */
+  const relative = (absX, absY) => {
+    const dx = absX - x;
+    const dy = absY - y;
+    x = absX;
+    y = absY;
+    return [dx, dy];
+  };
+  /** @type {Instruction[]} */ const instructions = [['rmoveto', x, y]];
+  for (let i = 1; i < points.length - 1; ++i) {
+    const cur = points[i];
+    if (!cur.r) {
+      instructions.push(['rlineto', ...relative(cur.x, cur.y)]);
+      continue;
+    }
+    const next = points[i + 1];
+    let d1x = x - cur.x;
+    let d1y = y - cur.y;
+    let d2x = next.x - cur.x;
+    let d2y = next.y - cur.y;
+    const l1 = Math.hypot(d1x, d1y);
+    const l2 = Math.hypot(d2x, d2y);
+    d1x /= l1;
+    d1y /= l1;
+    d2x /= l2;
+    d2y /= l2;
+    const angS = Math.abs(d2x * d1y - d2y * d1x);
+    const angC = d2x * d1x + d2y * d1y;
+    const p = angS / (1 - angC);
+    const rLim = Math.min(l1, l2) / p;
+    let r = cur.r;
+    if (r > rLim) {
+      console.error('clamped radius');
+      r = rLim;
+    }
+    let v = Math.atan(angS / angC);
+    if (v < 0) {
+      v += Math.PI;
+    }
+    const bezier = Math.tan((Math.PI - v) * 0.25) * 4 / 3;
+    instructions.push(['rlinecurve',
+      ...relative(cur.x + r * d1x * p, cur.y + r * d1y * p),
+      ...relative(cur.x + r * d1x * (p - bezier), cur.y + r * d1y * (p - bezier)),
+      ...relative(cur.x + r * d2x * (p - bezier), cur.y + r * d2y * (p - bezier)),
+      ...relative(cur.x + r * d2x * p, cur.y + r * d2y * p),
+    ]);
+  }
+  return instructions;
+}
