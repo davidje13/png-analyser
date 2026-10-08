@@ -2,13 +2,14 @@
 
 import { readFileSync } from 'node:fs';
 import { isPNG, readPNG } from '../src/image/png/png.mjs';
-import { NODE_INFO } from './node-info.mjs';
+import { makeID, NODE_INFO } from '../src/image/png/chunks/private/fireworks/tree/node_info.mjs';
 
 const includeDebugFilePaths = Boolean(process.env['FILE_PATHS']);
 
 /** @typedef {import('../src/image/png/chunks/private/fireworks/mkTS.mjs').mkTSChunk} mkTSChunk */
 /** @typedef {import('../src/image/png/chunks/private/fireworks/mkBS.mjs').mkBSChunk} mkBSChunk */
 /** @typedef {import('../src/image/png/chunks/private/fireworks/tree/tokeniser.mjs').NodeToken} NodeToken */
+/** @typedef {import('../src/image/png/chunks/private/fireworks/tree/node_info.mjs').NodeInfo} NodeInfo */
 
 /** @type {Map<string, { file: string, mkts: NodeToken }[]>} */ const files = new Map();
 
@@ -60,7 +61,8 @@ process.stdout.write('[`mkBT`]: ./Fireworks.md#mkbt\n');
 
 /**
  * @typedef {{
- * 	 parents: Set<string>;
+ *   id: string;
+ *   parents: Set<string>;
  * } & ({
  *   type: 'v';
  *   values?: Map<string, Set<string>> | undefined;
@@ -84,50 +86,36 @@ process.stdout.write('[`mkBT`]: ./Fireworks.md#mkbt\n');
  * @param {string} fileID
  * @param {NodeToken} base
  * @param {Map<string, Observed>} output
- * @param {string | null} parentID
- * @param {string[]} dcevPath
+ * @param {NodeToken[]} path
+ * @return {Observed}
  */
-function analyseNodes(fileID, base, output, parentID = null, dcevPath = []) {
-	const id = makeID(base, parentID, dcevPath);
-	if (base.type === 'v' && base.name === 'DCE') {
-		dcevPath = [...dcevPath, getDCEKey(base) ?? ''];
-	} else if (base.type !== 'v' || base.name !== 'GDT') {
-		dcevPath = [];
-	}
+function analyseNodes(fileID, base, output, path = []) {
+	const fullPath = [...path, base];
+	const id = makeID(fullPath);
 	/** @type {Map<string, number>} */ const curChildren = new Map();
 	if (base.type === 'v') {
 		for (const c of base.value) {
-			const subID = makeID(c, id, dcevPath);
-			curChildren.set(subID, (curChildren.get(subID) ?? 0) + 1);
-			analyseNodes(fileID, c, output, id, dcevPath);
+			const sub = analyseNodes(fileID, c, output, fullPath);
+			curChildren.set(sub.id, (curChildren.get(sub.id) ?? 0) + 1);
+			sub.parents.add(id);
 		}
 	}
 	let node = output.get(id);
 	if (!node) {
 		if (base.type === 'v') {
 			node = {
+				id,
 				type: base.type,
 				parents: new Set(),
 				children: new Map([...curChildren].map(([subID, c]) => [subID, { min: c, max: c }])),
 			};
-		} else if (base.type === 'i' || base.type === 'f') {
-			node = {
-				type: base.type,
-				parents: new Set(),
-				values: new Map(),
-			};
-		} else if (base.type === 's') {
-			node = {
-				type: base.type,
-				parents: new Set(),
-				values: new Map(),
-			};
 		} else {
-			node = {
+			node = /** @type {Observed} */ ({
+				id,
 				type: base.type,
 				parents: new Set(),
 				values: new Map(),
-			};
+			});
 		}
 		output.set(id, node);
 	} else if (node.children) {
@@ -159,9 +147,7 @@ function analyseNodes(fileID, base, output, parentID = null, dcevPath = []) {
 			accum(node.values, v, fileID);
 		}
 	}
-	if (parentID) {
-		node.parents.add(parentID);
-	}
+	return node;
 }
 
 /**
@@ -182,18 +168,6 @@ function accum(target, key, item) {
 /**
  * @param {NodeToken & { type: 'v' }} node
  */
-function getDCEKey(node) {
-	for (const c of node.value) {
-		if (c.name === 'DCK' && c.type === 's') {
-			return c.value;
-		}
-	}
-	return null;
-}
-
-/**
- * @param {NodeToken & { type: 'v' }} node
- */
 function getDCEStringValue(node) {
 	for (const c of node.value) {
 		if (c.name === 'DCV' && c.type === 's') {
@@ -204,33 +178,11 @@ function getDCEStringValue(node) {
 }
 
 /**
- * @param {NodeToken} node
- * @param {string | null} parentID
- * @param {string[]} dcevPath
- */
-function makeID(node, parentID, dcevPath) {
-	if (node.name === 'root') {
-		return 'Root';
-	}
-	if (node.name === 'DCE' && node.type === 'v') {
-		const key = getDCEKey(node);
-		if (key) {
-			return `\`${node.name}${node.type}\` ${[...dcevPath, key].map((k) => `"\`${k}\`"`).join('.')}`;
-		}
-	}
-	const id = `\`${node.name}${node.type}\``;
-	if (parentID && NODE_INFO.has(`${parentID}.${id}`)) {
-		return `${parentID}.${id}`;
-	}
-	return id;
-}
-
-/**
  * @param {[string, unknown]} a
  * @param {[string, unknown]} b
  */
 function byKey(a, b) {
-	return a[0] === 'Root' ? -1 : b[0] === 'Root' ? 1 : (a[0] > b[0]) ? 1 : -1;
+	return a[0] === 'rootv' ? -1 : b[0] === 'rootv' ? 1 : (a[0] > b[0]) ? 1 : -1;
 }
 
 /**
@@ -258,35 +210,31 @@ function printInfo(nodes, allFiles, includeTODOFilePaths) {
 	const seenNodes = new Set();
 	let hasDCEv = false;
 	for (const [id, info] of sortedNodes) {
-		let headingLevel = '##';
-		if (id.startsWith('`DCEv`')) {
+		let headingLevel = 2
+		if (id.startsWith('DCEv.')) {
 			if (!hasDCEv) {
-				const dcev = '`DCEv`';
+				const dcev = 'DCEv';
 				seenNodes.add(dcev);
 				const extraInfo = NODE_INFO.get(dcev);
 				if (!extraInfo) {
 					process.stderr.write(`Node with no info: ${dcev}\n`);
 				}
-				const fullHeading = extraInfo?.name ? `${dcev} ${extraInfo?.name}` : dcev;
-				process.stdout.write(`## ${fullHeading}\n\n`);
-				process.stdout.write(`[${dcev}]: #${toHeadingAnchor(fullHeading)}\n\n`);
+				printHeading(dcev, extraInfo?.name, 2);
 				if (extraInfo?.description) {
 					process.stdout.write(`${extraInfo.description}\n\n`);
 				}
 				hasDCEv = true;
 			}
-			headingLevel = '###';
+			headingLevel = 3;
 		}
 		const extraInfo = NODE_INFO.get(id);
 		seenNodes.add(id);
 		if (!extraInfo) {
 			process.stderr.write(`Node with no info: ${id}\n`);
 		}
-		const fullHeading = extraInfo?.name ? `${id} ${extraInfo?.name}` : id;
-		process.stdout.write(`${headingLevel} ${fullHeading}\n\n`);
-		process.stdout.write(`[${id}]: #${toHeadingAnchor(fullHeading)}\n\n`);
+		printHeading(id, extraInfo?.name, headingLevel);
 		if (info.parents.size) {
-			process.stdout.write(`Parent: ${[...info.parents].sort().map((p) => `[${p}]`).join(' / ')}\n\n`);
+			process.stdout.write(`Parent: ${[...info.parents].sort().map(idToLink).join(' / ')}\n\n`);
 		}
 		if (extraInfo?.description) {
 			process.stdout.write(`${extraInfo.description}\n\n`);
@@ -351,11 +299,30 @@ function printInfo(nodes, allFiles, includeTODOFilePaths) {
 }
 
 /**
+ * @param {string} id
+ * @param {string | undefined} name
+ * @param {number} level
+ */
+function printHeading(id, name, level) {
+	let fullHeading = formatID(id);
+	if (name) {
+		fullHeading += ` ${name}`;
+	}
+	const headingAnchor = fullHeading.replaceAll('*', '')
+		.replaceAll(/[^a-zA-Z0-9]+/g, ' ')
+		.trim()
+		.replaceAll(' ', '-')
+		.toLowerCase();
+	process.stdout.write(`${'#'.repeat(level)} ${fullHeading}\n\n`);
+	process.stdout.write(`${idToLink(id)}: #${headingAnchor}\n\n`);
+}
+
+/**
  * @param {Observed & { type: 'v' }} info
  */
 function printChildren(info) {
 	for (const [subID, c] of info.children) {
-		process.stdout.write(`- [${subID}]`);
+		process.stdout.write(`- ${idToLink(subID)}`);
 		if (c.min === 1 && c.max === 1) {
 			// exactly one (no annotation)
 		} else if (c.min === 0 && c.max === 1) {
@@ -380,7 +347,7 @@ function printChildren(info) {
 /**
  * @param {(string | number | boolean)[]} allValues
  * @param {Map<string | number | boolean, Set<string>>} observedValues
- * @param {import('./node-info.mjs').NodeInfo | undefined} extraInfo
+ * @param {NodeInfo | undefined} extraInfo
  * @param {string[]} allFiles
  * @param {boolean} includeTODOFilePaths
  */
@@ -407,12 +374,22 @@ function printObservedValues(allValues, observedValues, extraInfo, allFiles, inc
 }
 
 /**
- * @param {string} name
+ * @param {string} id
  */
-function toHeadingAnchor(name) {
-	return name.replaceAll('*', '')
-		.replaceAll(/[^a-zA-Z0-9]+/g, ' ')
-		.trim()
-		.replaceAll(' ', '-')
-		.toLowerCase();
+function idToLink(id) {
+	return `[${formatID(id)}]`;
+}
+
+/**
+ * @param {string} id
+ */
+function formatID(id) {
+	if (id === 'rootv') {
+		return 'Root';
+	}
+	return id
+		.split('.')
+		.map((v) => v.startsWith('"') ? `"\`${v.substring(1, v.length - 1)}\`"` : `\`${v}\``)
+		.join('.')
+		.replace('`."`', '` "`');
 }
