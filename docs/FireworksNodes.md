@@ -5380,7 +5380,6 @@ Values:
 - `Hatch 4`
 - `Hatch 5`
 - `Hue/Saturation...`
-- `I:\Data\Public\QUAD\pictures\RockTileFine.jpg`
 - `Illusion 1`
 - `Illusion 2`
 - `Impressionist-Blue`
@@ -5584,9 +5583,6 @@ Values:
 - `fn_Satin`
 - `fn_Waves`
 - `fn_WebDither`
-- `link-for-circle`
-- `link-for-polygon`
-- `link-for-rect`
 
 ## `IODb`
 
@@ -7909,10 +7905,6 @@ Values:
 - `Highlighter`
 - `Light Marker`
 - `Linear Smooth`
-- `My9SliceSymbol`
-- `MyAnimationSymbol`
-- `MyButtonSymbol`
-- `MyGraphicSymbol`
 - `Outline`
 - `Paint Splatter`
 - `Pastel`
@@ -7939,7 +7931,6 @@ Values:
 - `Thin`
 - `Toothpaste`
 - `Toxic Waste`
-- `TweenedSymbol`
 - `Viscous Alien Paint`
 - `Waves`
 - `Web Dither`
