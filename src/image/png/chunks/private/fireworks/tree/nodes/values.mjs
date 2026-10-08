@@ -386,7 +386,14 @@ registerNode('HIT', 'f', {
 registerNode('RES', 'f', {
   read: (target, value) => {
     target.value = value;
-    target.toString = () => `resolution: ${value} pixels per inch`;
+    target.toString = () => `resolution: ${value}`;
+  },
+});
+
+registerNode('RSU', 'i', {
+  read: (target, value) => {
+    target.value = value;
+    target.toString = () => 'resolution units: ' + (value === 0 ? 'pixels per inch' : 'pixels per cm');
   },
 });
 

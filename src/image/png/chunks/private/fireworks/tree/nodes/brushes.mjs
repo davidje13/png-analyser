@@ -100,7 +100,7 @@ registerNode('BPL', 'v', { // Brush Property List (?)
     const flowRate = (getBasicValue(value, 'BFR', 'i') ?? 0) * 0.1;
     const tipCount = getBasicValue(value, 'BNT', 'i') ?? 1;
     const spacing = (getBasicValue(value, 'BSP', 'i') ?? 0) * 0.1;
-    const tipSpacing = (getBasicValue(value, 'BTS', 'i') ?? 0) * 0.1;
+    const tipSpacing = getBasicValue(value, 'BTS', 'i') ?? 0;
     const textureBlend = (getBasicValue(value, 'BTB', 'i') ?? 0) * 0.1;
     const textureEdge = (getBasicValue(value, 'BTE', 'i') ?? 0) * 0.1;
     const tipSpacingModeId = getBasicValue(value, 'BSM', 'i');
