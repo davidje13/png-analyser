@@ -131,7 +131,7 @@ export function readBMP(data, { expectHeader = true, andMask = false } = {}) {
   if (dibHeader.byteLength >= 20) {
     const rawDataSize = dibHeader.getUint32(16, true);
     if (rawDataSize !== strideXOR * h) {
-      result.warnings.push('Bitmap raw data size does not match expectation');
+      result.warnings.push(`Bitmap raw data size ${rawDataSize} does not match expectation ${strideXOR * h} for ${w}x${h}`);
     }
   }
   let ppmX = 2835;

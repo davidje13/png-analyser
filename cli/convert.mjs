@@ -176,7 +176,7 @@ async function readImage(path) {
       process.stderr.write(`  WARN: ${warning}\n`);
     }
     for (const icon of ico.images) {
-      process.stderr.write(`  ${icon.image[0]?.length ?? 0}x${icon.image.length} [${icon.bitDepth}]\n`);
+      process.stderr.write(`  ${icon.image[0]?.length ?? 0}x${icon.image.length} [${icon.bitDepth}] ${icon.rawPNG ? 'PNG' : 'BMP'}\n`);
     }
     return ico.images.map((icon) => icon.image);
   } else if (isBMP(input)) {
