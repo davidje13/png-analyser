@@ -1,4 +1,4 @@
-import { indent } from '../../../../../../../display/pretty.mjs';
+import { disclosure, indent } from '../../../../../../../display/pretty.mjs';
 import { registerType } from '../node_registry.mjs';
 
 registerType('i', {
@@ -28,20 +28,15 @@ registerType(null, {
  *
  * @param {string} name
  * @param {(ProcessedNode | undefined)[]} nodes
- * @param {boolean=} onlyUnvisited
+ * @param {string} extraSummary
+ * @param {(details: HTMLElement) => void} displayAugmenter
  * @return {{
  *   toString: () => string,
- *   display: (summary: HTMLElement, content: HTMLElement) => void,
+ *   display: (container: HTMLElement) => void,
  * }}
  */
-export function outputNodes(name, nodes, onlyUnvisited = false) {
+export function outputNodes(name, nodes, extraSummary = '', displayAugmenter = () => {}) {
   let actualNodes = /** @type {ProcessedNode[]} */ (nodes.filter((n) => n));
-  if (onlyUnvisited) {
-    actualNodes = actualNodes.filter((n) => !n.visited);
-  }
-  for (const node of actualNodes) {
-    node.visited = true;
-  }
   return {
     toString: () => {
       if (!actualNodes.length) {
@@ -49,24 +44,18 @@ export function outputNodes(name, nodes, onlyUnvisited = false) {
       }
       return `${name}:\n${actualNodes.map((n) => indent(n.toString(), '  ', '- ')).join('\n')}`;
     },
-    display: (summary, content) => {
+    display: (container) => {
       if (!actualNodes.length) {
-        summary.append(`${name}: []`);
+        container.append(`${name}: []`);
         return;
       }
       const ul = document.createElement('ul');
       for (const n of actualNodes) {
         const li = document.createElement('li');
-        const s = document.createElement('div');
-        const c = document.createElement('div');
-        n.display(s, c);
-        li.append(s, c);
+        n.display(li);
         ul.append(li);
       }
-      const det = document.createElement('details');
-      det.setAttribute('open', 'open');
-      const sum = document.createElement('summary');
-      sum.append(name);
+      /** @type {(HTMLElement | string)[]} */ const summaryParts = [name];
 
       // download all children as an SVG
       if (actualNodes.some((n) => n.hasSVG?.())) {
@@ -112,11 +101,14 @@ export function outputNodes(name, nodes, onlyUnvisited = false) {
           download.setAttribute('download', 'image.svg');
           download.click();
         });
-        sum.append(' ', svg);
+        summaryParts.push(' ', svg);
       }
-
-      det.append(sum, ul);
-      content.append(det);
+      if (extraSummary) {
+        summaryParts.push(extraSummary);
+      }
+      const det = disclosure(summaryParts, ul, true);
+      displayAugmenter(det);
+      container.append(det);
     },
   };
 }

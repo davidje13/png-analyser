@@ -245,6 +245,23 @@ export function asColourDiv(col, alpha = false, label) {
 }
 
 /**
+ * @param {HTMLElement | string | (HTMLElement | string)[]} summary
+ * @param {HTMLElement | string | (HTMLElement | string)[]} content
+ * @param {boolean} open
+ * @return {HTMLElement}
+ */
+export function disclosure(summary, content, open = false) {
+  const det = document.createElement('details');
+  if (open) {
+    det.setAttribute('open', 'open');
+  }
+  const sum = document.createElement('summary');
+  sum.append(...(Array.isArray(summary) ? summary : [summary]));
+  det.append(sum, ...(Array.isArray(content) ? content : [content]));
+  return det;
+}
+
+/**
  * @param {number} c
  * @return {number}
  */

@@ -1,4 +1,4 @@
-import { makeCanvas } from '../../../../../../../display/pretty.mjs';
+import { disclosure, makeCanvas } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, getChildren, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
@@ -84,9 +84,9 @@ registerNode('PBPv', { // Path Bezier Points
 
     target.toString = () => `${isClosed ? 'Closed ' : ''}Bezier Path:\n${points.join('\n')}`;
 
-    target.display = (summary, content) => {
+    target.display = (container) => {
       if (!points.length) {
-        content.append('Empty bezier path');
+        container.append('Empty bezier path');
         return;
       }
       const bounds = getBezierBounds(points);
@@ -107,8 +107,7 @@ registerNode('PBPv', { // Path Bezier Points
       c.ctx.stroke();
       drawBezierPathControls(c.ctx, points, dispBounds);
 
-      summary.append(`Bezier Path: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`);
-      content.append(c.canvas);
+      container.append(disclosure(`Bezier Path: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`, c.canvas, true));
     };
 
     target.toSVG = (parts) => {
@@ -144,7 +143,7 @@ registerNode('PBLv', { // Path Beziers List
 
     target.toString = () => `Bezier Path Group:\n${contours.join('\n\n')}`;
 
-    target.display = (summary, content) => {
+    target.display = (container) => {
       const bounds = contours.map((c) => getBezierBounds(c.points)).reduce(unionBounds);
 
       const dispBounds = extendBounds(bounds, 5);
@@ -167,8 +166,7 @@ registerNode('PBLv', { // Path Beziers List
         drawBezierPathControls(c.ctx, contour.points, dispBounds);
       }
 
-      summary.append(`Bezier Path Group: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`);
-      content.append(c.canvas);
+      container.append(disclosure(`Bezier Path Group: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`, c.canvas, true));
     };
   },
 });
@@ -205,10 +203,7 @@ registerNode('PPTv', { // Path PoinT
 
     target.toString = () => `(${x}, ${y})${onControlPoint ? '' : ' (Interpolated)'}\npressure = ${pressure}, velocity = ${velocity}, duration = ${duration}, random seed = ${randomSeed}`;
 
-    target.display = (summary, content) => {
-      summary.append(`(${x}, ${y})${onControlPoint ? '' : ' (Interpolated)'}`);
-      content.append(`pressure = ${pressure}, velocity = ${velocity}, duration = ${duration}, random seed = ${randomSeed}`);
-    };
+    target.display = (container) => container.append(disclosure(`(${x}, ${y})${onControlPoint ? '' : ' (Interpolated)'}`, `pressure = ${pressure}, velocity = ${velocity}, duration = ${duration}, random seed = ${randomSeed}`, true));
   },
 });
 
@@ -234,9 +229,9 @@ registerNode('PPLv', { // Path Point List
 
     target.toString = () => `${isClosed ? 'Closed ' : ''}Segmented Path:\n${points.join('\n')}`;
 
-    target.display = (summary, content) => {
+    target.display = (container) => {
       if (!points.length) {
-        content.append('Empty path');
+        container.append('Empty path');
         return;
       }
       const bounds = getBounds(points);
@@ -257,8 +252,7 @@ registerNode('PPLv', { // Path Point List
       c.ctx.stroke();
       drawPathControls(c.ctx, points, dispBounds);
 
-      summary.append(`Segmented Path: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`);
-      content.append(c.canvas);
+      container.append(disclosure(`Segmented Path: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`, c.canvas, true));
     };
 
     target.toSVG = (parts) => {
@@ -294,7 +288,7 @@ registerNode('PCLv', { // Path Contour List
 
     target.toString = () => `Segmented Path Group:\n${contours.join('\n\n')}`;
 
-    target.display = (summary, content) => {
+    target.display = (container) => {
       const bounds = contours.map((c) => getBounds(c.points)).reduce(unionBounds);
 
       const dispBounds = extendBounds(bounds, 5);
@@ -317,8 +311,7 @@ registerNode('PCLv', { // Path Contour List
         drawPathControls(c.ctx, contour.points, dispBounds);
       }
 
-      summary.append(`Segmented Path Group: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`);
-      content.append(c.canvas);
+      container.append(disclosure(`Segmented Path Group: ${bounds.minX} - ${bounds.maxX} / ${bounds.minY} - ${bounds.maxY}`, c.canvas, true));
     };
   },
 });

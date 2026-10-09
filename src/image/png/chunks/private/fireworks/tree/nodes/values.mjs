@@ -1,4 +1,4 @@
-import { asColourDiv, termCol, termReset } from '../../../../../../../display/pretty.mjs';
+import { asColourDiv, disclosure, termCol, termReset } from '../../../../../../../display/pretty.mjs';
 import { registerNode, getBasicValue, getChildren } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
@@ -208,10 +208,7 @@ registerNode('BGCi', { // BackGround Colour
   read: (target, value) => {
     target.toString = () => `Background: ${termCol(value)} ${value.toString(16).padStart(8, '0')} ${termReset}`;
 
-    target.display = (summary, content) => {
-      summary.append('Background');
-      content.append(asColourDiv(value, true));
-    };
+    target.display = (container) => container.append(disclosure('Background', asColourDiv(value, true), true));
   },
 });
 

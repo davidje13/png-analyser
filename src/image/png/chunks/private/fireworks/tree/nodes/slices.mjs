@@ -1,4 +1,4 @@
-import { asColourDiv } from '../../../../../../../display/pretty.mjs';
+import { asColourDiv, disclosure } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, registerNode } from '../node_registry.mjs';
 
 registerNode('URLv', { // Link (e.g. image slice or hotspot)
@@ -41,26 +41,23 @@ registerNode('URLv', { // Link (e.g. image slice or hotspot)
       JSON.stringify(ext),
     ].join('\n');
 
-    target.display = (summary) => {
-      const det = document.createElement('details');
-      det.setAttribute('open', 'open');
-      const sum = document.createElement('summary');
-      summary.append(det);
-      det.append(sum);
+    target.display = (target) => {
+      /** @type {(HTMLElement | string)[]} */ const content = [];
 
-      sum.append(`Slice ${JSON.stringify(objectName)}/${JSON.stringify(name)}`);
       if (locked) {
-        det.append('locked\n')
+        content.push('locked\n')
       }
-      det.append(`${typeName} ${shapeName} (${left}, ${top}) - (${right}, ${bottom})\n`);
+      content.push(`${typeName} ${shapeName} (${left}, ${top}) - (${right}, ${bottom})\n`);
       if (link !== null) {
-        det.append(`link to: ${JSON.stringify(link)} in ${JSON.stringify(linkTarget)}, alt: ${JSON.stringify(alt)}\n`);
+        content.push(`link to: ${JSON.stringify(link)} in ${JSON.stringify(linkTarget)}, alt: ${JSON.stringify(alt)}\n`);
       }
-      det.append(`cell text: ${JSON.stringify(text)}\n`);
-      det.append(JSON.stringify(ext) + '\n');
+      content.push(`cell text: ${JSON.stringify(text)}\n`);
+      content.push(JSON.stringify(ext) + '\n');
       if (foregroundCol !== undefined) {
-        det.append('editor colour: ', asColourDiv(foregroundCol, true), '\n');
+        content.push('editor colour: ', asColourDiv(foregroundCol, true), '\n');
       }
+
+      target.append(disclosure(`Slice ${JSON.stringify(objectName)}/${JSON.stringify(name)}`, content, true));
     };
 
     target.toSVG = (parts) => {

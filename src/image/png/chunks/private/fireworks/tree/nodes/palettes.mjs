@@ -1,4 +1,4 @@
-import { asColourDiv, termCol, termReset } from '../../../../../../../display/pretty.mjs';
+import { asColourDiv, disclosure, termCol, termReset } from '../../../../../../../display/pretty.mjs';
 import { nodeBasicValue } from '../node_registry.mjs';
 import { registerNode } from '../node_registry.mjs';
 
@@ -48,8 +48,8 @@ registerNode('PALv', { // PALette
       ...entries.map((c) => `${termCol(c.col)} ${c.col.toString(16).padStart(8, '0')} ${termReset}`),
     ].join('\n');
 
-    target.display = (summary, content) => {
-      summary.append(`${entries.length}-colour palette`);
+    target.display = (container) => {
+      const out = disclosure(`${entries.length}-colour palette`, [], true);
       for (const entry of entries) {
         const o = asColourDiv(entry.col, true);
         if (entry.locked) {
@@ -58,11 +58,12 @@ registerNode('PALv', { // PALette
         if (entry.transparent) {
           o.classList.add('transparent');
         }
-        content.append(o);
+        out.append(o);
         if (entry.mapTo !== undefined && entry.mapped) {
-          content.append('\u2192', asColourDiv(entry.mapTo, true));
+          out.append('\u2192', asColourDiv(entry.mapTo, true));
         }
       }
+      container.append(out);
     };
   },
 });

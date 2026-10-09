@@ -1,5 +1,6 @@
 import { inflate } from '../../../../../data/inflate.mjs';
 import { registerChunk } from '../../registry.mjs';
+import { displayRawStructure } from './tree/display_raw.mjs';
 import { parse } from './tree/parser.mjs';
 import { tokenise } from './tree/tokeniser.mjs';
 
@@ -23,9 +24,18 @@ registerChunk('mkBS', {}, async (/** @type {mkBSChunk} */ chunk, /** @type {mkBS
   }
 }, (state, warnings) => {
   if (state.mkbs?.raw) {
-    const root = parse(null, state.mkbs.raw, { mkbts: state.mkbts, warnings });
+    const baseID = 'mkbs-raw';
+    const raw = state.mkbs.raw;
+    const root = parse(null, raw, { mkbts: state.mkbts, warnings }, baseID);
     state.mkbs.root = root;
     state.mkbs.toString = () => root.toString();
-    state.mkbs.display = (summary, content) => root.display(summary, content);
+    state.mkbs.display = (summary, content) => {
+      const parsed = document.createElement('div');
+      parsed.className = 'parsed';
+      root.display(parsed);
+      content.append(parsed);
+
+      displayRawStructure(content, raw, baseID, 'Raw node hierarchy');
+    };
   }
 });

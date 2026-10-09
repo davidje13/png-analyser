@@ -26,22 +26,18 @@ registerNode('EPSv', { // Effect ???
     const moaID = getEntityValue(value, 'EffectMoaID') ?? '';
     const previewTileSize = getEntityValue(value, 'MB_filter_preview_tile_size') ?? '-1 -1';
 
-    const out = outputNodes(target.id, value);
     const meta = KNOWN_EFFECTS.get(moaID);
-    if (!meta) {
-      state.warnings.push(`Unknown effect Moa ID: ${moaID}`);
-      Object.assign(target, out);
-    } else {
-      const display = meta.read(target, value, state);
-      target.toString = out.toString;
-      target.display = (summary, content) => {
-        out.display(summary, content);
-        summary.append(`${tempUIName ?? '?'} ${visible ? '[visible]' : '[hidden]'}`);
+    if (meta) {
+      Object.assign(target, outputNodes(target.id, value, `${tempUIName ?? '?'} ${visible ? '[visible]' : '[hidden]'}`, (det) => {
+        const display = meta.read(target, value, state);
         const preview = document.createElement('div');
         preview.classList.add('effect-preview');
         display(preview);
-        content.append(preview);
-      };
+        det.append(preview);
+      }));
+    } else {
+      state.warnings.push(`Unknown effect Moa ID: ${moaID}`);
+      Object.assign(target, outputNodes(target.id, value, `${tempUIName ?? '?'} UNKNOWN ${visible ? '[visible]' : '[hidden]'}`));
     }
   },
 });

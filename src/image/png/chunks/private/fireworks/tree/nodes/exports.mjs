@@ -59,8 +59,6 @@ registerNode('EXPv', { // EXPort options
     if (removeUnusedColours) {
       info.push(' [remove unused colours]');
     }
-
-    Object.assign(target, outputNodes(info.join(''), value, true));
   },
 });
 

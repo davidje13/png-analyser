@@ -22,10 +22,9 @@
  * @typedef {Record<string, unknown> & {
  *   id: string,
  *   toString: () => string,
- *   display: (summary: HTMLElement, content: HTMLElement) => void,
+ *   display: (container: HTMLElement) => void,
  *   toSVG?: (target: SVGPart[]) => void,
  *   hasSVG?: () => boolean,
- *   visited: boolean,
  *   parent: ProcessedNode | null,
  *   storage: Record<string, any>,
  * }} ProcessedNode
@@ -116,11 +115,7 @@ export function getTypeMeta(id) {
  * @return {ProcessedNode[]}
  */
 export function getChildren(list, id) {
-  const results = list.filter((n) => n.id === id);
-  for (const node of results) {
-    node.visited = true;
-  }
-  return results;
+  return list.filter((n) => n.id === id);
 }
 
 /**
@@ -133,7 +128,6 @@ export function nodeBasicValue(node, id) {
   if (node?.id !== id) {
     return undefined;
   }
-  node.visited = true;
   return /** @type {any} */ (node.value);
 }
 

@@ -1,4 +1,4 @@
-import { tilesAsCanvas } from '../../../../../../../display/pretty.mjs';
+import { disclosure, tilesAsCanvas } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, nodeBasicValue, registerNode } from '../node_registry.mjs';
 
 registerNode('TIDi', { // Tile ID
@@ -9,10 +9,6 @@ registerNode('TIDi', { // Tile ID
     }
     target.mkbt = mkbt;
     target.toString = () => mkbt?.toString() ?? value.toString(16).padStart(8, '0');
-    target.display = (summary, content) => {
-      summary.append('Tile: ');
-      mkbt?.display(summary, content);
-    };
   },
 });
 
@@ -34,10 +30,7 @@ registerNode('IMGv', { // IMaGe
     target.height = height;
     const toString = () => `Image: ${width} x ${height} @${xLocation}, ${yLocation} / ${xOf}, ${yOf}${locked ? ' locked' : ''}`;
     target.toString = toString;
-    target.display = (summary, content) => {
-      summary.append(toString());
-      content.append(tilesAsCanvas(tileData));
-    };
+    target.display = (container) => container.append(disclosure(toString(), tilesAsCanvas(tileData), true));
 
     target.toSVG = (parts) => {
       const element = document.createElementNS('http://www.w3.org/2000/svg', 'image');
@@ -61,11 +54,9 @@ registerNode('MSKv', { // MaSK
     const tileSize = getBasicValue(value, 'TSZi') ?? 0;
     const tiles = getBasicValue(value, 'TILv') ?? [];
     const tileData = extractTiles(width, height, tiles, tileSize, state.warnings);
-    target.toString = () => `Mask: ${width} x ${height}`;
-    target.display = (summary, content) => {
-      summary.append(target.toString());
-      content.append(tilesAsCanvas(tileData));
-    };
+    const toString = () => `Mask: ${width} x ${height}`;
+    target.toString = toString;
+    target.display = (container) => container.append(disclosure(toString(), tilesAsCanvas(tileData), true));
   },
 });
 

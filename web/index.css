@@ -46,6 +46,10 @@ body.hasoutput .drop.active {
   background: #DDDDDD;
   padding: 5px 0;
   z-index: 1;
+  text-align: right;
+  width: fit-content;
+  margin-left: auto;
+  padding-left: 5px;
 }
 
 .chunk {
@@ -97,6 +101,10 @@ li::before {
 
 li > details > summary {
   margin-left: -4px;
+}
+
+.parsed {
+  margin-bottom: 20px;
 }
 
 .colour-preview {

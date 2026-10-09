@@ -113,10 +113,9 @@ registerNode('TXTv', { // TeXT
     displayNodes.push({
       parent: target,
       id: 'TFSv',
-      visited: true,
       toString: () => JSON.stringify(strings.map((s) => s.text).join('')),
-      display: (summary, content) => {
-        content.append(JSON.stringify(strings, undefined, 2) + '\n');
+      display: (container) => {
+        container.append(JSON.stringify(strings, undefined, 2) + '\n');
         const oStr = document.createElement('div');
         oStr.style.width = `${right - left}px`;
         oStr.style.height = `${bottom - top}px`;
@@ -193,9 +192,9 @@ registerNode('TXTv', { // TeXT
           oStr.style.transformOrigin = `${-left}px ${-top}px`;
           oStr.style.boxShadow = '0 0 0 1px black';
           hold.append(oStr);
-          content.append(hold);
+          container.append(hold);
         } else {
-          content.append(oStr);
+          container.append(oStr);
         }
       },
       storage: {},

@@ -3,7 +3,6 @@
 // (e.g. EffectMoaID values)
 
 import { getTypeMeta } from './node_registry.mjs';
-import { outputNodes } from './nodes/generic.mjs';
 import './nodes/index.mjs';
 
 /**
@@ -12,40 +11,41 @@ import './nodes/index.mjs';
  * @param {ProcessedNode | null} parent
  * @param {import('./tokeniser.mjs').NodeToken} nodeToken
  * @param {import('./node_registry.mjs').NodeState} state
+ * @param {string} rawID
  * @return {ProcessedNode}
  */
-export function parse(parent, nodeToken, state) {
+export function parse(parent, nodeToken, state, rawID = '') {
   const meta = getTypeMeta(nodeToken.id);
 
   /** @type {ProcessedNode} */ const processedNode = {
     parent,
     id: nodeToken.id,
-    visited: false,
     toString: () => `${processedNode.id}: ???`,
-    display: (summary, content) => content.append(processedNode.toString()),
+    display: (container) => container.append(processedNode.toString()),
     storage: {},
   };
-  const fallbackDisplay = processedNode.display;
 
   if (nodeToken.type === 'v') {
-    const value = nodeToken.value.map((child) => parse(processedNode, child, state));
-    meta.read(processedNode, value, state);
-    const unvisited = value.filter((n) => !n.visited);
-    if (unvisited.length) {
-      const ts = processedNode.toString.bind(processedNode);
-      const ds = processedNode.display;
-      const dsb = ds.bind(processedNode);
-      const out = outputNodes('Additional child nodes', unvisited);
-      processedNode.toString = () => ts() + '\n' + out.toString();
-      processedNode.display = (summary, content) => {
-        if (ds === fallbackDisplay) {
-          content.append(ts());
-        } else {
-          dsb(summary, content);
-        }
-        out.display(summary, content);
-      };
+    /** @type {ProcessedNode[]} */ const value = [];
+    const counters = new Map();
+    for (const sub of nodeToken.value) {
+      const count = counters.get(sub.id) ?? 0;
+      counters.set(sub.id, count + 1);
+      let subRawID = `${rawID}.${sub.id}`;
+      if (count > 1) {
+        subRawID += `-${count}`;
+      }
+      value.push(parse(processedNode, sub, state, subRawID));
     }
+    meta.read(processedNode, value, state);
+    const ds = processedNode.display.bind(processedNode);
+    processedNode.display = (container) => {
+      ds(container);
+      const rawLink = document.createElement('a');
+      rawLink.textContent = '[raw]';
+      rawLink.setAttribute('href', `#${encodeURIComponent(rawID)}`);
+      (container.querySelector('& > details > summary') ?? container).append(' ', rawLink);
+    };
     if (!processedNode.toSVG) {
       processedNode.toSVG = (parts) => {
         for (let i = value.length; (i--) > 0;) {

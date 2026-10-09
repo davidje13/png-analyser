@@ -1,4 +1,4 @@
-import { asGradientDiv, rgba } from '../../../../../../../display/pretty.mjs';
+import { asGradientDiv, disclosure, rgba } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, getBasicValues, getChild, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
@@ -22,10 +22,7 @@ registerNode('FGVv', { // Fill Gradient ???
 
     target.toString = () => `FGV ${stops.length}-stop FGV gradient`;
 
-    target.display = (summary, content) => {
-      summary.append(`FGV ${stops.length}-stop FGV gradient`);
-      content.append(asGradientDiv(stops));
-    };
+    target.display = (container) => container.append(disclosure(`FGV ${stops.length}-stop FGV gradient`, asGradientDiv(stops), true));
   },
 });
 
@@ -41,10 +38,7 @@ registerNode('FG0v', { // Fill Gradient 0 (RGB)
     }
     target.stops = stops;
 
-    target.display = (summary, content) => {
-      summary.append(`${stops.length}-stop FG0 (RGB) gradient`);
-      content.append(asGradientDiv(stops));
-    };
+    target.display = (container) => container.append(disclosure(`${stops.length}-stop FG0 (RGB) gradient`, asGradientDiv(stops), true));
   },
 });
 
@@ -60,10 +54,7 @@ registerNode('FG1v', { // Fill Gradient 1 (Alpha)
 
     target.toString = () => `${stops.length}-stop FG1 (alpha) gradient`;
 
-    target.display = (summary, content) => {
-      summary.append(`${stops.length}-stop FG1 (alpha) gradient`);
-      content.append(asGradientDiv(stops, true));
-    };
+    target.display = (container) => container.append(disclosure(`${stops.length}-stop FG1 (alpha) gradient`, asGradientDiv(stops, true), true));
   },
 });
 
@@ -83,10 +74,7 @@ registerNode('FGYv', { // Fill Gradient ??? (RGB + Alpha gradient)
 
     target.toString = () => `${stops.length}-stop FGY (RGB + alpha) gradient`;
 
-    target.display = (summary, content) => {
-      summary.append(`${stops.length}-stop FGY (RGB + alpha) gradient`);
-      content.append(asGradientDiv(stops));
-    };
+    target.display = (container) => container.append(disclosure(`${stops.length}-stop FGY (RGB + alpha) gradient`, asGradientDiv(stops), true));
   },
 });
 
@@ -172,10 +160,7 @@ registerNode('FPLv', { // Fill Pattern (?) ??
       ...details,
     ].join('\n');
 
-    target.display = (summary, content) => {
-      summary.append(`Fill: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
-      content.append(details.join(', '));
-    };
+    target.display = (container) => container.append(disclosure(`Fill: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`, details.join(', '), true));
     target.storage.category = category;
   },
 });

@@ -1,3 +1,4 @@
+import { disclosure } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, registerNode } from '../node_registry.mjs';
 
 const FEEDBACK = ['none', 'brush', 'background'];
@@ -63,7 +64,7 @@ registerNode('BPLv', { // Brush Property List (?)
   read: (target, value, state) => {
     const category = getBasicValue(value, 'CATs');
     const name = getBasicValue(value, 'INMs');
-    const friendlyName = getBasicValue(value, 'UNMs');
+    const friendlyName = getBasicValue(value, 'UNMs') ?? '';
     const angle = getBasicValue(value, 'BANi') ?? 0;
     const aspect = (getBasicValue(value, 'BASi') ?? 0) * 0.1;
     const diameter = getBasicValue(value, 'BDIi');
@@ -191,12 +192,13 @@ registerNode('BPLv', { // Brush Property List (?)
       anySens ? makeSensitivityTable(sensitivity).map((r) => r.join(' ')).join('\n') : '',
     ].join('\n');
 
-    target.display = (summary, content) => {
-      summary.append(`Brush: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`);
-      content.append(details.join(', '));
+    target.display = (container) => {
+      /** @type {(HTMLElement | string)[]} */ const content = [];
+      content.push(details.join(', '));
       if (anySens) {
-        content.append('\n' + makeSensitivityTable(sensitivity).map((r) => r.join(' ')).join('\n'));
+        content.push('\n' + makeSensitivityTable(sensitivity).map((r) => r.join(' ')).join('\n'));
       }
+      container.append(disclosure(`Brush: ${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`, content));
     };
   },
 });
