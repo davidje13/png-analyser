@@ -2,14 +2,14 @@ import { asColourDiv, termCol, termReset } from '../../../../../../../display/pr
 import { registerNode, getBasicValue, getChildren } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
-registerNode('DCE', 'v', { // ??? Entity
+registerNode('DCEv', { // ??? Entity
   read: (target, value) => {
-    const key = getBasicValue(value, 'DCK', 's');
+    const key = getBasicValue(value, 'DCKs');
     target.key = key;
 
-    const val1 = getBasicValue(value, 'DCV', 's');
-    const val2 = getBasicValue(value, 'GPL', 'v');
-    const val3 = getBasicValue(value, 'GDT', 'v');
+    const val1 = getBasicValue(value, 'DCVs');
+    const val2 = getBasicValue(value, 'GPLv');
+    const val3 = getBasicValue(value, 'GDTv');
 
     if (val1) {
       target.val = val1;
@@ -27,10 +27,10 @@ registerNode('DCE', 'v', { // ??? Entity
   },
 });
 
-registerNode('GPT', 'v', {
+registerNode('GPTv', {
   read: (target, value) => {
-    const x = getBasicValue(value, 'XLC', 'f') ?? 0;
-    const y = getBasicValue(value, 'YLC', 'f') ?? 0;
+    const x = getBasicValue(value, 'XLCf') ?? 0;
+    const y = getBasicValue(value, 'YLCf') ?? 0;
     target.x = x;
     target.y = y;
     target.toString = () => `${x}, ${y}`;
@@ -43,24 +43,24 @@ registerNode('GPT', 'v', {
  * @return {string | undefined}
  */
 export function getEntityValue(list, key) {
-  const values = getChildren(list, 'DCE', 'v').filter((n) => n.key === key);
+  const values = getChildren(list, 'DCEv').filter((n) => n.key === key);
   if (values.length > 1) {
     throw new Error(`multiple values for ${key}`);
   }
   return /** @type {string | undefined} */ (values[0]?.val);
 }
 
-registerNode('MTX', 'v', { // MaTriX
+registerNode('MTXv', { // MaTriX
   read: (target, value) => {
-    const m00 = getBasicValue(value, 'M00', 'f') ?? 1;
-    const m01 = getBasicValue(value, 'M01', 'f') ?? 0;
-    const m02 = getBasicValue(value, 'M02', 'f') ?? 0;
-    const m10 = getBasicValue(value, 'M10', 'f') ?? 0;
-    const m11 = getBasicValue(value, 'M11', 'f') ?? 1;
-    const m12 = getBasicValue(value, 'M12', 'f') ?? 0;
-    const m20 = getBasicValue(value, 'M20', 'f') ?? 0;
-    const m21 = getBasicValue(value, 'M21', 'f') ?? 0;
-    const m22 = getBasicValue(value, 'M22', 'f') ?? 1;
+    const m00 = getBasicValue(value, 'M00f') ?? 1;
+    const m01 = getBasicValue(value, 'M01f') ?? 0;
+    const m02 = getBasicValue(value, 'M02f') ?? 0;
+    const m10 = getBasicValue(value, 'M10f') ?? 0;
+    const m11 = getBasicValue(value, 'M11f') ?? 1;
+    const m12 = getBasicValue(value, 'M12f') ?? 0;
+    const m20 = getBasicValue(value, 'M20f') ?? 0;
+    const m21 = getBasicValue(value, 'M21f') ?? 0;
+    const m22 = getBasicValue(value, 'M22f') ?? 1;
 
     const mat = [
       m00, m01, m02,
@@ -83,14 +83,14 @@ registerNode('MTX', 'v', { // MaTriX
   },
 });
 
-registerNode('LCK', 'b', {
+registerNode('LCKb', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => value ? 'locked' : 'not locked';
   },
 });
 
-registerNode('VIS', 'b', {
+registerNode('VISb', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => value ? 'visible' : 'hidden';
@@ -152,14 +152,14 @@ const BLEND_MODES = [
   'xor', // 50
 ];
 
-registerNode('BLD', 'i', { // omitted = 0
+registerNode('BLDi', { // omitted = 0
   read: (target, value) => {
     target.value = value;
     target.toString = () => `blend mode: ${BLEND_MODES[value] || `unknown (${value})`}`;
   },
 });
 
-registerNode('DIS', 'b', {
+registerNode('DISb', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => value ? 'not collapsed' : 'collapsed';
@@ -173,14 +173,14 @@ registerNode('DIS', 'b', {
 
 // sub-layers appear inside ELMv (alongside elements)
 
-registerNode('OPA', 'i', {
+registerNode('OPAi', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `opacity ${(value * 0.1).toFixed(1)}%`;
   },
 });
 
-registerNode('BCL', 'i', { // Brush CoLour
+registerNode('BCLi', { // Brush CoLour
   read: (target, value) => {
     const r = value & 0xFF;
     const g = (value >>> 8) & 0xFF;
@@ -192,7 +192,7 @@ registerNode('BCL', 'i', { // Brush CoLour
   },
 });
 
-registerNode('FCL', 'i', { // Fill CoLour
+registerNode('FCLi', { // Fill CoLour
   read: (target, value) => {
     const r = value & 0xFF;
     const g = (value >>> 8) & 0xFF;
@@ -204,7 +204,7 @@ registerNode('FCL', 'i', { // Fill CoLour
   },
 });
 
-registerNode('BGC', 'i', { // BackGround Colour
+registerNode('BGCi', { // BackGround Colour
   read: (target, value) => {
     target.toString = () => `Background: ${termCol(value)} ${value.toString(16).padStart(8, '0')} ${termReset}`;
 
@@ -215,21 +215,21 @@ registerNode('BGC', 'i', { // BackGround Colour
   },
 });
 
-registerNode('FET', 'i', { // TODO
+registerNode('FETi', { // TODO
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill text antialiasing: ${['none', 'antialias'][value] || `unknown ${value}`}`;
   },
 });
 
-registerNode('FOT', 'b', {
+registerNode('FOTb', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill on top: ${value}`;
   },
 });
 
-registerNode('EOF', 'b', {
+registerNode('EOFb', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill rule: ${value ? 'even-odd' : 'nonzero'}`;
@@ -242,112 +242,112 @@ const PLACEMENTS = [
   'outside',
 ];
 
-registerNode('BRP', 'i', {
+registerNode('BRPi', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `brush placement: ${PLACEMENTS[value] || `unknown ${value}`}`;
   },
 });
 
-registerNode('TOX', 'f', {
+registerNode('TOXf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `texture offset X: ${value}`;
   },
 });
 
-registerNode('TOY', 'f', {
+registerNode('TOYf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `texture offset Y: ${value}`;
   },
 });
 
-registerNode('PSX', 'f', {
+registerNode('PSXf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill handle 1 (S) X: ${value}`;
   },
 });
 
-registerNode('PSY', 'f', {
+registerNode('PSYf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill handle 1 (S) Y: ${value}`;
   },
 });
 
-registerNode('PEX', 'f', {
+registerNode('PEXf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill handle 2 (E) X: ${value}`;
   },
 });
 
-registerNode('PEY', 'f', {
+registerNode('PEYf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill handle 2 (E) Y: ${value}`;
   },
 });
 
-registerNode('PFX', 'f', {
+registerNode('PFXf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill handle 3 (F) X: ${value}`;
   },
 });
 
-registerNode('PFY', 'f', {
+registerNode('PFYf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `fill handle 3 (F) Y: ${value}`;
   },
 });
 
-registerNode('RND', 'i', {
+registerNode('RNDi', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `random seed: ${value.toString(16).padStart(6, '0')}`;
   },
 });
 
-registerNode('LFT', 'f', {
+registerNode('LFTf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `left: ${value}`;
   },
 });
 
-registerNode('TOP', 'f', {
+registerNode('TOPf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `top: ${value}`;
   },
 });
 
-registerNode('RIT', 'f', {
+registerNode('RITf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `right: ${value}`;
   },
 });
 
-registerNode('BOT', 'f', {
+registerNode('BOTf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `bottom: ${value}`;
   },
 });
 
-registerNode('OBN', 's', {
+registerNode('OBNs', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `object name: ${value}`;
   },
 });
 
-registerNode('ORI', 'i', {
+registerNode('ORIi', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `orientation: ${value}`;
@@ -355,67 +355,67 @@ registerNode('ORI', 'i', {
 });
 
 // frames seem to be stored as one CELv per frame inside CLLv blocks, with VIFv containing one VISb per frame too (both live in LAYv).
-registerNode('FRC', 'i', {
+registerNode('FRCi', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `frame count: ${value}`;
   },
 });
 
-registerNode('JSS', 's', {
+registerNode('JSSs', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `script:\n${value}`;
   },
 });
 
-registerNode('WID', 'f', {
+registerNode('WIDf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `width: ${value}`;
   },
 });
 
-registerNode('HIT', 'f', {
+registerNode('HITf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `height: ${value}`;
   },
 });
 
-registerNode('RES', 'f', {
+registerNode('RESf', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => `resolution: ${value}`;
   },
 });
 
-registerNode('RSU', 'i', {
+registerNode('RSUi', {
   read: (target, value) => {
     target.value = value;
     target.toString = () => 'resolution units: ' + (value === 0 ? 'pixels per inch' : 'pixels per cm');
   },
 });
 
-registerNode('LNM', 's', { // Layer NaMe
+registerNode('LNMs', { // Layer NaMe
   read: (target, value) => {
     target.toString = () => `layer name: ${JSON.stringify(value)}`;
   },
 });
 
-registerNode('PID', 's', { // Page ID
+registerNode('PIDs', { // Page ID
   read: (target, value) => {
     target.toString = () => `page ID: ${JSON.stringify(value)}`;
   },
 });
 
-registerNode('PGN', 's', { // PaGe Name
+registerNode('PGNs', { // PaGe Name
   read: (target, value) => {
     target.toString = () => `page name: ${JSON.stringify(value)}`;
   },
 });
 
-registerNode('ISP', 'b', { // IS Primary
+registerNode('ISPb', { // IS Primary
   read: (target, value) => {
     target.toString = () => value ? 'primary' : 'not primary';
   },

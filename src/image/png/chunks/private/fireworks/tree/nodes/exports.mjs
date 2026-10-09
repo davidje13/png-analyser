@@ -14,32 +14,32 @@ const COLOURS = [
   'rgba',
 ];
 
-registerNode('EXP', 'v', { // EXPort options
+registerNode('EXPv', { // EXPort options
   read: (target, value, state) => {
-    const formatId = getBasicValue(value, 'FMT', 'i');
+    const formatId = getBasicValue(value, 'FMTi');
     const format = FORMATS[formatId ?? -1];
     if (!format) {
       state.warnings.push(`unknown export format ${formatId}`);
     }
-    const colourId = getBasicValue(value, 'CLR', 'i');
+    const colourId = getBasicValue(value, 'CLRi');
     const colour = COLOURS[colourId ?? -1];
     if (!colour) {
       state.warnings.push(`unknown export colour mode ${colourId}`);
     }
-    const paletteId = getBasicValue(value, 'PLT', 'i'); // preset-palette index? 1 = adaptive, 3 = black&white
-    //const palette = getBasicValue(value, 'PAL', 'v');
-    const paletteSize = getBasicValue(value, 'PLN', 'i');
-    const dither = getBasicValue(value, 'PLD', 'i'); // 0-100
-    const formatMagicRaw = getBasicValue(value, 'MCT', 'i');
+    const paletteId = getBasicValue(value, 'PLTi'); // preset-palette index? 1 = adaptive, 3 = black&white
+    //const palette = getBasicValue(value, 'PALv');
+    const paletteSize = getBasicValue(value, 'PLNi');
+    const dither = getBasicValue(value, 'PLDi'); // 0-100
+    const formatMagicRaw = getBasicValue(value, 'MCTi');
     const formatMagic = formatMagicRaw ? readStr32(formatMagicRaw) : '';
-    const mccRaw = getBasicValue(value, 'MCC', 'i'); // set to "MKBY" ?
-    const jpegQuality = getBasicValue(value, 'JPQ', 'i');
-    const jpegSmoothing = getBasicValue(value, 'JPS', 'i'); // 0-8
-    const jpegProgressive = getBasicValue(value, 'JPP', 'b');
-    const jpegColourMode = getBasicValue(value, 'JPO', 'i'); // 0 = sharp, 1 = smooth colour edges
+    const mccRaw = getBasicValue(value, 'MCCi'); // set to "MKBY" ?
+    const jpegQuality = getBasicValue(value, 'JPQi');
+    const jpegSmoothing = getBasicValue(value, 'JPSi'); // 0-8
+    const jpegProgressive = getBasicValue(value, 'JPPb');
+    const jpegColourMode = getBasicValue(value, 'JPOi'); // 0 = sharp, 1 = smooth colour edges
 
-    const removeUnusedColours = getBasicValue(value, 'PLO', 'b');
-    const interlaced = getBasicValue(value, 'GFI', 'b');
+    const removeUnusedColours = getBasicValue(value, 'PLOb');
+    const interlaced = getBasicValue(value, 'GFIb');
 
     const formatName = formatId === 3 ? `${formatMagic}` : format;
     const info = [`Export config ${formatName} (${colour})`];

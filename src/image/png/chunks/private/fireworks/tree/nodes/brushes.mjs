@@ -59,63 +59,63 @@ const BRUSH_TYPES = [
   size: 'Z',
 };
 
-registerNode('BPL', 'v', { // Brush Property List (?)
+registerNode('BPLv', { // Brush Property List (?)
   read: (target, value, state) => {
-    const category = getBasicValue(value, 'CAT', 's');
-    const name = getBasicValue(value, 'INM', 's');
-    const friendlyName = getBasicValue(value, 'UNM', 's');
-    const angle = getBasicValue(value, 'BAN', 'i') ?? 0;
-    const aspect = (getBasicValue(value, 'BAS', 'i') ?? 0) * 0.1;
-    const diameter = getBasicValue(value, 'BDI', 'i');
-    const maxCount = getBasicValue(value, 'BMM', 'i');
-    const minSize = (getBasicValue(value, 'BMS', 'i') ?? 0) * 0.1;
-    const softness = (getBasicValue(value, 'BSE', 'i') ?? 0) * 0.1;
-    const softenModeId = getBasicValue(value, 'BSF', 'i');
+    const category = getBasicValue(value, 'CATs');
+    const name = getBasicValue(value, 'INMs');
+    const friendlyName = getBasicValue(value, 'UNMs');
+    const angle = getBasicValue(value, 'BANi') ?? 0;
+    const aspect = (getBasicValue(value, 'BASi') ?? 0) * 0.1;
+    const diameter = getBasicValue(value, 'BDIi');
+    const maxCount = getBasicValue(value, 'BMMi');
+    const minSize = (getBasicValue(value, 'BMSi') ?? 0) * 0.1;
+    const softness = (getBasicValue(value, 'BSEi') ?? 0) * 0.1;
+    const softenModeId = getBasicValue(value, 'BSFi');
     const softenMode = SOFTEN_MODES[softenModeId ?? -1];
     if (!softenMode) {
       state.warnings.push(`unknown brush soften mode (BSF): ${softenModeId}`);
     }
-    const shapeId = getBasicValue(value, 'BSH', 'i');
+    const shapeId = getBasicValue(value, 'BSHi');
     const shape = SHAPES[shapeId ?? -1];
     if (!shape) {
       state.warnings.push(`unknown brush shape (BSH): ${shapeId}`);
     }
-    const blackness = (getBasicValue(value, 'BBK', 'i') ?? 0) * 0.1;
-    const concentration = (getBasicValue(value, 'BCN', 'i') ?? 0) * 0.1;
-    const effectId = getBasicValue(value, 'BEF', 'i');
+    const blackness = (getBasicValue(value, 'BBKi') ?? 0) * 0.1;
+    const concentration = (getBasicValue(value, 'BCNi') ?? 0) * 0.1;
+    const effectId = getBasicValue(value, 'BEFi');
     const effect = EFFECTS[effectId ?? -1];
     if (!effect) {
       state.warnings.push(`unknown brush effect (BEF): ${effectId}`);
     }
-    const brushTypeId = getBasicValue(value, 'BRT', 'i');
+    const brushTypeId = getBasicValue(value, 'BRTi');
     const brushType = BRUSH_TYPES[brushTypeId ?? -1];
     if (!brushType) {
       state.warnings.push(`unknown brush brush type (BRT): ${brushTypeId}`);
     }
-    const feedbackId = getBasicValue(value, 'BFB', 'i');
+    const feedbackId = getBasicValue(value, 'BFBi');
     const feedback = FEEDBACK[feedbackId ?? -1];
     if (!feedback) {
       state.warnings.push(`unknown brush feedback (BFB): ${feedbackId}`);
     }
-    const flowRate = (getBasicValue(value, 'BFR', 'i') ?? 0) * 0.1;
-    const tipCount = getBasicValue(value, 'BNT', 'i') ?? 1;
-    const spacing = (getBasicValue(value, 'BSP', 'i') ?? 0) * 0.1;
-    const tipSpacing = getBasicValue(value, 'BTS', 'i') ?? 0;
-    const textureBlend = (getBasicValue(value, 'BTB', 'i') ?? 0) * 0.1;
-    const textureEdge = (getBasicValue(value, 'BTE', 'i') ?? 0) * 0.1;
-    const tipSpacingModeId = getBasicValue(value, 'BSM', 'i');
+    const flowRate = (getBasicValue(value, 'BFRi') ?? 0) * 0.1;
+    const tipCount = getBasicValue(value, 'BNTi') ?? 1;
+    const spacing = (getBasicValue(value, 'BSPi') ?? 0) * 0.1;
+    const tipSpacing = getBasicValue(value, 'BTSi') ?? 0;
+    const textureBlend = (getBasicValue(value, 'BTBi') ?? 0) * 0.1;
+    const textureEdge = (getBasicValue(value, 'BTEi') ?? 0) * 0.1;
+    const tipSpacingModeId = getBasicValue(value, 'BSMi');
     const tipSpacingMode = SPACING_MODES[tipSpacingModeId ?? -1];
     if (!tipSpacingMode) {
       state.warnings.push(`unknown tip spacing mode (BSM): ${tipSpacingModeId}`);
     }
-    const tipColouringModeId = getBasicValue(value, 'BCM', 'i');
+    const tipColouringModeId = getBasicValue(value, 'BCMi');
     const tipColouringMode = COLOURING_MODES[tipColouringModeId ?? -1];
     if (!tipColouringMode) {
       state.warnings.push(`unknown tip colouring mode (BCM): ${tipColouringModeId}`);
     }
 
-    //const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
-    //const BBL = getBasicValue(value, 'BBL', 'i'); // always 0?
+    //const RDO = getBasicValue(value, 'RDOb'); // always false?
+    //const BBL = getBasicValue(value, 'BBLi'); // always 0?
 
     target.usesTexture = textureBlend > 0 || textureEdge > 0;
 
@@ -125,22 +125,21 @@ registerNode('BPL', 'v', { // Brush Property List (?)
     for (const source in SENSITIVITY_SOURCES) {
       /** @type {Record<string, number>} */ const effects = {};
       for (const target in SENSITIVITY_TARGETS) {
-        const key = `S${SENSITIVITY_SOURCES[source]}${SENSITIVITY_TARGETS[target]}`;
-        const v = (getBasicValue(value, key, 'i') ?? 0) * 0.1;
+        const v = (getBasicValue(value, `S${SENSITIVITY_SOURCES[source]}${SENSITIVITY_TARGETS[target]}i`) ?? 0) * 0.1;
         effects[target] = v;
         anySens ||= v !== 0;
       }
       sensitivity[source] = effects;
     }
 
-    const isAntialiased = getBasicValue(value, 'BIA', 'b');
-    const dashCount = getBasicValue(value, 'NDI', 'i') ?? 0;
-    const dashOn1 = getBasicValue(value, 'DO1', 'i');
-    const dashOn2 = getBasicValue(value, 'DO2', 'i');
-    const dashOn3 = getBasicValue(value, 'DO3', 'i');
-    const dashOff1 = getBasicValue(value, 'DF1', 'i');
-    const dashOff2 = getBasicValue(value, 'DF2', 'i');
-    const dashOff3 = getBasicValue(value, 'DF3', 'i');
+    const isAntialiased = getBasicValue(value, 'BIAb');
+    const dashCount = getBasicValue(value, 'NDIi') ?? 0;
+    const dashOn1 = getBasicValue(value, 'DO1i');
+    const dashOn2 = getBasicValue(value, 'DO2i');
+    const dashOn3 = getBasicValue(value, 'DO3i');
+    const dashOff1 = getBasicValue(value, 'DF1i');
+    const dashOff2 = getBasicValue(value, 'DF2i');
+    const dashOff3 = getBasicValue(value, 'DF3i');
 
     target.diameter = diameter ?? 1;
     target.storage.diameter = diameter ?? 1;

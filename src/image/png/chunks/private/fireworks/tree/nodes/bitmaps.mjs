@@ -1,7 +1,7 @@
 import { tilesAsCanvas } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, nodeBasicValue, registerNode } from '../node_registry.mjs';
 
-registerNode('TID', 'i', { // Tile ID
+registerNode('TIDi', { // Tile ID
   read: (target, value, state) => {
     const mkbt = state.mkbts?.get(value);
     if (!mkbt) {
@@ -16,17 +16,17 @@ registerNode('TID', 'i', { // Tile ID
   },
 });
 
-registerNode('IMG', 'v', { // IMaGe
+registerNode('IMGv', { // IMaGe
   read: (target, value, state) => {
-    const locked = getBasicValue(value, 'LCK', 'b') ?? false;
-    const xOf = getBasicValue(value, 'XOF', 'f') ?? 0; // TODO: what is this?
-    const yOf = getBasicValue(value, 'YOF', 'f') ?? 0; // TODO: what is this?
-    const xLocation = getBasicValue(value, 'XLC', 'f') ?? 0;
-    const yLocation = getBasicValue(value, 'YLC', 'f') ?? 0;
-    const width = getBasicValue(value, 'WPX', 'i') ?? 0;
-    const height = getBasicValue(value, 'HPX', 'i') ?? 0;
-    const tileSize = getBasicValue(value, 'TSZ', 'i') ?? 0;
-    const tiles = getBasicValue(value, 'TIL', 'v') ?? [];
+    const locked = getBasicValue(value, 'LCKb') ?? false;
+    const xOf = getBasicValue(value, 'XOFf') ?? 0; // TODO: what is this?
+    const yOf = getBasicValue(value, 'YOFf') ?? 0; // TODO: what is this?
+    const xLocation = getBasicValue(value, 'XLCf') ?? 0;
+    const yLocation = getBasicValue(value, 'YLCf') ?? 0;
+    const width = getBasicValue(value, 'WPXi') ?? 0;
+    const height = getBasicValue(value, 'HPXi') ?? 0;
+    const tileSize = getBasicValue(value, 'TSZi') ?? 0;
+    const tiles = getBasicValue(value, 'TILv') ?? [];
     const tileData = extractTiles(width, height, tiles, tileSize, state.warnings);
     target.xLocation = xLocation;
     target.yLocation = yLocation;
@@ -54,12 +54,12 @@ registerNode('IMG', 'v', { // IMaGe
   },
 });
 
-registerNode('MSK', 'v', { // MaSK
+registerNode('MSKv', { // MaSK
   read: (target, value, state) => {
-    const width = getBasicValue(value, 'WPX', 'i') ?? 0;
-    const height = getBasicValue(value, 'HPX', 'i') ?? 0;
-    const tileSize = getBasicValue(value, 'TSZ', 'i') ?? 0;
-    const tiles = getBasicValue(value, 'TIL', 'v') ?? [];
+    const width = getBasicValue(value, 'WPXi') ?? 0;
+    const height = getBasicValue(value, 'HPXi') ?? 0;
+    const tileSize = getBasicValue(value, 'TSZi') ?? 0;
+    const tiles = getBasicValue(value, 'TILv') ?? [];
     const tileData = extractTiles(width, height, tiles, tileSize, state.warnings);
     target.toString = () => `Mask: ${width} x ${height}`;
     target.display = (summary, content) => {
@@ -93,14 +93,14 @@ function extractTiles(width, height, tiles, tileSize, warnings) {
       const px = x * tileSize;
       const py = y * tileSize;
       const tile = tiles[y * nx + x];
-      if (tile?.name === 'TIDi' && tile.mkbt) {
+      if (tile?.id === 'TIDi' && tile.mkbt) {
         const mkbt = /** @type {mkBTChunk} */ (tile.mkbt);
         if (mkbt.img) {
           r.tiles.push({ type: 'i', x: px, y: py, value: mkbt.img() });
           continue;
         }
       }
-      const tmci = nodeBasicValue(tile, 'TMC', 'i') ?? 0xFFFF0000;
+      const tmci = nodeBasicValue(tile, 'TMCi') ?? 0xFFFF0000;
       r.tiles.push({ type: 'c', x: px, y: py, value: tmci, w: tileSize, h: tileSize });
     }
   }

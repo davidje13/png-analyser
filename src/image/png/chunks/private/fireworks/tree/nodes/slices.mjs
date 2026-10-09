@@ -1,31 +1,31 @@
 import { asColourDiv } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, registerNode } from '../node_registry.mjs';
 
-registerNode('URL', 'v', { // Link (e.g. image slice or hotspot)
+registerNode('URLv', { // Link (e.g. image slice or hotspot)
   read: (target, value, state) => {
-    const foregroundCol = getBasicValue(value, 'FCL', 'i');
-    const left = getBasicValue(value, 'LFT', 'f') ?? 0;
-    const top = getBasicValue(value, 'TOP', 'f') ?? 0;
-    const right = getBasicValue(value, 'RIT', 'f') ?? 0;
-    const bottom = getBasicValue(value, 'BOT', 'f') ?? 0;
-    const locked = getBasicValue(value, 'LCK', 'b') ?? false;
-    const name = getBasicValue(value, 'FIL', 's') ?? null; // only used by slice
-    const text = getBasicValue(value, 'TDT', 's') ?? null; // only used by slice
-    const objectName = getBasicValue(value, 'OBN', 's') ?? null; // only used by hotspot
-    const link = getBasicValue(value, 'INM', 's') ?? null;
-    const alt = getBasicValue(value, 'A2T', 's') ?? null;
-    const linkTarget = getBasicValue(value, 'ALT', 's') ?? null;
-    const shapeType = getBasicValue(value, 'URS', 'i') ?? 0;
-    const typeOfSlice = getBasicValue(value, 'TSL', 'i') ?? 0;
-    const repeat = getBasicValue(value, 'CBR', 'i') ?? 0;
+    const foregroundCol = getBasicValue(value, 'FCLi');
+    const left = getBasicValue(value, 'LFTf') ?? 0;
+    const top = getBasicValue(value, 'TOPf') ?? 0;
+    const right = getBasicValue(value, 'RITf') ?? 0;
+    const bottom = getBasicValue(value, 'BOTf') ?? 0;
+    const locked = getBasicValue(value, 'LCKb') ?? false;
+    const name = getBasicValue(value, 'FILs') ?? null; // only used by slice
+    const text = getBasicValue(value, 'TDTs') ?? null; // only used by slice
+    const objectName = getBasicValue(value, 'OBNs') ?? null; // only used by hotspot
+    const link = getBasicValue(value, 'INMs') ?? null;
+    const alt = getBasicValue(value, 'A2Ts') ?? null;
+    const linkTarget = getBasicValue(value, 'ALTs') ?? null;
+    const shapeType = getBasicValue(value, 'URSi') ?? 0;
+    const typeOfSlice = getBasicValue(value, 'TSLi') ?? 0;
+    const repeat = getBasicValue(value, 'CBRi') ?? 0;
     const ext = {
-      MSN: getBasicValue(value, 'MSN', 'i') ?? 0, // possibly a unique tag / hash
-      CBT: getBasicValue(value, 'CBT', 'b') ?? null, // appears to be true for background slices (typeOfSlice == 2), or maybe for 9-slice groups?
-      CBA: getBasicValue(value, 'CBA', 'i') ?? null, // possibly: 0 = fixed, 1 = scroll ?
-      CBH: getBasicValue(value, 'CBH', 'i') ?? null, // something about horizontal scrolling. 0/1/2 = left/centre/right, 3 = use CHV
-      CHV: getBasicValue(value, 'CHV', 'i') ?? null, // relevant if CBH is 3, else always set to 0xFFFFFFFF
-      CBV: getBasicValue(value, 'CBV', 'i') ?? null, // something about vertical scrolling. 0/1/2 = top/centre/bottom, 3 = use CVV
-      CVV: getBasicValue(value, 'CVV', 'i') ?? null, // relevant if CBV is 3, else always set to 0xFFFFFFFF
+      MSN: getBasicValue(value, 'MSNi') ?? 0, // possibly a unique tag / hash
+      CBT: getBasicValue(value, 'CBTb') ?? null, // appears to be true for background slices (typeOfSlice == 2), or maybe for 9-slice groups?
+      CBA: getBasicValue(value, 'CBAi') ?? null, // possibly: 0 = fixed, 1 = scroll ?
+      CBH: getBasicValue(value, 'CBHi') ?? null, // something about horizontal scrolling. 0/1/2 = left/centre/right, 3 = use CHV
+      CHV: getBasicValue(value, 'CHVi') ?? null, // relevant if CBH is 3, else always set to 0xFFFFFFFF
+      CBV: getBasicValue(value, 'CBVi') ?? null, // something about vertical scrolling. 0/1/2 = top/centre/bottom, 3 = use CVV
+      CVV: getBasicValue(value, 'CVVi') ?? null, // relevant if CBV is 3, else always set to 0xFFFFFFFF
     };
     // also can contain EXPv to set custom export options for slice
     // and PBPv (bezier path) if shape type is 2 (polygon)

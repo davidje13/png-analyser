@@ -1040,11 +1040,11 @@ export function makeID(path) {
 	let i = path.length - 1;
 	while (i >= 0) {
 		const node = path[i];
-		if (node.name === 'GDT' && node.type === 'v' && rev) {
+		if (node.id === 'GDTv' && rev) {
 			--i;
 			continue;
 		}
-		if (node.name !== 'DCE' || node.type !== 'v') {
+		if (node.id !== 'DCEv') {
 			break;
 		}
 		const key = getDCEKey(node);
@@ -1057,12 +1057,12 @@ export function makeID(path) {
 	if (rev) {
 		++i;
 	}
-	rev += `.${path[i].name}${path[i].type}`;
+	rev += `.${path[i].id}`;
 	--i;
 	const base = rev;
 	let best = REVERSED_LOOKUP.get(rev);
 	while (i >= 0 && AMBIGUOUS_NODES.has(rev)) {
-		rev += `.${path[i].name}${path[i].type}`;
+		rev += `.${path[i].id}`;
 		--i;
 		const id = REVERSED_LOOKUP.get(rev);
 		if (id) {
@@ -1085,7 +1085,7 @@ export function makeID(path) {
  */
 function getDCEKey(node) {
 	for (const c of node.value) {
-		if (c.name === 'DCK' && c.type === 's') {
+		if (c.id === 'DCKs') {
 			return c.value;
 		}
 	}

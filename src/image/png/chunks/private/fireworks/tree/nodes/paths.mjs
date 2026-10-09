@@ -8,10 +8,10 @@ import { outputNodes } from './generic.mjs';
  * @typedef {import('../node_registry.mjs').ProcessedNode} ProcessedNode
  */
 
-registerNode('PTH', 'v', { // PaTH
+registerNode('PTHv', { // PaTH
   read: (target, value, state) => {
-    Object.assign(target, outputNodes(target.name, value));
-    const fillOnTop = getBasicValue(value, 'FOT', 'b') ?? false;
+    Object.assign(target, outputNodes(target.id, value));
+    const fillOnTop = getBasicValue(value, 'FOTb') ?? false;
     target.storage.fillOnTop = fillOnTop;
   },
 });
@@ -31,18 +31,18 @@ registerNode('PTH', 'v', { // PaTH
  * }} PBTNode
  */
 
-registerNode('PBT', 'v', { // Path Bezier poinT
+registerNode('PBTv', { // Path Bezier poinT
   read: (target, value, state) => {
-    const x = getBasicValue(value, 'XLC', 'f');
-    const y = getBasicValue(value, 'YLC', 'f');
-    const xC1 = getBasicValue(value, 'XPC', 'f') ?? x;
-    const yC1 = getBasicValue(value, 'YPC', 'f') ?? y;
-    const xC2 = getBasicValue(value, 'XSC', 'f') ?? x;
-    const yC2 = getBasicValue(value, 'YSC', 'f') ?? y;
-    const isCurve = getBasicValue(value, 'CRV', 'b') ?? false;
-    const randomSeed = getBasicValue(value, 'RND', 'i');
-    const NSD = getBasicValue(value, 'NSD', 'f');
-    const BZL = getBasicValue(value, 'BZL', 'v'); // TODO: maybe this holds attributes like pressure / velocity? Seems to have BZCi (count?) and BAZv (item array?)
+    const x = getBasicValue(value, 'XLCf');
+    const y = getBasicValue(value, 'YLCf');
+    const xC1 = getBasicValue(value, 'XPCf') ?? x;
+    const yC1 = getBasicValue(value, 'YPCf') ?? y;
+    const xC2 = getBasicValue(value, 'XSCf') ?? x;
+    const yC2 = getBasicValue(value, 'YSCf') ?? y;
+    const isCurve = getBasicValue(value, 'CRVb') ?? false;
+    const randomSeed = getBasicValue(value, 'RNDi');
+    const NSD = getBasicValue(value, 'NSDf');
+    const BZL = getBasicValue(value, 'BZLv'); // TODO: maybe this holds attributes like pressure / velocity? Seems to have BZCi (count?) and BAZv (item array?)
 
     target.x = x;
     target.y = y;
@@ -67,12 +67,12 @@ registerNode('PBT', 'v', { // Path Bezier poinT
  * }} PBPNode
  */
 
-registerNode('PBP', 'v', { // Path Bezier Points
+registerNode('PBPv', { // Path Bezier Points
   read: (target, value, state) => {
-    const isClosed = getBasicValue(value, 'ISC', 'b') ?? false;
-    const count = getBasicValue(value, 'PPC', 'i');
-    const BSL = getBasicValue(value, 'BSL', 'f');
-    const points = /** @type {PBTNode[]} */ (getChildren(value, 'PBT', 'v'));
+    const isClosed = getBasicValue(value, 'ISCb') ?? false;
+    const count = getBasicValue(value, 'PPCi');
+    const BSL = getBasicValue(value, 'BSLf');
+    const points = /** @type {PBTNode[]} */ (getChildren(value, 'PBTv'));
 
     if (points.length !== count) {
       state.warnings.push(`Expected ${count} bezier points but got ${points.length}`);
@@ -136,9 +136,9 @@ registerNode('PBP', 'v', { // Path Bezier Points
   },
 });
 
-registerNode('PBL', 'v', { // Path Beziers List
+registerNode('PBLv', { // Path Beziers List
   read: (target, value, state) => {
-    const contours = /** @type {PBPNode[]} */ (getChildren(value, 'PBP', 'v'));
+    const contours = /** @type {PBPNode[]} */ (getChildren(value, 'PBPv'));
 
     target.contours = contours;
 
@@ -185,15 +185,15 @@ registerNode('PBL', 'v', { // Path Beziers List
  * }} PPTNode
  */
 
-registerNode('PPT', 'v', { // Path PoinT
+registerNode('PPTv', { // Path PoinT
   read: (target, value, state) => {
-    const x = getBasicValue(value, 'XLC', 'f');
-    const y = getBasicValue(value, 'YLC', 'f');
-    const pressure = getBasicValue(value, 'PRS', 'f');
-    const velocity = getBasicValue(value, 'VEL', 'f');
-    const duration = getBasicValue(value, 'DUR', 'i');
-    const randomSeed = getBasicValue(value, 'RND', 'i');
-    const onControlPoint = getBasicValue(value, 'ONC', 'b') ?? false;
+    const x = getBasicValue(value, 'XLCf');
+    const y = getBasicValue(value, 'YLCf');
+    const pressure = getBasicValue(value, 'PRSf');
+    const velocity = getBasicValue(value, 'VELf');
+    const duration = getBasicValue(value, 'DURi');
+    const randomSeed = getBasicValue(value, 'RNDi');
+    const onControlPoint = getBasicValue(value, 'ONCb') ?? false;
 
     target.x = x;
     target.y = y;
@@ -219,11 +219,11 @@ registerNode('PPT', 'v', { // Path PoinT
  * }} PPLNode
  */
 
-registerNode('PPL', 'v', { // Path Point List
+registerNode('PPLv', { // Path Point List
   read: (target, value, state) => {
-    const isClosed = getBasicValue(value, 'ISC', 'b') ?? false;
-    const count = getBasicValue(value, 'PPC', 'i');
-    const points = /** @type {PPTNode[]} */ (getChildren(value, 'PPT', 'v'));
+    const isClosed = getBasicValue(value, 'ISCb') ?? false;
+    const count = getBasicValue(value, 'PPCi');
+    const points = /** @type {PPTNode[]} */ (getChildren(value, 'PPTv'));
 
     if (points.length !== count) {
       state.warnings.push(`Expected ${count} points but got ${points.length}`);
@@ -286,9 +286,9 @@ registerNode('PPL', 'v', { // Path Point List
   },
 });
 
-registerNode('PCL', 'v', { // Path Contour List
+registerNode('PCLv', { // Path Contour List
   read: (target, value, state) => {
-    const contours = /** @type {PPLNode[]} */ (getChildren(value, 'PPL', 'v'));
+    const contours = /** @type {PPLNode[]} */ (getChildren(value, 'PPLv'));
 
     target.contours = contours;
 

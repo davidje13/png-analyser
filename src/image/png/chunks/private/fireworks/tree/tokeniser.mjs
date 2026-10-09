@@ -12,23 +12,23 @@ import { findIndex, getLatin1, getUTF16BE } from '../../../../../../data/utils.m
 
 /**
  * @typedef {{
- *   name: string,
+ *   id: `${string}s`,
  *   type: 's',
  *   value: string,
  * } | {
- *   name: string,
+ *   id: `${string}i`,
  *   type: 'i',
  *   value: number,
  * } | {
- *   name: string,
+ *   id: `${string}f`,
  *   type: 'f',
  *   value: number,
  * } | {
- *   name: string,
+ *   id: `${string}b`,
  *   type: 'b',
  *   value: boolean,
  * } | {
- *   name: string,
+ *   id: `${string}v`,
  *   type: 'v',
  *   value: NodeToken[],
  * }} NodeToken
@@ -55,8 +55,6 @@ export function tokenise(buf, warnings) {
       continue;
     }
     const full = getLatin1(buf, p, p + 4, warnings);
-    const name = full.substring(0, 3);
-    const type = full[3];
     p += 4;
     if (buf.getUint8(p) !== 0x7b) { // '{'
       warnings.push(`mkBS expected { after ${full}`);
@@ -64,13 +62,13 @@ export function tokenise(buf, warnings) {
     }
     p++;
     const target = cur;
-    switch (type) {
+    switch (full[3]) {
       case 'v': // vector
         stack.push(cur);
         cur = [];
         target.push({
-          name,
-          type,
+          id: /** @type {`${string}v`} */ (full),
+          type: 'v',
           value: cur,
         });
         break;
@@ -81,8 +79,8 @@ export function tokenise(buf, warnings) {
           warnings.push(`mkBS expected } after ${full}`);
         }
         target.push({
-          name,
-          type,
+          id: /** @type {`${string}s`} */ (full),
+          type: 's',
           value: getUTF16BE(buf, p + 2, end, warnings),
         });
         p = end + 1;
@@ -95,25 +93,25 @@ export function tokenise(buf, warnings) {
           end = buf.byteLength;
         }
         const value = getLatin1(buf, p, end, warnings);
-        switch (type) {
+        switch (full[3]) {
           case 'i': // int
             target.push({
-              name,
-              type,
+              id: /** @type {`${string}i`} */ (full),
+              type: 'i',
               value: Number.parseInt(value, 16),
             });
             break;
           case 'f': // float
             target.push({
-              name,
-              type,
+              id: /** @type {`${string}f`} */ (full),
+              type: 'f',
               value: Number.parseFloat(value),
             });
             break;
           case 'b': // boolean
             target.push({
-              name,
-              type,
+              id: /** @type {`${string}b`} */ (full),
+              type: 'b',
               value: value !== '0',
             });
             break;
@@ -128,5 +126,5 @@ export function tokenise(buf, warnings) {
   if (stack.length) {
     warnings.push('mkBS missing }');
   }
-  return { name: 'root', type: 'v', value: root };
+  return { id: 'rootv', type: 'v', value: root };
 }

@@ -2,12 +2,12 @@ import { asGradientDiv, rgba } from '../../../../../../../display/pretty.mjs';
 import { getBasicValue, getBasicValues, getChild, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
-registerNode('FGL', 'v', { // Fill Gradient ???
+registerNode('FGLv', { // Fill Gradient ???
   read: (target, value, state) => {
-    const category = getBasicValue(value, 'CAT', 's');
-    const name = getBasicValue(value, 'INM', 's');
-    const grad = getChild(value, 'FGV', 'v');
-    const grad2 = getChild(value, 'FGY', 'v');
+    const category = getBasicValue(value, 'CATs');
+    const name = getBasicValue(value, 'INMs');
+    const grad = getChild(value, 'FGVv');
+    const grad2 = getChild(value, 'FGYv');
 
     Object.assign(target, outputNodes(
       `Gradient ${JSON.stringify(category)} / ${JSON.stringify(name)}`,
@@ -16,7 +16,7 @@ registerNode('FGL', 'v', { // Fill Gradient ???
   },
 });
 
-registerNode('FGV', 'v', { // Fill Gradient ???
+registerNode('FGVv', { // Fill Gradient ???
   read: (target, value, state) => {
     const stops = extractGradient(value, state.warnings);
 
@@ -29,7 +29,7 @@ registerNode('FGV', 'v', { // Fill Gradient ???
   },
 });
 
-registerNode('FG0', 'v', { // Fill Gradient 0 (RGB)
+registerNode('FG0v', { // Fill Gradient 0 (RGB)
   read: (target, value, state) => {
     const stops = extractGradient(value, state.warnings);
 
@@ -48,7 +48,7 @@ registerNode('FG0', 'v', { // Fill Gradient 0 (RGB)
   },
 });
 
-registerNode('FG1', 'v', { // Fill Gradient 1 (Alpha)
+registerNode('FG1v', { // Fill Gradient 1 (Alpha)
   read: (target, value, state) => {
     const stops = extractGradient(value, state.warnings);
     for (const stop of stops) {
@@ -67,10 +67,10 @@ registerNode('FG1', 'v', { // Fill Gradient 1 (Alpha)
   },
 });
 
-registerNode('FGY', 'v', { // Fill Gradient ??? (RGB + Alpha gradient)
+registerNode('FGYv', { // Fill Gradient ??? (RGB + Alpha gradient)
   read: (target, value, state) => {
-    const rgb = /** @type {Gradient | undefined} */ (getChild(value, 'FG0', 'v')?.stops);
-    const alpha = /** @type {Gradient | undefined} */ (getChild(value, 'FG1', 'v')?.stops);
+    const rgb = /** @type {Gradient | undefined} */ (getChild(value, 'FG0v')?.stops);
+    const alpha = /** @type {Gradient | undefined} */ (getChild(value, 'FG1v')?.stops);
     if (!rgb) {
       state.warnings.push('Missing FG0v for FGYv');
       return;
@@ -117,21 +117,21 @@ const SHAPES = [
   'contour grad',
 ];
 
-registerNode('FPL', 'v', { // Fill Pattern (?) ??
+registerNode('FPLv', { // Fill Pattern (?) ??
   read: (target, value, state) => {
-    const category = getBasicValue(value, 'CAT', 's');
-    const name = getBasicValue(value, 'INM', 's');
-    const friendlyName = getBasicValue(value, 'UNM', 's');
-    const textureBlend = (getBasicValue(value, 'FTB', 'i') ?? 0) * 0.1;
-    const feather = getBasicValue(value, 'FEF', 'i') ?? 0;
-    const stampingModeId = getBasicValue(value, 'FSM', 'i');
+    const category = getBasicValue(value, 'CATs');
+    const name = getBasicValue(value, 'INMs');
+    const friendlyName = getBasicValue(value, 'UNMs');
+    const textureBlend = (getBasicValue(value, 'FTBi') ?? 0) * 0.1;
+    const feather = getBasicValue(value, 'FEFi') ?? 0;
+    const stampingModeId = getBasicValue(value, 'FSMi');
     const stampingMode = STAMPING_MODES[stampingModeId ?? -1];
     if (!stampingMode) {
       state.warnings.push(`unknown fill stamping mode (FSM): ${stampingModeId}`);
     }
-    const hardEdge = getBasicValue(value, 'FRD', 'b');
-    const fallbackShapeId = getBasicValue(value, 'FSH', 'i');
-    const shapeId = getBasicValue(value, 'FSX', 'i') ?? fallbackShapeId;
+    const hardEdge = getBasicValue(value, 'FRDb');
+    const fallbackShapeId = getBasicValue(value, 'FSHi');
+    const shapeId = getBasicValue(value, 'FSXi') ?? fallbackShapeId;
     const shape = SHAPES[shapeId ?? -1];
     if (!shape) {
       state.warnings.push(`unknown fill shape (FSH): ${shapeId}`);
@@ -139,12 +139,12 @@ registerNode('FPL', 'v', { // Fill Pattern (?) ??
 
     // only used by web dither
     const ditherCols = [
-      getBasicValue(value, 'FD1', 'i') ?? 0,
-      getBasicValue(value, 'FD2', 'i') ?? 0,
-      getBasicValue(value, 'FD3', 'i') ?? 0,
-      getBasicValue(value, 'FD4', 'i') ?? 0,
+      getBasicValue(value, 'FD1i') ?? 0,
+      getBasicValue(value, 'FD2i') ?? 0,
+      getBasicValue(value, 'FD3i') ?? 0,
+      getBasicValue(value, 'FD4i') ?? 0,
     ];
-    const ditherTrans = getBasicValue(value, 'FDT', 'b');
+    const ditherTrans = getBasicValue(value, 'FDTb');
 
     target.usesTexture = textureBlend > 0;
 
@@ -163,9 +163,9 @@ registerNode('FPL', 'v', { // Fill Pattern (?) ??
       details.push(`dither: ${ditherCols.map((c) => rgba(c)).join(' & ')}${ditherTrans ? ' [transparent]' : ''}`);
     }
 
-    //const RDO = getBasicValue(value, 'RDO', 'b'); // always false?
-    //const FET = getBasicValue(value, 'FET', 'i'); // always 1?
-    //const FRR = getBasicValue(value, 'FRR', 'i'); // always 0?
+    //const RDO = getBasicValue(value, 'RDOb'); // always false?
+    //const FET = getBasicValue(value, 'FETi'); // always 1?
+    //const FRR = getBasicValue(value, 'FRRi'); // always 0?
 
     target.toString = () => [
       `${JSON.stringify(category)} / ${JSON.stringify(name)} ${JSON.stringify(friendlyName)}`,
@@ -190,14 +190,14 @@ registerNode('FPL', 'v', { // Fill Pattern (?) ??
  * @return {Gradient}
  */
 function extractGradient(nodes, warnings) {
-  const count = getBasicValue(nodes, 'FNC', 'i') ?? 0;
-  const stops = getBasicValues(nodes, 'FGI', 'v');
+  const count = getBasicValue(nodes, 'FNCi') ?? 0;
+  const stops = getBasicValues(nodes, 'FGIv');
   if (stops.length !== count) {
     warnings.push(`Expected ${count} colour stops but got ${stops.length}`);
   }
   return stops.map((stop) => ({
-    position: getBasicValue(stop, 'FGP', 'f') ?? 0,
-    colour: getBasicValue(stop, 'FGC', 'i') ?? 0,
+    position: getBasicValue(stop, 'FGPf') ?? 0,
+    colour: getBasicValue(stop, 'FGCi') ?? 0,
   }));
 }
 

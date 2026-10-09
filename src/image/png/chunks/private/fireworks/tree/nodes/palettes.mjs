@@ -12,15 +12,15 @@ import { registerNode } from '../node_registry.mjs';
  * }} Entry
  */
 
-registerNode('PAL', 'v', { // PALette
+registerNode('PALv', { // PALette
   read: (target, value, state) => {
     /** @type {Entry[]} */ const entries = [];
     for (const c of value) {
-      const fcl = nodeBasicValue(c, 'FCL', 'i');
-      const bcl = nodeBasicValue(c, 'BCL', 'i');
-      const cll = nodeBasicValue(c, 'CLL', 'b');
-      const clt = nodeBasicValue(c, 'CLT', 'b');
-      const clm = nodeBasicValue(c, 'CLM', 'b');
+      const fcl = nodeBasicValue(c, 'FCLi');
+      const bcl = nodeBasicValue(c, 'BCLi');
+      const cll = nodeBasicValue(c, 'CLLb');
+      const clt = nodeBasicValue(c, 'CLTb');
+      const clm = nodeBasicValue(c, 'CLMb');
       if (fcl !== undefined) {
         entries.push({
           col: fcl,
@@ -38,7 +38,7 @@ registerNode('PAL', 'v', { // PALette
       } else if (bcl !== undefined && entries.length > 0) {
         entries[entries.length - 1].mapTo = bcl;
       } else {
-        state.warnings.push(`Unknown palette node ${c.name}`);
+        state.warnings.push(`Unknown palette node ${c.id}`);
       }
     }
     target.entries = entries;

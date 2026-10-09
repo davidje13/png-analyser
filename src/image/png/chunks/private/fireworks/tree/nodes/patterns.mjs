@@ -1,34 +1,34 @@
 import { getBasicValue, getChild, registerNode } from '../node_registry.mjs';
 import { outputNodes } from './generic.mjs';
 
-registerNode('TXB', 'v', {
+registerNode('TXBv', {
   read: (target, value) => {
-    const name = getBasicValue(value, 'INM', 's');
-    const mask = getChild(value, 'MSK', 'v');
+    const name = getBasicValue(value, 'INMs');
+    const mask = getChild(value, 'MSKv');
 
     Object.assign(target, outputNodes('Brush texture: ' + JSON.stringify(name), [mask]));
   },
 });
 
-registerNode('TXF', 'v', {
+registerNode('TXFv', {
   read: (target, value) => {
-    const name = getBasicValue(value, 'INM', 's');
-    const mask = getChild(value, 'MSK', 'v');
+    const name = getBasicValue(value, 'INMs');
+    const mask = getChild(value, 'MSKv');
 
     Object.assign(target, outputNodes('Fill texture: ' + JSON.stringify(name), [mask]));
   },
 });
 
-registerNode('PAT', 'v', { // PATtern (?)
+registerNode('PATv', { // PATtern (?)
   read: (target, value) => {
-    const fill = getChild(value, 'FPL', 'v');
-    const fillCol = getChild(value, 'FCL', 'i');
-    const fillTex = getChild(value, 'TXF', 'v');
-    const fillAntialiasText = getChild(value, 'FET', 'i');
+    const fill = getChild(value, 'FPLv');
+    const fillCol = getChild(value, 'FCLi');
+    const fillTex = getChild(value, 'TXFv');
+    const fillAntialiasText = getChild(value, 'FETi');
 
-    const brush = getChild(value, 'BPL', 'v');
-    const brushCol = getChild(value, 'BCL', 'i');
-    const brushTex = getChild(value, 'TXB', 'v');
+    const brush = getChild(value, 'BPLv');
+    const brushCol = getChild(value, 'BCLi');
+    const brushTex = getChild(value, 'TXBv');
 
     target.value = value;
 

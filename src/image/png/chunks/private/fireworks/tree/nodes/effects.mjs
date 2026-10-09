@@ -19,14 +19,14 @@ import { getEntityValue } from './values.mjs';
 
 /** @type {Map<string, EffectMeta>} */ const KNOWN_EFFECTS = new Map();
 
-registerNode('EPS', 'v', { // Effect ???
+registerNode('EPSv', { // Effect ???
   read: (target, value, state) => {
     const visible = getEntityValue(value, 'EffectIsVisible') === 'true';
     const tempUIName = getEntityValue(value, 'mkbFile_WriteOnly_TemporaryEffectUiName');
     const moaID = getEntityValue(value, 'EffectMoaID') ?? '';
     const previewTileSize = getEntityValue(value, 'MB_filter_preview_tile_size') ?? '-1 -1';
 
-    const out = outputNodes(target.name, value);
+    const out = outputNodes(target.id, value);
     const meta = KNOWN_EFFECTS.get(moaID);
     if (!meta) {
       state.warnings.push(`Unknown effect Moa ID: ${moaID}`);

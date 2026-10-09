@@ -7,6 +7,8 @@
  *   'v': ProcessedNode[],
  * }} NodeTypes
  *
+ * @typedef {`${string}${keyof NodeTypes}`} NodeID
+ *
  * @typedef {{
  *   element: SVGElement,
  *   bounds: {
@@ -18,7 +20,7 @@
  * }} SVGPart
  *
  * @typedef {Record<string, unknown> & {
- *   name: string,
+ *   id: string,
  *   toString: () => string,
  *   display: (summary: HTMLElement, content: HTMLElement) => void,
  *   toSVG?: (target: SVGPart[]) => void,
@@ -35,6 +37,18 @@
  */
 
 /**
+ * @template {NodeID} T
+ * @typedef {(
+ *   T extends `${string}s` ? string :
+ *   T extends `${string}i` ? number :
+ *   T extends `${string}f` ? number :
+ *   T extends `${string}b` ? boolean :
+ *   T extends `${string}v` ? ProcessedNode[] :
+ *   never
+ * )} ValueType
+ */
+
+/**
  * @template V
  * @typedef {{
  *   read: (target: ProcessedNode, value: V, state: NodeState) => void,
@@ -47,18 +61,18 @@
 
 /**
  * @type {(
- *   ((name: string, type: 's', meta: NodeMeta<NodeTypes['s']>) => void) &
- *   ((name: string, type: 'i', meta: NodeMeta<NodeTypes['i']>) => void) &
- *   ((name: string, type: 'f', meta: NodeMeta<NodeTypes['f']>) => void) &
- *   ((name: string, type: 'b', meta: NodeMeta<NodeTypes['b']>) => void) &
- *   ((name: string, type: 'v', meta: NodeMeta<NodeTypes['v']>) => void)
+ *   ((id: `${string}s`, meta: NodeMeta<NodeTypes['s']>) => void) &
+ *   ((id: `${string}i`, meta: NodeMeta<NodeTypes['i']>) => void) &
+ *   ((id: `${string}f`, meta: NodeMeta<NodeTypes['f']>) => void) &
+ *   ((id: `${string}b`, meta: NodeMeta<NodeTypes['b']>) => void) &
+ *   ((id: `${string}v`, meta: NodeMeta<NodeTypes['v']>) => void)
  * )}
  */
-export const registerNode = (name, type, meta) => {
-  if (KNOWN_NODES.has(name + type)) {
-    throw new Error(`duplicate config for ${name}${type}`);
+export const registerNode = (id, meta) => {
+  if (KNOWN_NODES.has(id)) {
+    throw new Error(`duplicate config for ${id}`);
   }
-  KNOWN_NODES.set(name + type, meta);
+  KNOWN_NODES.set(id, meta);
 };
 
 /**
@@ -83,29 +97,26 @@ export const registerType = (type, meta) => {
 };
 
 /**
- * @template {keyof NodeTypes} T
- * @param {string} name
- * @param {T} type
- * @return {NodeMeta<NodeTypes[T]>}
+ * @template {NodeID} T
+ * @param {T} id
+ * @return {NodeMeta<ValueType<T>>}
  */
-export function getTypeMeta(name, type) {
-  let meta = KNOWN_NODES.get(name + type);
+export function getTypeMeta(id) {
+  let meta = KNOWN_NODES.get(id);
   if (meta) {
     return meta;
   }
-  meta = KNOWN_TYPES.get(type);
+  meta = KNOWN_TYPES.get(id[id.length - 1]);
   return meta ?? GENERIC;
 }
 
 /**
  * @param {ProcessedNode[]} list
- * @param {string} name
- * @param {string} type
+ * @param {string} id
  * @return {ProcessedNode[]}
  */
-export function getChildren(list, name, type) {
-  const lookup = name + type;
-  const results = list.filter((n) => n.name === lookup);
+export function getChildren(list, id) {
+  const results = list.filter((n) => n.id === id);
   for (const node of results) {
     node.visited = true;
   }
@@ -113,14 +124,13 @@ export function getChildren(list, name, type) {
 }
 
 /**
- * @template {keyof NodeTypes} T
+ * @template {NodeID} T
  * @param {ProcessedNode | undefined} node
- * @param {string} name
- * @param {T} type
- * @return {NodeTypes[T] | undefined}
+ * @param {T} id
+ * @return {ValueType<T> | undefined}
  */
-export function nodeBasicValue(node, name, type) {
-  if (node?.name !== name + type) {
+export function nodeBasicValue(node, id) {
+  if (node?.id !== id) {
     return undefined;
   }
   node.visited = true;
@@ -128,42 +138,38 @@ export function nodeBasicValue(node, name, type) {
 }
 
 /**
- * @template {keyof NodeTypes} T
+ * @template {NodeID} T
  * @param {ProcessedNode[]} list
- * @param {string} name
- * @param {T} type
- * @return {NodeTypes[T][]}
+ * @param {T} id
+ * @return {ValueType<T>[]}
  */
-export function getBasicValues(list, name, type) {
-  return /** @type {any[]} */ (getChildren(list, name, type).map((n) => n.value));
+export function getBasicValues(list, id) {
+  return /** @type {any[]} */ (getChildren(list, id).map((n) => n.value));
 }
 
 /**
- * @template {keyof NodeTypes} T
+ * @template {NodeID} T
  * @param {ProcessedNode[]} list
- * @param {string} name
- * @param {T} type
- * @return {NodeTypes[T] | undefined}
+ * @param {T} id
+ * @return {ValueType<T> | undefined}
  */
-export function getBasicValue(list, name, type) {
-  const values = getBasicValues(list, name, type);
+export function getBasicValue(list, id) {
+  const values = getBasicValues(list, id);
   if (values.length > 1) {
-    throw new Error(`multiple values for ${name}${type}`);
+    throw new Error(`multiple values for ${id}`);
   }
   return values[0];
 }
 
 /**
- * @template {keyof NodeTypes} T
  * @param {ProcessedNode[]} list
- * @param {string} name
- * @param {T} type
+ * @param {NodeID} id
  * @return {ProcessedNode | undefined}
  */
-export function getChild(list, name, type) {
-  const values = getChildren(list, name, type);
+export function getChild(list, id) {
+  const values = getChildren(list, id);
   if (values.length > 1) {
-    throw new Error(`multiple values for ${name}${type}`);
+    throw new Error(`multiple values for ${id}`);
   }
   return values[0];
 }

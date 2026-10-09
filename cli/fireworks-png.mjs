@@ -140,7 +140,7 @@ function analyseNodes(fileID, base, output, path = []) {
 		accum(node.values, base.value, fileID);
 	} else if (base.type === 'b' && node.type === base.type) {
 		accum(node.values, base.value, fileID);
-	} else if (base.name === 'DCE' && base.type === 'v' && node.type === base.type) {
+	} else if (base.id === 'DCEv' && node.type === base.type) {
 		const v = getDCEStringValue(base);
 		if (v !== null) {
 			node.values ??= new Map();
@@ -170,7 +170,7 @@ function accum(target, key, item) {
  */
 function getDCEStringValue(node) {
 	for (const c of node.value) {
-		if (c.name === 'DCV' && c.type === 's') {
+		if (c.id === 'DCVs') {
 			return c.value;
 		}
 	}

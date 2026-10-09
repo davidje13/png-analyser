@@ -15,13 +15,13 @@ import './nodes/index.mjs';
  * @return {ProcessedNode}
  */
 export function parse(parent, nodeToken, state) {
-  const meta = getTypeMeta(nodeToken.name, nodeToken.type);
+  const meta = getTypeMeta(nodeToken.id);
 
   /** @type {ProcessedNode} */ const processedNode = {
     parent,
-    name: nodeToken.name + nodeToken.type,
+    id: nodeToken.id,
     visited: false,
-    toString: () => `${processedNode.name}: ???`,
+    toString: () => `${processedNode.id}: ???`,
     display: (summary, content) => content.append(processedNode.toString()),
     storage: {},
   };

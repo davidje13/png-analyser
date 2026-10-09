@@ -14,25 +14,25 @@ const ANTIALIAS = [
   'custom',
 ];
 
-registerNode('TXT', 'v', { // TeXT
+registerNode('TXTv', { // TeXT
   read: (target, value, state) => {
-    const left = getBasicValue(value, 'LFT', 'f') ?? 0;
-    const top = getBasicValue(value, 'TOP', 'f') ?? 0;
-    const right = getBasicValue(value, 'RIT', 'f') ?? 0;
-    const bottom = getBasicValue(value, 'BOT', 'f') ?? 0;
+    const left = getBasicValue(value, 'LFTf') ?? 0;
+    const top = getBasicValue(value, 'TOPf') ?? 0;
+    const right = getBasicValue(value, 'RITf') ?? 0;
+    const bottom = getBasicValue(value, 'BOTf') ?? 0;
 
-    const pattern = getBasicValue(value, 'PAT', 'v') ?? [];
-    const transform = /** @type {number[] | undefined} */ (getChild(value, 'MTX', 'v')?.matrix);
-    const img = getChild(value, 'IMG', 'v');
-    const brush = getChild(pattern, 'BPL', 'v');
-    const antialiasId = getBasicValue(value, 'TAA', 'i');
+    const pattern = getBasicValue(value, 'PATv') ?? [];
+    const transform = /** @type {number[] | undefined} */ (getChild(value, 'MTXv')?.matrix);
+    const img = getChild(value, 'IMGv');
+    const brush = getChild(pattern, 'BPLv');
+    const antialiasId = getBasicValue(value, 'TAAi');
     const antialias = ANTIALIAS[antialiasId ?? 0];
     if (!antialias) {
       state.warnings.push(`unknown antialias ID ${antialiasId}`);
     }
-    const customAASamples = getBasicValue(value, 'TOS', 'i');
-    const customAASharpness = getBasicValue(value, 'TA1', 'i');
-    const customAAStrength = getBasicValue(value, 'TA2', 'i');
+    const customAASamples = getBasicValue(value, 'TOSi');
+    const customAASharpness = getBasicValue(value, 'TA1i');
+    const customAAStrength = getBasicValue(value, 'TA2i');
 
     let aaInfo = antialias;
     if (antialiasId === 4) {
@@ -46,57 +46,57 @@ registerNode('TXT', 'v', { // TeXT
     const useFontStretch = false; // not supported by all fonts
 
     const fontState = {
-      fillColour: getBasicValue(pattern, 'FCL', 'i'),
-      lineColour: getBasicValue(pattern, 'BCL', 'i'),
+      fillColour: getBasicValue(pattern, 'FCLi'),
+      lineColour: getBasicValue(pattern, 'BCLi'),
       lineWidth: /** @type {number} */ (brush?.diameter ?? 0),
-      fillOnTop: getBasicValue(value, 'FOT', 'b') ?? false,
-      font: getBasicValue(value, 'FON', 's'),
-      pointSize: getBasicValue(value, 'PTS', 'f'),
-      bold: getBasicValue(value, 'BOL', 'b'),
-      italic: getBasicValue(value, 'ITL', 'b'),
-      underline: getBasicValue(value, 'UND', 'b'),
-      hScale: getBasicValue(value, 'HSC', 'f') ?? 1,
-      KRN: getBasicValue(value, 'KRN', 'f'),
-      autoKern: getBasicValue(value, 'ATK', 'b'),
-      kerning: getBasicValue(value, 'RKN', 'f') ?? 0,
-      baselineShift: getBasicValue(value, 'BLS', 'f'),
-      lineHeight: getBasicValue(value, 'LED', 'f') ?? 1,
-      lineHeightUnit: getBasicValue(value, 'LDM', 'i'),
-      justification: getBasicValue(value, 'JST', 'i'),
-      PIN: getBasicValue(value, 'PIN', 'f'),
-      PSB: getBasicValue(value, 'PSB', 'f'),
-      PSA: getBasicValue(value, 'PSA', 'f'),
+      fillOnTop: getBasicValue(value, 'FOTb') ?? false,
+      font: getBasicValue(value, 'FONs'),
+      pointSize: getBasicValue(value, 'PTSf'),
+      bold: getBasicValue(value, 'BOLb'),
+      italic: getBasicValue(value, 'ITLb'),
+      underline: getBasicValue(value, 'UNDb'),
+      hScale: getBasicValue(value, 'HSCf') ?? 1,
+      KRN: getBasicValue(value, 'KRNf'),
+      autoKern: getBasicValue(value, 'ATKb'),
+      kerning: getBasicValue(value, 'RKNf') ?? 0,
+      baselineShift: getBasicValue(value, 'BLSf'),
+      lineHeight: getBasicValue(value, 'LEDf') ?? 1,
+      lineHeightUnit: getBasicValue(value, 'LDMi'),
+      justification: getBasicValue(value, 'JSTi'),
+      PIN: getBasicValue(value, 'PINf'),
+      PSB: getBasicValue(value, 'PSBf'),
+      PSA: getBasicValue(value, 'PSAf'),
     };
 
-    const parts = getBasicValue(value, 'TFS', 'v') ?? [];
+    const parts = getBasicValue(value, 'TFSv') ?? [];
     /** @type {(typeof fontState & { text: string })[]} */ const strings = [];
     for (const part of parts) {
-      switch (part.name) {
-        case 'FCLi': fontState.fillColour = nodeBasicValue(part, 'FCL', 'i'); break;
-        //case 'FOTb': fontState.fillOnTop = nodeBasicValue(part, 'FOT', 'b') ?? false; break;
-        case 'FONs': fontState.font = nodeBasicValue(part, 'FON', 's'); break;
-        case 'PTSf': fontState.pointSize = nodeBasicValue(part, 'PTS', 'f'); break;
-        case 'BOLb': fontState.bold = nodeBasicValue(part, 'BOL', 'b'); break;
-        case 'ITLb': fontState.italic = nodeBasicValue(part, 'ITL', 'b'); break;
-        case 'UNDb': fontState.underline = nodeBasicValue(part, 'UND', 'b'); break;
-        case 'HSCf': fontState.hScale = nodeBasicValue(part, 'HSC', 'f') ?? 1; break;
-        //case 'KRNf': fontState.KRN = nodeBasicValue(part, 'KRN', 'f'); break;
-        case 'RKNf': fontState.kerning = nodeBasicValue(part, 'RKN', 'f') ?? 0; break;
-        case 'BLSf': fontState.baselineShift = nodeBasicValue(part, 'BLS', 'f'); break;
-        case 'LEDf': fontState.lineHeight = nodeBasicValue(part, 'LED', 'f') ?? 1; break;
-        case 'LDMi': fontState.lineHeightUnit = nodeBasicValue(part, 'LDM', 'i'); break;
-        case 'JSTi': fontState.justification = nodeBasicValue(part, 'JST', 'i'); break;
-        case 'PINf': fontState.PIN = nodeBasicValue(part, 'PIN', 'f'); break;
-        case 'PSBf': fontState.PSB = nodeBasicValue(part, 'PSB', 'f'); break;
-        case 'PSAf': fontState.PSA = nodeBasicValue(part, 'PSA', 'f'); break;
+      switch (part.id) {
+        case 'FCLi': fontState.fillColour = nodeBasicValue(part, 'FCLi'); break;
+        //case 'FOTb': fontState.fillOnTop = nodeBasicValue(part, 'FOTb') ?? false; break;
+        case 'FONs': fontState.font = nodeBasicValue(part, 'FONs'); break;
+        case 'PTSf': fontState.pointSize = nodeBasicValue(part, 'PTSf'); break;
+        case 'BOLb': fontState.bold = nodeBasicValue(part, 'BOLb'); break;
+        case 'ITLb': fontState.italic = nodeBasicValue(part, 'ITLb'); break;
+        case 'UNDb': fontState.underline = nodeBasicValue(part, 'UNDb'); break;
+        case 'HSCf': fontState.hScale = nodeBasicValue(part, 'HSCf') ?? 1; break;
+        //case 'KRNf': fontState.KRN = nodeBasicValue(part, 'KRNf'); break;
+        case 'RKNf': fontState.kerning = nodeBasicValue(part, 'RKNf') ?? 0; break;
+        case 'BLSf': fontState.baselineShift = nodeBasicValue(part, 'BLSf'); break;
+        case 'LEDf': fontState.lineHeight = nodeBasicValue(part, 'LEDf') ?? 1; break;
+        case 'LDMi': fontState.lineHeightUnit = nodeBasicValue(part, 'LDMi'); break;
+        case 'JSTi': fontState.justification = nodeBasicValue(part, 'JSTi'); break;
+        case 'PINf': fontState.PIN = nodeBasicValue(part, 'PINf'); break;
+        case 'PSBf': fontState.PSB = nodeBasicValue(part, 'PSBf'); break;
+        case 'PSAf': fontState.PSA = nodeBasicValue(part, 'PSAf'); break;
         case 'TRNs':
           strings.push({
-            text: (nodeBasicValue(part, 'TRN', 's') ?? '').replace(/\r/g, '\n'),
+            text: (nodeBasicValue(part, 'TRNs') ?? '').replace(/\r/g, '\n'),
             ...fontState,
           });
           break;
         default:
-          state.warnings.push(`Unknown text formatter ${part.name}`);
+          state.warnings.push(`Unknown text formatter ${part.id}`);
       }
     }
 
@@ -109,10 +109,10 @@ registerNode('TXT', 'v', { // TeXT
       ) / transform[8];
     }
 
-    const displayNodes = value.filter(({ name }) => !EXCLUDE.includes(name));
+    const displayNodes = value.filter(({ id }) => !EXCLUDE.includes(id));
     displayNodes.push({
       parent: target,
-      name: 'TFSv',
+      id: 'TFSv',
       visited: true,
       toString: () => JSON.stringify(strings.map((s) => s.text).join('')),
       display: (summary, content) => {

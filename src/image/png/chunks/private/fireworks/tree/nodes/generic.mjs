@@ -4,21 +4,21 @@ import { registerType } from '../node_registry.mjs';
 registerType('i', {
   read: (target, value) => {
     target.value = value;
-    target.toString = () => `${target.name}: ${value.toString(16).padStart(8, '0')}`;
+    target.toString = () => `${target.id}: ${value.toString(16).padStart(8, '0')}`;
   },
 });
 
 registerType('v', {
   read: (target, value) => {
     target.value = value;
-    Object.assign(target, outputNodes(target.name, value));
+    Object.assign(target, outputNodes(target.id, value));
   },
 });
 
 registerType(null, {
   read: (target, value) => {
     target.value = value;
-    target.toString = () => `${target.name}: ${JSON.stringify(value)}`;
+    target.toString = () => `${target.id}: ${JSON.stringify(value)}`;
   },
 });
 
