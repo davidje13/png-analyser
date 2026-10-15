@@ -5,7 +5,7 @@ import { scoreFlatness } from '../src/image/actions/score-flatness.mjs';
 import { quantise } from '../src/image/actions/dither.mjs';
 import { PALETTES } from '../src/image/palettes.mjs';
 import { readPNG } from '../src/image/png/png.mjs';
-import { asImageData, makeCanvas } from '../src/display/pretty.mjs';
+import { asImageData, disclosure, el, makeCanvas } from '../src/display/pretty.mjs';
 import { writePNG } from '../src/image/png/png-write.mjs';
 
 /**
@@ -13,38 +13,24 @@ import { writePNG } from '../src/image/png/png-write.mjs';
  * @param {string} name
  */
 async function processFile(data, name) {
-  const output = document.createElement('section');
-  output.classList.add('output');
-  const header = document.createElement('h2');
-  header.append(name);
-  output.append(header);
+  const output = el('section', { class: 'output' }, [el('h2', {}, [name])]);
 
   try {
     const png = await readPNG(data);
 
     if (png.warnings.length > 0) {
-      const oDetails = document.createElement('details');
-      oDetails.setAttribute('open', 'open');
-      const oSummary = document.createElement('summary');
-      oSummary.append('Warnings');
-      oDetails.append(oSummary);
+      const oDetails = el('details', { open: 'open' }, [el('summary', {}, ['Warnings'])]);
       for (const warning of png.warnings) {
-        const owarn = document.createElement('div');
-        owarn.classList.add('warning');
-        owarn.append(warning);
-        oDetails.append(owarn);
+        oDetails.append(el('div', { class: 'warning' }, [warning]));
       }
       output.append(oDetails);
     }
 
     /** @type {Set<string>} */ const seen = new Set();
     for (const chunk of png.chunks) {
-      const oSummary = document.createElement('span');
-      const oHeader = document.createElement('span');
-      oHeader.classList.add('chunk-header');
-      oHeader.append(`${chunk.name}`);
-      const oData = document.createElement('div');
-      oData.classList.add('chunk-value');
+      const oSummary = el('span');
+      const oHeader = el('span', { class: 'chunk-header' }, [`${chunk.name}`]);
+      const oData = el('div', { class: 'chunk-value' });
 
       /** @type {HTMLElement} */ let section;
       if (chunk.aggregate) {
@@ -55,10 +41,10 @@ async function processFile(data, name) {
         const agg = chunk.aggregate();
         const parts = png.chunks.filter((c) => c.name === chunk.name);
 
-        agg.display(oSummary, oData);
+        agg.display(oSummary, oData, name);
         oSummary.prepend(oHeader, ` [${parts.map((c) => c.data.byteLength).join(' & ')}] `);
       } else {
-        chunk.display(oSummary, oData);
+        chunk.display(oSummary, oData, name);
         oSummary.prepend(oHeader, ` [${chunk.data.byteLength}] `);
       }
       section = makeDetails(oSummary, oData, !chunk.defaultCollapse);
@@ -74,13 +60,10 @@ async function processFile(data, name) {
       //weightsOut.ctx.putImageData(asImageData(falseColour(weights, SPECTRUM_RED, 0, 1), false), 0, 0);
       //output.append(weightsOut.canvas);
 
-      const palette = document.createElement('select');
-      const optNone = document.createElement('option');
-      optNone.setAttribute('selected', 'selected');
-      optNone.append('none');
-      palette.append(optNone);
+      const palette = el('select');
+      palette.append(el('option', { selected: 'selected' }, ['none']));
       for (let i = 0; i < PALETTES.length; ++i) {
-        const opt = document.createElement('option');
+        const opt = el('option');
         if (typeof PALETTES[i].value === 'function') {
           opt.append(PALETTES[i].name);
         } else {
@@ -89,50 +72,26 @@ async function processFile(data, name) {
         palette.append(opt);
       }
 
-      const colspace = document.createElement('select');
+      const colspace = el('select');
       for (let i = 0; i < COLOURSPACES.length; ++i) {
-        const opt = document.createElement('option');
-        if (!i) {
-          opt.setAttribute('selected', 'selected');
-        }
-        opt.append(COLOURSPACES[i].name);
-        colspace.append(opt);
+        colspace.append(el('option', { selected: i === 0 ? 'selected' : undefined }, [COLOURSPACES[i].name]));
       }
 
-      const transLabel = document.createElement('label');
-      const transparent = document.createElement('input');
-      transparent.setAttribute('type', 'checkbox');
-      transparent.setAttribute('checked', 'checked');
-      transLabel.append(transparent, ' Transparent');
+      const transLabel = el('label');
+      const transparent = el('input', { type: 'checkbox', checked: 'checked' }, ['Transparent']);
 
-      const matteLabel = document.createElement('label');
-      const matte = document.createElement('input');
-      matte.setAttribute('type', 'color');
-      matte.setAttribute('value', '#000000');
-      matteLabel.append(matte, ' Matte');
+      const matte = el('input', { type: 'color', value: '#000000' });
+      const matteLabel = el('label', {}, [matte, 'Matte']);
 
-      const amount = document.createElement('input');
-      amount.setAttribute('type', 'range');
-      amount.setAttribute('min', '0');
-      amount.setAttribute('max', '1');
-      amount.setAttribute('step', 'any');
-      amount.setAttribute('value', '0.85');
+      const amount = el('input', { type: 'range', min: 0, max: 1, step: 'any', value: '0.85' });
 
-      const diffusion = document.createElement('select');
+      const diffusion = el('select');
       for (let i = 0; i < DIFFUSION_TYPES.length; ++i) {
-        const opt = document.createElement('option');
-        if (i === 1) {
-          opt.setAttribute('selected', 'selected');
-        }
-        opt.append(DIFFUSION_TYPES[i].name);
-        diffusion.append(opt);
+        diffusion.append(el('option', { selected: i === 1 ? 'selected' : undefined }, [DIFFUSION_TYPES[i].name]));
       }
 
-      const serpLabel = document.createElement('label');
-      const serpentine = document.createElement('input');
-      serpentine.setAttribute('type', 'checkbox');
-      serpentine.setAttribute('checked', 'checked');
-      serpLabel.append(serpentine, ' Serpentine');
+      const serpentine = el('input', { type: 'checkbox', checked: 'checked' });
+      const serpLabel = el('label', {}, [serpentine, 'Serpentine']);
 
       palette.addEventListener('change', updateDither);
       colspace.addEventListener('change', updateDither);
@@ -142,19 +101,15 @@ async function processFile(data, name) {
       diffusion.addEventListener('change', updateDither);
       serpentine.addEventListener('change', updateDither);
 
-      const save = document.createElement('button');
-      save.setAttribute('type', 'button');
-      save.innerText = 'Save';
+      const save = el('button', { type: 'button' }, ['Save']);
 
-      const options = document.createElement('form');
-      options.setAttribute('action', '#');
-      options.classList.add('options');
+      const options = el('form', { action: '#', class: 'options' });
       options.append(palette, colspace, transLabel, matteLabel, amount, diffusion, serpLabel, save);
       const ditherIn = image;
       const palettePreviewSize = 20;
       const paletteOut = makeCanvas(1, 1);
       const ditherOut = makeCanvas(ditherIn[0]?.length ?? 0, ditherIn.length);
-      output.append(options, paletteOut.canvas, document.createElement('br'), ditherOut.canvas);
+      output.append(options, paletteOut.canvas, el('br'), ditherOut.canvas);
       /** @type {number[][] | null} */ let ditheredData = null;
       /** @type {{ from: number, to: number } | null} */ let highlight = null;
       /** @type {number[]} */ let chosenPalette = [];
@@ -249,12 +204,9 @@ async function processFile(data, name) {
             preserveTransparentColour: false,
             compressionTimeAllotment: 20000,
           });
-          const blob = new Blob([output.data.toBytes()], { type: 'image/png' });
-          const download = document.createElement('a');
+          const blob = new Blob([/** @type {Uint8Array<any>} */ (output.data.toBytes())], { type: 'image/png' });
           const url = URL.createObjectURL(blob);
-          download.setAttribute('href', url);
-          download.setAttribute('download', name);
-          download.click();
+          el('a', { href: url, download: name }).click();
           // not sure when it's safe to revoke the URL, but this works...
           setTimeout(() => URL.revokeObjectURL(url), 0);
 
@@ -320,25 +272,14 @@ function makeContrastingColour(c) {
  */
 function makeDetails(summary, content, open) {
   if (!content.childNodes.length) {
-    const oItem = document.createElement('div');
-    oItem.append(summary);
-    return oItem;
+    return el('div', {}, [summary]);
   }
-  const oDetails = document.createElement('details');
-  if (open) {
-    oDetails.setAttribute('open', 'open');
-  }
-  const oSummary = document.createElement('summary');
-  oSummary.append(summary);
-  oDetails.append(oSummary, content);
-  return oDetails;
+  return disclosure(summary, content, open);
 }
 
-const out = document.createElement('div');
+const out = el('div');
 
-const drop = document.createElement('div');
-drop.classList.add('drop');
-drop.append('Drop a PNG file here');
+const drop = el('div', { class: 'drop' }, ['Drop a PNG file here']);
 let dragc = 0;
 
 window.addEventListener('dragover', (e) => {

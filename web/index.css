@@ -58,6 +58,10 @@ body.hasoutput .drop.active {
   background: #EEEEEE;
 }
 
+details {
+  contain: inline-size layout paint style;
+}
+
 summary {
   cursor: pointer;
 }
@@ -82,11 +86,20 @@ ul {
   padding: 0 0 0 16px;
   border-left: 1px solid #BBBBBB;
   list-style: none;
+
+  &:target {
+    border-left: 4px solid #99DD88;
+    padding-left: 13px;
+  }
 }
 
 li {
   margin-top: 5px;
   position: relative;
+
+  &:target {
+    background: #99DD88;
+  }
 }
 
 li::before {
@@ -99,12 +112,58 @@ li::before {
   background: #BBBBBB;
 }
 
-li > details > summary {
+li > details {
   margin-left: -4px;
+  padding-left: 4px;
+
+  & > summary {
+    margin-left: -4px;
+  }
 }
 
 .parsed {
   margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+a:link, a:visited {
+  color: #000080;
+  text-decoration: underline;
+}
+
+a:active, a:hover {
+  color: #0000FF;
+  text-decoration-thickness: 2px;
+}
+
+.horizontal {
+  display: flex;
+  flex-flow: row;
+  overflow-x: auto;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.image-canvas {
+  border: 1px solid black;
+  background: conic-gradient(
+      #ffffff 25%,
+      #cccccc 25%,
+      #cccccc 50%,
+      #ffffff 50%,
+      #ffffff 75%,
+      #cccccc 75%
+    )
+    top left / 16px 16px;
+  width: fit-content;
+  height: fit-content;
+  max-width: 100%;
+  overflow: auto;
+
+  & > svg {
+    display: block;
+    contain: strict;
+  }
 }
 
 .colour-preview {
@@ -115,49 +174,6 @@ li > details > summary {
   min-width: 10px;
   min-height: 10px;
   margin: 2px;
-}
-
-.locked::after {
-  content: '\1F512';
-  position: absolute;
-  bottom: -4px;
-  right: -5px;
-  width: 15px;
-  height: 15px;
-  font-size: 12px;
-  background: white;
-  border-radius: 100%;
-  text-align: center;
-}
-
-.transparent::before {
-  content: 't';
-  position: absolute;
-  bottom: -4px;
-  left: -5px;
-  width: 15px;
-  height: 15px;
-  font-size: 12px;
-  background: white;
-  border-radius: 100%;
-  text-align: center;
-}
-
-.gradient-preview {
-  border: 1px solid black;
-  width: 100%;
-  max-width: 200px;
-  height: 40px;
-  margin-top: 5px;
-}
-
-.effect-preview {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  background: red;
-  border: 1px solid black;
-  margin: 50px;
 }
 
 .options {

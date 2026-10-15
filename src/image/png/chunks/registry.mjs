@@ -14,7 +14,7 @@
  *
  * @typedef {{
  *   toString: () => string,
- *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
+ *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement, filename: string) => void,
  * }} ChunkAggregate
  *
  * @typedef {{
@@ -24,7 +24,7 @@
  *   filePos: number,
  *   advance: number,
  *   toString: () => string,
- *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement) => void,
+ *   display: (summaryTarget: HTMLElement, contentTarget: HTMLElement, filename: string) => void,
  *   aggregate?: () => ChunkAggregate,
  *   defaultCollapse?: boolean,
  * }} Chunk

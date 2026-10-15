@@ -133,7 +133,7 @@ Value range: `-360`..`360` (degrees)
 
 Parent: [`ALSv`]
 
-Amount of x translation (pixels) to apply to an animation-type symbol. Uses a **signed** 32-bit value.
+Amount of x translation (pixels) to apply to an animation-type symbol.
 
 ## `ANYf` **An**imation **Y** Shift
 
@@ -141,7 +141,7 @@ Amount of x translation (pixels) to apply to an animation-type symbol. Uses a **
 
 Parent: [`ALSv`]
 
-Amount of y translation (pixels) to apply to an animation-type symbol. Uses a **signed** 32-bit value.
+Amount of y translation (pixels) to apply to an animation-type symbol.
 
 ## `APLb`
 
@@ -295,7 +295,7 @@ Values:
 
 Parent: [`PALv`] / [`PATv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -400,7 +400,7 @@ Contains:
 
 Parent: [`BEHv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -420,7 +420,7 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`BEHv`]
 
-ABGR (?) format colour for the text of highlighted menu items.
+ARGB (?) format colour for the text of highlighted menu items.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -480,7 +480,7 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`MKBv`] / [`MSTv`] / [`PDCv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -608,7 +608,7 @@ Width to fit text to, if [`TFTi`] is `1`.
 
 Parent: [`BEHv`]
 
-An ABGR colour for the popup menu border.
+An ARGB colour for the popup menu border.
 
 Values:
 
@@ -801,9 +801,7 @@ Parent: [`PBPv`]
 
 Possibly related to hand-drawn curves? (TODO)
 
-Values:
-
-- `0`: unknown - TODO
+Observed value range: `0`..`0`
 
 ## `BSMi` **B**rush Tip **S**pacing **M**ode
 
@@ -1207,7 +1205,7 @@ Values:
 
 Parent: [`BEHv`]
 
-An ABGR colour for the popup menu border shadow.
+An ARGB colour for the popup menu border shadow.
 
 Values:
 
@@ -2076,9 +2074,9 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Brightness/Contrast" filter.
+Used by "Brightness/Contrast" filter. Though it looks like a percentage due to the range permitted in the UI, this is actually a raw value to add to the pixel values (meaning it has an effective range of -39%..+39%). The value is added to the red, green, and blue channels independently.
 
-Value range: `-100`..`100` (percent)
+Value range: `-100`..`100`
 
 Contains:
 
@@ -2245,9 +2243,15 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Brightness/Contrast" filter.
+Used by "Brightness/Contrast" filter. This is applied _after_ [`DCEv`."`brightness_amount`"], operating on each channel independently and using a centre-point of 112 rather than 128. This might be by splitting the input into 2 linear ranges, but can also be approximated by pre-applying a gamma of 0.842 and reversing it (with 1.187) afterwards.
+The behaviour is quite linear, but has a few discontinuities:
 
-Observed value range: `-100`..`100`
+- Between `-100` and `0` this linearly interpolates from 112 to the original colour.
+- From `0` to `87.5` the input range is reduced linearly on each side of 112 (i.e. at 50%, the input ranges is `56`..`184`, mapped to `0`..`255`).
+- From `87.5` to `99` the behaviour is the same but the range increases more slowly, reaching `98`..`130` at 99%.
+- At `100` this has a discontinuity and switches to `v >= 112 ? 255 : 0`.
+
+Value range: `-100`..`100`
 
 Contains:
 
@@ -4186,14 +4190,16 @@ Values:
 
 Parent: [`CELv`] / [`GRPv`]
 
+A list of individual elements to render within a layer or group, ordered from front to back.
+
 Contains:
 
+- [`IMGv`]\* Image
 - [`PTHv`]\* Path
 - [`TXTv`]\* Text
 - [`GRPv`]\* Group
-- [`LSLv`]? Layer Sub-Layer
+- [`LSLv`]\* Layer Sub-Layer
 - [`URLv`]\* Image Slice / Hotspot
-- [`IMGv`]\* Image
 - [`ALSv`]\* Symbol Instance
 
 ## `ENCi` HTML **Enc**oding
@@ -4405,7 +4411,7 @@ Contains:
 
 Parent: [`EXPv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -4463,7 +4469,7 @@ Values:
 
 Parent: [`PALv`] / [`PATv`] / [`TFSv`] / [`URLv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -4473,6 +4479,8 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`FPLv`]
 
+Top-left pixel colour for web dither fill
+
 Value range: `0x00000000`..`0xffffffff`
 
 ## `FD2i` **F**ill **D**ither Colour **2**
@@ -4480,6 +4488,8 @@ Value range: `0x00000000`..`0xffffffff`
 [`FD2i`]: #fd2i-fill-dither-colour-2
 
 Parent: [`FPLv`]
+
+Top-right pixel colour for web dither fill
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -4489,6 +4499,8 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`FPLv`]
 
+Bottom-left pixel colour for web dither fill
+
 Value range: `0x00000000`..`0xffffffff`
 
 ## `FD4i` **F**ill **D**ither Colour **4**
@@ -4497,6 +4509,8 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`FPLv`]
 
+Bottom-right pixel colour for web dither fill
+
 Value range: `0x00000000`..`0xffffffff`
 
 ## `FDTb` **F**ill **D**ither **T**ransparent
@@ -4504,6 +4518,8 @@ Value range: `0x00000000`..`0xffffffff`
 [`FDTb`]: #fdtb-fill-dither-transparent
 
 Parent: [`FPLv`]
+
+If `true`, sets the top left and bottom right pixels ([`FD1i`] and [`FD4i`]) of web dither fill to transparent.
 
 ## `FEFi` **Fe**ather **F**ill Amount
 
@@ -4769,11 +4785,11 @@ Contains:
 - [`INMs`] Internal Name
 - [`UNMs`] User-facing Name
 - [`RDOb`]
-- [`FTBi`] Fill Texture Blending
+- [`FTBi`] Fill Texture Blend
 - [`FEFi`] Feather Fill Amount
 - [`FSMi`] Fill Stamping Mode
-- [`FPLv`.`FETi`]
-- [`FRDb`] Fill Hard Edge
+- [`FPLv`.`FETi`] Fill Edge Anti-alias
+- [`FRDb`]
 - [`FRRi`]
 - [`FSHi`] Fill Shape
 - [`FSXi`]? Fill Shape Extended
@@ -4785,18 +4801,16 @@ Contains:
 - [`FDTb`]? Fill Dither Transparent
 - [`FPTv`]? Fill Pattern Tile
 
-## `FPLv`.`FETi`
+## `FPLv`.`FETi` **F**ill **E**dge An**t**i-alias
 
-[`FPLv`.`FETi`]: #fplv-feti
+[`FPLv`.`FETi`]: #fplv-feti-fill-edge-anti-alias
 
 Parent: [`FPLv`]
 
-Seems related to hard edge / non-anti-aliased fills
-
 Values:
 
-- `0`: unknown - TODO
-- `1`: unknown - TODO - observed in all files
+- `0`: hard edges (no anti-aliasing)
+- `1`: anti-aliased edges
 
 ## `FPTv` **F**ill **P**attern **T**ile
 
@@ -4817,16 +4831,15 @@ Parent: [`MKBv`] / [`MSTv`] / [`PDCv`]
 
 The number of animation frames. It is not clear why this node is duplicated.
 
-## `FRDb` **F**ill Ha**rd** Edge
+## `FRDb`
 
-[`FRDb`]: #frdb-fill-hard-edge
+[`FRDb`]: #frdb
 
 Parent: [`FPLv`]
 
 Values:
 
-- `false`: anti-aliased edge
-- `true`: hard (non-anti-aliased) edge
+- `false`: unknown - TODO - observed in all files
 
 ## `FRRi`
 
@@ -4898,9 +4911,9 @@ Values:
 - `16`: web dither
 - `17`: contour grad
 
-## `FTBi` **F**ill **T**exture **B**lending
+## `FTBi` **F**ill **T**exture **B**lend
 
-[`FTBi`]: #ftbi-fill-texture-blending
+[`FTBi`]: #ftbi-fill-texture-blend
 
 Parent: [`FPLv`]
 
@@ -4912,7 +4925,7 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`GRDv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -4938,7 +4951,7 @@ Contains:
 
 Parent: [`GDSv`]
 
-ABGR format colour.
+ARGB format colour.
 
 Value range: `0x00000000`..`0xffffffff`
 
@@ -5126,7 +5139,7 @@ Parent: [`GRPv`]
 Values:
 
 - `0`: regular
-- `1`: grayscale mask (first element in parent node's [`ELMv`] = mask, second = masked)
+- `1`: grayscale mask (first element in parent node's [`ELMv`] = mask, second = masked). Note this uses white for transparent and black for opaque.
 - `2`: shape mask (first element in parent node's [`ELMv`] = mask, second = masked)
 
 ## `GSLb`
@@ -5157,7 +5170,7 @@ Parent: [`GRDv`]
 
 Parent: [`BEHv`]
 
-An ABGR colour for the popup menu border highlight.
+An ARGB colour for the popup menu border highlight.
 
 Values:
 
@@ -5280,11 +5293,11 @@ Contains:
 - [`TSZi`] Tile Size
 - [`TILv`] Tile ID List
 - [`DTAv`]? Data
-- [`BLDi`]? Blend Mode
 - [`EFLv`]? Effect List
+- [`IMGv`]? Image
+- [`BLDi`]? Blend Mode
 - [`OPAi`]? Opacity
 - [`VISb`]? Visible
-- [`IMGv`]? Image
 - [`OBNs`]? Object Name
 
 ## `IMPb` **I**s **M**aster **P**age
@@ -5293,7 +5306,7 @@ Contains:
 
 Parent: [`MKBv`] / [`PDCv`]
 
-One page can be marked as the master page, which is then referenced by [`MPLv`] nodes in each page (using [`PIDs`])
+One page can be marked as the "Master Page", which is then referenced by [`MPLv`] nodes in each page (using [`PIDs`])
 
 ## `INMs` **I**nternal **N**a**m**e
 
@@ -5310,6 +5323,7 @@ Values:
 - `Add Noise...`
 - `Angled Strokes...`
 - `Auto Levels`
+- `Bars`
 - `Bas Relief...`
 - `Berber Rug`
 - `Bevel Boss...`
@@ -5757,9 +5771,7 @@ Contains:
 
 Parent: [`TXTv`]
 
-Values:
-
-- `0`: unknown - TODO
+Observed value range: `0`..`0`
 
 ## `LAYv` **Lay**er
 
@@ -5774,12 +5786,12 @@ Contains:
 - [`BKGb`]
 - [`URLb`]
 - [`LNMs`] Layer Name
-- [`LLLi`]? Layer Nesting Level
 - [`MSLb`] Special Layer
-- [`MCLb`] Frame Changing Layer
-- [`DISb`] Display
 - [`CLLv`] Animation Cell List
-- [`VIFv`] Visibility per Frame
+- [`LLLi`]? Layer Nesting Level
+- [`MCLb`]? Frame Changing Layer
+- [`DISb`]? Display
+- [`VIFv`]? Visibility per Frame
 
 ## `LCKb` **L**o**ck**
 
@@ -5819,7 +5831,7 @@ Observed value range: `1`..`40`
 
 Parent: [`TXTv`]
 
-Typically this is the same as [`LFTf`]. See [`PINf`] for an explanation of when this property will differ.
+This is the location of the text anchor point, which for left-aligned text or text with an explicit width is typically the same as [`LFTf`]. For centred and right-aligned text without an explicit width, `LFTf` will be set to the left bounds of the text, making it less than `LFAf`. This property is also independent of paragraph indents (see [`PINf`])
 
 Observed value range: `-30`..`962`
 
@@ -5895,7 +5907,7 @@ Y coordinate of top of export area (or not present if entire image is to be expo
 
 Parent: [`LYLv`]
 
-Links to an [`LSEv`] from the master page.
+Links to an [`LSEv`] from the [`LSMv`] list in [`MKBv`].
 
 Contains:
 
@@ -6007,7 +6019,7 @@ Parent: [`MKBv`] / [`PDCv`]
 
 Parent: [`MKBv`] / [`MSTv`] / [`PDCv`]
 
-An ordered list of layers.
+A list of layers, ordered from back to front.
 
 Contains:
 
@@ -6156,10 +6168,7 @@ Defines any layer content which is shared between pages (in [`LSMv`] as [`LSEv`]
 
 Contains:
 
-- [`VRSi`]?
-- [`VRMi`]?
 - [`FRCi`]+ Frame Count
-- [`RQNi`]
 - [`XLCf`] X Location
 - [`YLCf`] Y Location
 - [`WIDf`] Width
@@ -6167,26 +6176,29 @@ Contains:
 - [`RESf`] Resolution
 - [`RSUi`] Resolution Unit
 - [`BGCi`] Background Colour
-- [`PLLv`] Brush Definitions
-- [`FLDv`] Fill Type Definitions
-- [`GLDv`] Gradient List Definitions
-- [`EFDv`] Effect Definitions
-- [`MSLv`] Symbol Definition List
+- [`LYLv`] Layer List
+- [`VRSi`]?
+- [`VRMi`]?
+- [`RQNi`]?
+- [`PLLv`]? Brush Definitions
+- [`FLDv`]? Fill Type Definitions
+- [`GLDv`]? Gradient List Definitions
+- [`EFDv`]? Effect Definitions
+- [`MSLv`]? Symbol Definition List
 - [`ZSLv`]?
-- [`PATv`] Pattern
-- [`EXPv`] Export Options
-- [`MNFv`]
+- [`PATv`]? Pattern
+- [`EXPv`]? Export Options
+- [`MNFv`]?
 - [`PGNs`]? Page Name
 - [`IMPb`]? Is Master Page
 - [`PILb`]? Page Is Linked
 - [`PIDs`]? Page ID
 - [`LSMv`]? Layer Shared Definitions
 - [`ILLb`]?
-- [`LYLv`] Layer List
-- [`GRDv`] Grid
-- [`GDSv`] Guides
-- [`OSBi`] Onion Skinning Before Frames
-- [`OSAi`] Onion Skinning After Frames
+- [`GRDv`]? Grid
+- [`GDSv`]? Guides
+- [`OSBi`]? Onion Skinning Before Frames
+- [`OSAi`]? Onion Skinning After Frames
 - [`LXDs`]? Last Export Directory
 - [`LXFs`]? Last Export Filename
 
@@ -6224,9 +6236,7 @@ Contains:
 
 Parent: [`MSTv`]
 
-Values:
-
-- `0`: unknown - TODO
+Observed value range: `0`..`0`
 
 ## `MOYf`
 
@@ -6234,9 +6244,7 @@ Values:
 
 Parent: [`MSTv`]
 
-Values:
-
-- `0`: unknown - TODO
+Observed value range: `0`..`0`
 
 ## `MPLv` **M**aster **P**age **L**ink
 
@@ -6514,9 +6522,9 @@ Contains:
 
 - [`NMFi`] (x2) HTML Slice Export Name Frame Part
 
-## `NSDf` **S**egment **D**istance
+## `NSDf` **N**ext **S**egment **D**istance
 
-[`NSDf`]: #nsdf-segment-distance
+[`NSDf`]: #nsdf-next-segment-distance
 
 Parent: [`PBTv`]
 
@@ -6693,7 +6701,7 @@ Contains:
 - [`YSCf`]? Y Secondary Control
 - [`CRVb`]? Is Curve
 - [`RNDi`]? Random Seed
-- [`NSDf`]? Segment Distance
+- [`NSDf`]? Next Segment Distance
 - [`BZLv`] Bezier Sub-Points List
 - [`PPLv`]? Path Point List
 
@@ -6812,7 +6820,7 @@ Marks page as "linked" to the "Master Page". Linked pages are automatically upda
 
 Parent: [`TFSv`] / [`TXTv`]
 
-Amount to indent the first line of the paragraph by. If the text is not multiline (i.e. [`ATEb`] is `true`), the [`LFTf`] value is modified and [`LFAf`] stores the original left coordinate. If the text _is_ multiline (i.e. [`ATEb`] is `false`), the [`LFTf`] and [`LFAf`] values remain equal and the indent is applied inside the text area.
+Amount to indent the first line of the paragraph by. This indent is relative to [`LFAf`] and may cause the bounds ([`LFTf`]) to change.
 
 Value range: `0`..inf (pixels)
 
@@ -7878,6 +7886,7 @@ Values:
 - `3D`
 - `3D Glow`
 - `Bamboo`
+- `Bars`
 - `Basic`
 - `Basic Dash`
 - `Bristle`
@@ -8177,9 +8186,7 @@ Parent: [`PBTv`]
 
 Parent: [`BEHv`]
 
-Values:
-
-- `-5`: unknown - TODO
+Observed value range: `-5`..`-5`
 
 ## `XSZi` Export **X** **S**i**z**e
 
@@ -8187,7 +8194,7 @@ Values:
 
 Parent: [`EXPv`]
 
-Width (in pixels) of the exported image, if [`CNSi`] is `true`.
+Width (in pixels) of the exported image, if [`CNSb`] is `true`.
 
 ## `XTMi` **X**H**TM**L
 
@@ -8232,9 +8239,7 @@ Parent: [`PBTv`]
 
 Parent: [`BEHv`]
 
-Values:
-
-- `7`: unknown - TODO
+Observed value range: `7`..`7`
 
 ## `YSZi` Export **Y** **S**i**z**e
 
@@ -8242,7 +8247,7 @@ Values:
 
 Parent: [`EXPv`]
 
-Height (in pixels) of the exported image, if [`CNSi`] is `true`.
+Height (in pixels) of the exported image, if [`CNSb`] is `true`.
 
 ## `ZSFi`
 

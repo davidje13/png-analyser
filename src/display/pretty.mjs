@@ -135,7 +135,7 @@ export function makeCanvas(w, h) {
   if (w < 0 || h < 0) {
     throw new Error(`Invalid canvas size ${w} x ${h}`);
   }
-  const canvas = document.createElement('canvas');
+  const canvas = el('canvas');
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
@@ -200,25 +200,11 @@ export function tilesAsCanvas({ width, height, tiles }) {
 }
 
 /**
- * @typedef {{ position: number, colour: number }[]} Gradient
+ * @typedef {ReadonlyArray<{ position: number, colour: number }>} Gradient
  */
 
 const backgroundImage = 'linear-gradient(white,white),repeating-linear-gradient(to right,#333333 0px 8px,#000000 8px 16px),repeating-linear-gradient(to bottom,#333333 0px 8px,#000000 8px 16px)';
 const backgroundBlend = 'difference,difference,normal';
-
-/**
- * @param {Gradient} gradient
- * @param {boolean=} alphaToLum
- * @return {HTMLElement}
- */
-export function asGradientDiv(gradient, alphaToLum = false) {
-  const stops = gradient.map((stop) => `${rgba(alphaToLum ? a2l(stop.colour) : stop.colour)} ${stop.position * 100}%`);
-  const preview = document.createElement('div');
-  preview.classList.add('gradient-preview');
-  preview.style.backgroundImage = `linear-gradient(to right,${stops.join(',')}),${backgroundImage}`;
-  preview.style.backgroundBlendMode = `normal,${backgroundBlend}`;
-  return preview;
-}
 
 /**
  * @param {number} col
@@ -227,8 +213,9 @@ export function asGradientDiv(gradient, alphaToLum = false) {
  * @return {HTMLElement}
  */
 export function asColourDiv(col, alpha = false, label) {
-  const preview = document.createElement('div');
-  preview.classList.add('colour-preview');
+  const preview = el('div', {
+    class: 'colour-preview',
+  }, [label ?? col.toString(16).padStart(alpha ? 8 : 6, '0')]);
   if (alpha) {
     if ((col >>> 24) !== 255) {
       const c = rgba(col);
@@ -240,7 +227,6 @@ export function asColourDiv(col, alpha = false, label) {
   } else {
     preview.style.backgroundColor = rgb(col);
   }
-  preview.append(label ?? col.toString(16).padStart(alpha ? 8 : 6, '0'));
   return preview;
 }
 
@@ -251,18 +237,98 @@ export function asColourDiv(col, alpha = false, label) {
  * @return {HTMLElement}
  */
 export function disclosure(summary, content, open = false) {
-  const det = document.createElement('details');
-  if (open) {
-    det.setAttribute('open', 'open');
-  }
-  const sum = document.createElement('summary');
-  sum.append(...(Array.isArray(summary) ? summary : [summary]));
-  det.append(sum, ...(Array.isArray(content) ? content : [content]));
-  return det;
+  return el('details', { open: open ? 'open' : undefined }, [
+    el('summary', {}, Array.isArray(summary) ? summary : [summary]),
+    ...(Array.isArray(content) ? content : [content]),
+  ]);
 }
 
 /**
- * @param {number} c
- * @return {number}
+ * @template {unknown} T
+ * @param {T[]} items
+ * @param {{ getGroup?: (o: T) => string | null | undefined, getName: (o: T) => string, getContent: (o: T) => HTMLElement }} opts
+ * @return {{ select: HTMLElement, tabs: HTMLElement }}
  */
-const a2l = (c) => ((c >>> 24) * 0x010101) | 0xFF000000;
+export function selectTabs(items, { getGroup = () => null, getName, getContent }) {
+  const conv = items.map((o) => ({
+    group: getGroup(o) ?? '',
+    name: getName(o),
+    content: getContent(o),
+  }));
+  conv.sort((a, b) => a.group !== b.group ? (a.group > b.group ? 1 : -1) : (a.name > b.name ? 1 : -1));
+  const select = el('select');
+  const tabs = el('div');
+  let curGroup = '';
+  /** @type {HTMLElement} */ let curOptGroup = select;
+  /** @type {HTMLElement[]} */ const tabNodes = [];
+  tabNodes.push(el('div'));
+  let i = 1;
+  const optNone = el('option', { value: 0 }, []);
+  select.append(optNone);
+  for (const o of conv) {
+    if (o.group !== curGroup) {
+      curGroup = o.group;
+      curOptGroup = el('optgroup', { label: o.group });
+      select.append(curOptGroup);
+    }
+    tabNodes.push(o.content);
+    curOptGroup.append(el('option', { value: i }, [String(o.name)]));
+    ++i;
+  }
+  let curTab = -1;
+  /**
+   * @param {number} n
+   */
+  function showTab(n) {
+    if (curTab === n) {
+      return;
+    }
+    curTab = n;
+    tabs.childNodes[0]?.remove();
+    tabs.append(tabNodes[n]);
+    select.value = String(n);
+  }
+  showTab(0);
+  select.addEventListener('change', () => showTab(Number(select.value)));
+  return { select, tabs };
+}
+
+/**
+ * @template {keyof HTMLElementTagNameMap} K
+ * @param {K} tag
+ * @param {Record<string, string | number | boolean | undefined>} attrs
+ * @param {(Element | string)[]} children
+ * @return {HTMLElementTagNameMap[K]}
+ */
+export function el(tag, attrs = {}, children = []) {
+	const o = document.createElement(tag);
+	for (const [k, v] of Object.entries(attrs)) {
+		if (v === true) {
+			o.setAttribute(k, '');
+		} else if (v !== false && v !== undefined) {
+			o.setAttribute(k, String(v));
+		}
+	}
+	o.append(...children);
+	return o;
+}
+
+/**
+ * @template {keyof SVGElementTagNameMap} K
+ * @param {K} tag
+ * @param {Record<string, string | number | boolean | undefined>} attrs
+ * @param {(Element | string)[]} children
+ * @return {SVGElementTagNameMap[K]}
+ */
+export function svgEl(tag, attrs = {}, children = []) {
+	const o = document.createElementNS('http://www.w3.org/2000/svg', tag);
+	for (const [k, v] of Object.entries(attrs)) {
+		if (v === true) {
+			o.setAttribute(k, '');
+		} else if (v !== false && v !== undefined) {
+			o.setAttribute(k, String(v));
+		}
+	}
+	o.append(...children);
+	return o;
+}

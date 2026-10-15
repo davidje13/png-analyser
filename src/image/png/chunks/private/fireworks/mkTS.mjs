@@ -1,16 +1,17 @@
 import { inflate } from '../../../../../data/inflate.mjs';
+import { el } from '../../../../../display/pretty.mjs';
 import { registerChunk } from '../../registry.mjs';
-import { displayRawStructure } from './tree/display_raw.mjs';
-import { parse } from './tree/parser.mjs';
-import { tokenise } from './tree/tokeniser.mjs';
+import { displayRawStructure, populatePaths } from './display-raw.mjs';
+import { parseRoot } from './parser.mjs';
+import { renderAllPages } from './render.mjs';
+import { tokenise } from './tokeniser.mjs';
 
 /**
  * @typedef {import('./mkBT.mjs').mkBTState & {
  *   mkts?: mkTSChunk,
  * }} mkTSState
  * @typedef {import('../../registry.mjs').Chunk & {
- *   raw?: import('./tree/tokeniser.mjs').NodeToken,
- *   root?: import('./tree/node_registry.mjs').ProcessedNode,
+ *   raw?: import('./tokeniser.mjs').NodeToken,
  * }} mkTSChunk
  */
 
@@ -24,18 +25,17 @@ registerChunk('mkTS', {}, async (/** @type {mkTSChunk} */ chunk, /** @type {mkTS
   }
 }, (state, warnings) => {
   if (state.mkts?.raw) {
-    const baseID = 'mkts-raw';
     const raw = state.mkts.raw;
-    const root = parse(null, raw, { mkbts: state.mkbts, warnings }, baseID);
-    state.mkts.root = root;
-    state.mkts.toString = () => root.toString();
-    state.mkts.display = (summary, content) => {
-      const parsed = document.createElement('div');
-      parsed.className = 'parsed';
-      root.display(parsed);
-      content.append(parsed);
-
-      displayRawStructure(content, raw, baseID, 'Raw node hierarchy');
+    populatePaths(raw, 'mkts-raw');
+    state.mkts.toString = () => '';
+    state.mkts.display = (summary, content, filename) => {
+      content.append(el('div', { class: 'parsed' }, [
+        renderAllPages(
+          parseRoot(raw, state.mkbts ?? new Map()),
+          filename.replace(/\.[^.]+$/, ''),
+        )
+      ]));
+      displayRawStructure(content, raw, 'Raw node hierarchy');
     };
   }
 });
