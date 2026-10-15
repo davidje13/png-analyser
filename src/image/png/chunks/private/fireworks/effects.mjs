@@ -4,17 +4,21 @@ import { GPLv } from './nodes/GPLv.mjs';
 import { GPTv } from './nodes/GPTv.mjs';
 
 /**
- * @param {SVGElement} container
- * @param {SVGElement} target
+ * @typedef {{
+ *   nextID: () => string,
+ *   addDef: (o: SVGElement) => string;
+ * }} ImageGlobals
+ */
+
+/**
+ * @param {ImageGlobals} globals
+ * @param {SVGElement} contents
  * @param {EPSv} epsv
  * @return {SVGElement}
  */
-export function applyEffect(container, target, epsv) {
+export function applyEffect(globals, contents, epsv) {
 	const effect = KNOWN_EFFECTS.get(str(epsv.data['EffectMoaID']) ?? '')
-	if (effect) {
-		return effect.apply(container, target, epsv.data);
-	}
-	return target;
+	return effect?.apply(globals, contents, epsv.data) ?? contents;
 }
 
 /**
@@ -23,7 +27,7 @@ export function applyEffect(container, target, epsv) {
  *
  * @typedef {{
  *   name: string,
- *   apply: (container: SVGElement, element: SVGElement, data: Data) => SVGElement,
+ *   apply: (globals: ImageGlobals, contents: SVGElement, data: Data) => SVGElement,
  * }} EffectMeta
  */
 
@@ -54,7 +58,7 @@ const BUTTON_STATES = new Map([
 
 KNOWN_EFFECTS.set('{7fe61102-6ce2-11d1-8c76000502701850}', {
 	name: 'Bevel',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		//const typeId = str(data['BevelType']) ?? '';
 		//const type = BEVEL_TYPES.get(typeId);
 		//if (!type) {
@@ -85,13 +89,13 @@ KNOWN_EFFECTS.set('{7fe61102-6ce2-11d1-8c76000502701850}', {
 		//const glowStartDist = float(data['GlowStartDistance']) ?? 0;
 		//const glowWidth = float(data['GlowWidth']) ?? 0;
 
-		return target; // TODO
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{a7944db8-6ce2-11d1-8c76000502701850}', {
 	name: 'Drop Shadow',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const knockout = data['ShadowType'] === '1';
 		const blur = float(data['ShadowBlur']) ?? 0;
 		const dist = float(data['ShadowDistance']) ?? 0;
@@ -99,9 +103,9 @@ KNOWN_EFFECTS.set('{a7944db8-6ce2-11d1-8c76000502701850}', {
 		const shadowCol = col(data['ShadowColor']);
 		if (!shadowCol) {
 			if (knockout) {
-				target.setAttribute('hidden', 'hidden');
+				contents.setAttribute('display', 'none');
 			}
-			return target;
+			return contents;
 		}
 
 		// match fireworks behaviour
@@ -109,10 +113,8 @@ KNOWN_EFFECTS.set('{a7944db8-6ce2-11d1-8c76000502701850}', {
 		const y = Math.trunc(Math.sin(angle) * dist);
 		const stdDeviation = blur * 0.5;
 
-		const filterID = crypto.randomUUID();
 		if (knockout) {
-			container.append(svgEl('filter', {
-				id: filterID,
+			const filterID = globals.addDef(svgEl('filter', {
 				// TODO: extend bounds based on blur amount (need to know what size the target is)
 				x: '-30%',
 				y: '-30%',
@@ -125,9 +127,9 @@ KNOWN_EFFECTS.set('{a7944db8-6ce2-11d1-8c76000502701850}', {
 				svgEl('feFlood', { 'flood-color': rgba(shadowCol) }),
 				svgEl('feComposite', { operator: 'in', in2: 'b' }),
 			]));
+			contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		} else {
-			container.append(svgEl('filter', {
-				id: filterID,
+			const filterID = globals.addDef(svgEl('filter', {
 				// TODO: extend bounds based on blur amount (need to know what size the target is)
 				x: '-30%',
 				y: '-30%',
@@ -141,22 +143,22 @@ KNOWN_EFFECTS.set('{a7944db8-6ce2-11d1-8c76000502701850}', {
 					'flood-color': rgba(shadowCol),
 				}),
 			]));
+			contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		}
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{5600f702-774c-11d3-baad0000861f4d01}', {
 	name: 'Inner Shadow',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const knockout = data['ShadowType'] === '1';
 		const blur = float(data['ShadowBlur']) ?? 0;
 		const dist = float(data['ShadowDistance']) ?? 0;
 		const angle = -(float(data['ShadowAngle']) ?? 0) * Math.PI / 180;
 		const shadowCol = col(data['ShadowColor']);
 		if (!shadowCol) {
-			return target;
+			return contents;
 		}
 
 		// match fireworks behaviour
@@ -164,9 +166,7 @@ KNOWN_EFFECTS.set('{5600f702-774c-11d3-baad0000861f4d01}', {
 		const y = Math.trunc(Math.sin(angle) * dist);
 		const stdDeviation = blur * 0.5;
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			// TODO: extend bounds based on translation distance (need to know what size the target is)
 			x: x >= 0 ? '0%' : '-50%',
 			y: y >= 0 ? '0%' : '-50%',
@@ -181,14 +181,14 @@ KNOWN_EFFECTS.set('{5600f702-774c-11d3-baad0000861f4d01}', {
 				? svgEl('feComposite', { operator: 'in', in: 'SourceAlpha' })
 				: svgEl('feComposite', { operator: 'atop', in2: 'SourceGraphic' }),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{b90c950e-64df-11d8-aaf2000a9582f7d4}', {
 	name: 'Solid Shadow',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const dist = float(data['distance']) ?? 0;
 		const angle = -(float(data['angle']) ?? 0) * Math.PI / 180;
 		const shadowCol = col(data['color']) ?? 0;
@@ -239,35 +239,31 @@ KNOWN_EFFECTS.set('{b90c950e-64df-11d8-aaf2000a9582f7d4}', {
 			svgEl('feComposite', { operator: 'over', in: 'SourceGraphic' }),
 		);
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			// TODO: extend bounds based on translation distance (need to know what size the target is)
 			x: x >= 0 ? '0%' : '-50%',
 			y: y >= 0 ? '0%' : '-50%',
 			width: '150%',
 			height: '150%',
 		}, steps));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{2ba87123-8220-11d3-baad0000861f4d01}', {
 	name: 'Inner Glow',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const maskSoftness = float(data['MaskSoftness']) ?? 0;
 		const glowCol = col(data['OuterBevelColor'], data['BevelContrast'], 100);
 		const glowStartDist = float(data['GlowStartDistance']) ?? 0;
 		const glowWidth = float(data['GlowWidth']) ?? 0;
 		if (!glowCol) {
-			return target;
+			return contents;
 		}
 
 		if (glowStartDist === 0) {
-			const filterID = crypto.randomUUID();
-			container.append(svgEl('filter', {
-				id: filterID,
+			const filterID = globals.addDef(svgEl('filter', {
 				x: '0%',
 				y: '0%',
 				width: '100%',
@@ -281,10 +277,10 @@ KNOWN_EFFECTS.set('{2ba87123-8220-11d3-baad0000861f4d01}', {
 				svgEl('feComposite', { operator: 'out', in2: 'b' }),
 				svgEl('feComposite', { operator: 'atop', in2: 'SourceGraphic' }),
 			]));
-			target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-			return target;
+			contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+			return contents;
 		} else {
-			return target; // TODO
+			return contents; // TODO
 		}
 	},
 });
@@ -329,11 +325,11 @@ const COLOR_FILL_BLEND = new Map([
 
 KNOWN_EFFECTS.set('{dd54adc0-a279-11d3-b92a000502f3fdbe}', {
 	name: 'Color Fill',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const fillCol = col(data['Color'], data['Opacity'], 100) ?? 0;
 		const blendMode = COLOR_FILL_BLEND.get(str(data['Blendmode']) ?? '0') ?? {};
 		if (!fillCol) {
-			return target;
+			return contents;
 		}
 
 		/** @type {SVGElement[]} */ const steps = [
@@ -358,16 +354,14 @@ KNOWN_EFFECTS.set('{dd54adc0-a279-11d3-b92a000502f3fdbe}', {
 				}),
 			);
 		}
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
 			height: '100%',
 		}, steps));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
@@ -466,33 +460,29 @@ function gammaLevsls(data) {
 
 KNOWN_EFFECTS.set('{d04ef8c1-71b4-11d1-8c8200a024cdc039}', {
 	name: 'Auto Levels',
-	apply: (container, target, data) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents, data) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
 			height: '100%',
 		}, gammaLevsls(data)));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{d04ef8c2-71b5-11d1-8c8200a024cdc039}', {
 	name: 'Levels',
-	apply: (container, target, data) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents, data) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
 			height: '100%',
 		}, gammaLevsls(data)));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
@@ -573,19 +563,17 @@ function makeCurveMapping(points) {
 
 KNOWN_EFFECTS.set('{3439b08e-1923-11d3-9bde00e02910d580}', {
 	name: 'Curves',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const rgb = data['rgb_points'];
 		const r = data['red_points'];
 		const g = data['green_points'];
 		const b = data['blue_points'];
 		if (!(rgb instanceof GPLv) || !(r instanceof GPLv) || !(g instanceof GPLv) || !(b instanceof GPLv)) {
-			return target;
+			return contents;
 		}
 		const cRGB = makeCurveMapping(rgb);
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -597,14 +585,14 @@ KNOWN_EFFECTS.set('{3439b08e-1923-11d3-9bde00e02910d580}', {
 				makeColourTable('feFuncB', combineMappings(makeCurveMapping(b), cRGB)),
 			]),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{3439b08d-1922-11d3-9bde00e02910d580}', {
 	name: 'Hue/Saturation',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const hue = float(data['hue_amount']) ?? 0;
 		const saturation = (float(data['saturation_amount']) ?? 0) * 0.01;
 		const lightness = (float(data['lightness_amount']) ?? 0) * 0.01;
@@ -693,25 +681,23 @@ KNOWN_EFFECTS.set('{3439b08d-1922-11d3-9bde00e02910d580}', {
 		}
 
 		if (!steps.length) {
-			return target;
+			return contents;
 		}
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
 			height: '100%',
 		}, steps));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{3439b08c-1921-11d3-9bde00e02910d580}', {
 	name: 'Brightness/Contrast',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const brightness = (float(data['brightness_amount']) ?? 0) / 255;
 		const contrast = (float(data['contrast_amount']) ?? 0) * 0.01 + 1;
 		const mid = 112 / 255;
@@ -727,9 +713,7 @@ KNOWN_EFFECTS.set('{3439b08c-1921-11d3-9bde00e02910d580}', {
 		);
 		const intercept = 0.5 - slope * 0.5;
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -756,17 +740,15 @@ KNOWN_EFFECTS.set('{3439b08c-1921-11d3-9bde00e02910d580}', {
 				svgEl('feFuncB', { type: 'gamma', exponent: e2 }),
 			]),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{d2541291-70d6-11d1-8c8000a024cdc039}', {
 	name: 'Invert',
-	apply: (container, target) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -778,17 +760,15 @@ KNOWN_EFFECTS.set('{d2541291-70d6-11d1-8c8000a024cdc039}', {
 				svgEl('feFuncB', { type: 'linear', slope: -1, intercept: 1 }),
 			]),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{2932d5a2-ca48-11d1-8561000502701850}', {
 	name: 'Convert to Alpha',
-	apply: (container, target) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -804,17 +784,15 @@ KNOWN_EFFECTS.set('{2932d5a2-ca48-11d1-8561000502701850}', {
 				].join(' '),
 			}),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{fc7093f1-f95c-11d0-8be200a024cdc039}', {
 	name: 'Find Edges',
-	apply: (container, target) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -831,17 +809,15 @@ KNOWN_EFFECTS.set('{fc7093f1-f95c-11d0-8be200a024cdc039}', {
 				preserveAlpha: 'true',
 			}),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{f1cfce41-718e-11d1-8c8200a024cdc039}', {
 	name: 'Blur',
-	apply: (container, target) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -856,14 +832,14 @@ KNOWN_EFFECTS.set('{f1cfce41-718e-11d1-8c8200a024cdc039}', {
 				edgeMode: 'duplicate',
 			}),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{538016b6-ffd6-418f-a10c590e6ee841ae}', {
 	name: 'Motion Blur',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const dist = float(data['motion_blur_distance']) ?? 0;
 		const angle = -(float(data['motion_blur_angle']) ?? 0) * Math.PI / 180;
 
@@ -899,77 +875,75 @@ KNOWN_EFFECTS.set('{538016b6-ffd6-418f-a10c590e6ee841ae}', {
 			prev = next;
 		}
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			// TODO: extend bounds based on translation distance (need to know what size the target is)
 			x: x >= 0 ? '0%' : '-50%',
 			y: y >= 0 ? '0%' : '-50%',
 			width: '150%',
 			height: '150%',
 		}, steps));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{d1c33142-2ad8-4215-a39fc5d934c8fc0c}', {
 	name: 'Radial Blur',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const angle = (float(data['radial_blur_amount']) ?? 0) * 0.5;
 		const n = Math.max(1, Math.min(180, Math.ceil((float(data['radial_blur_quality']) ?? 0) / 2)));
 
-		const sourceID = crypto.randomUUID();
-		const source = svgEl('g', { id: sourceID, opacity: 1 / (n * 2 + 1) });
-		source.style.mixBlendMode = 'plus-lighter';
-		target.style.isolation = 'isolate';
-		target.append(source);
+		const sourceID = globals.nextID();
+		contents.setAttribute('id', sourceID);
+		contents.setAttribute('opacity', String(1 / (n * 2 + 1)));
+		contents.style.mixBlendMode = 'plus-lighter';
+		const hold = svgEl('g', {}, [contents]);
+		hold.style.isolation = 'isolate';
 		for (let i = -n; i <= n; ++i) {
 			if (i) {
 				const sample = svgEl('use', { href: `#${encodeURIComponent(sourceID)}`, transform: `rotate(${angle * i / n})`, 'transform-origin': 'center' });
 				sample.style.transformBox = 'fill-box'; // TODO: may be better to specify an explicit transform origin, but that requires knowing the object's bounds
 				sample.style.mixBlendMode = 'plus-lighter';
-				target.append(sample);
+				hold.append(sample);
 			}
 		}
-		return source;
+		return hold;
 	},
 });
 
 KNOWN_EFFECTS.set('{94dbd663-9b2e-44bf-8064ab6efdd2d327}', {
 	name: 'Zoom Blur',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const zoom = (float(data['zoom_blur_amount']) ?? 0) * 0.005;
 		const n = Math.max(1, Math.min(100, Math.ceil((float(data['zoom_blur_quality']) ?? 0) / 2)));
 
-		const sourceID = crypto.randomUUID();
-		const source = svgEl('g', { id: sourceID, opacity: 1 / (n * 2 + 1) });
-		source.style.mixBlendMode = 'plus-lighter';
-		target.style.isolation = 'isolate';
-		target.append(source);
+		const sourceID = globals.nextID();
+		contents.setAttribute('id', sourceID);
+		contents.setAttribute('opacity', String(1 / (n * 2 + 1)));
+		contents.style.mixBlendMode = 'plus-lighter';
+		const hold = svgEl('g', {}, [contents]);
+		hold.style.isolation = 'isolate';
 		for (let i = -n; i <= n; ++i) {
 			if (i) {
 				const sample = svgEl('use', { href: `#${encodeURIComponent(sourceID)}`, transform: `scale(${(1 + zoom * i / n)})`, 'transform-origin': 'center' });
 				sample.style.transformBox = 'fill-box'; // TODO: may be better to specify an explicit transform origin, but that requires knowing the object's bounds
 				sample.style.mixBlendMode = 'plus-lighter';
-				target.append(sample);
+				hold.append(sample);
 			}
 		}
-		return source;
+		return hold;
 	},
 });
 
 KNOWN_EFFECTS.set('{d04ef8c0-71b3-11d1-8c8200a024cdc039}', {
 	name: 'Gaussian Blur',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		const blur = float(data['gaussian_blur_radius']) ?? 0;
 
 		// match fireworks behaviour
 		const stdDeviation = blur * 1.05;
 
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			// TODO: extend bounds based on blur amount (need to know what size the target is)
 			x: '-30%',
 			y: '-30%',
@@ -978,17 +952,15 @@ KNOWN_EFFECTS.set('{d04ef8c0-71b3-11d1-8c8200a024cdc039}', {
 		}, [
 			svgEl('feGaussianBlur', { stdDeviation }),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{f1cfce42-718e-11d1-8c8200a024cdc039}', {
 	name: 'Blur More',
-	apply: (container, target, data) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -1003,28 +975,26 @@ KNOWN_EFFECTS.set('{f1cfce42-718e-11d1-8c8200a024cdc039}', {
 				edgeMode: 'duplicate',
 			}),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{f1cfce44-718e-11d1-8c8200a024cdc039}', {
 	name: 'Unsharp Mask',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		//"unsharp_mask_radius" = "4.0999999999999996"
 		//"unsharp_mask_amount" = "50"
 		//"unsharp_mask_threshold" = "0"
 
-		return target; // TODO
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{c20952b1-fc76-11d0-8be700a024cdc039}', {
 	name: 'Sharpen',
-	apply: (container, target) => {
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+	apply: (globals, contents) => {
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -1039,18 +1009,16 @@ KNOWN_EFFECTS.set('{c20952b1-fc76-11d0-8be700a024cdc039}', {
 				edgeMode: 'duplicate',
 			}),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{1f2f2591-9db7-11d1-8cad00a024cdc039}', {
 	name: 'Sharpen More',
-	apply: (container, target) => {
+	apply: (globals, contents) => {
 		// actually the same as sharpen
-		const filterID = crypto.randomUUID();
-		container.append(svgEl('filter', {
-			id: filterID,
+		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
 			width: '100%',
@@ -1065,73 +1033,73 @@ KNOWN_EFFECTS.set('{1f2f2591-9db7-11d1-8cad00a024cdc039}', {
 				edgeMode: 'duplicate',
 			}),
 		]));
-		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
-		return target;
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
 KNOWN_EFFECTS.set('{e4c0f4bc-c0a3-4cb3-b3513822027e4d9f}', {
 	name: 'Add Noise',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		//"add_noise_amount" = "50"
 		//"add_noise_use_color" = "false"
 
-		return target; // TODO
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{ff84d00c-4494-11d8-a072000a9582f7d4}', {
 	name: 'Clouds',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		//"cloud_color" = "#999933"
 		//"sky_color" = "#99ff99"
 
-		return target; // TODO
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{d2e7769c-6349-11d8-b0e9000a9595f34e}', {
 	name: 'Difference Clouds',
-	apply: (container, target, data) => {
+	apply: (globals, contents, data) => {
 		//"cloud_color" = "#999933"
 		//"sky_color" = "#99ff99"
 
-		return target; // TODO
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{d810e821-f86b-11d0-6563413465646d41}', {
 	name: 'Marble',
-	apply: (container, target, data) => {
-		return target; // TODO
+	apply: (globals, contents, data) => {
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{d810e821-f86b-11d0-656341346564694e}', {
 	name: 'Bevel Boss',
-	apply: (container, target, data) => {
-		return target; // TODO
+	apply: (globals, contents, data) => {
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{d810e821-f86b-11d0-6563413465646d54}', {
 	name: 'Motion Trail',
-	apply: (container, target, data) => {
-		return target; // TODO
+	apply: (globals, contents, data) => {
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{d810e821-f86b-11d0-7371473173676544}', {
 	name: 'Edges',
-	apply: (container, target, data) => {
-		return target; // TODO
+	apply: (globals, contents, data) => {
+		return contents; // TODO
 	},
 });
 
 KNOWN_EFFECTS.set('{8eeadf50-9efe-11da-a7460800200c9a66}', {
 	name: 'Photoshop Live Effects Special Fill',
-	apply: (container, target, data) => {
-		return target; // TODO
+	apply: (globals, contents, data) => {
+		return contents; // TODO
 	},
 });
 

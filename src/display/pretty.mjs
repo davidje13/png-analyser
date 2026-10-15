@@ -297,38 +297,46 @@ export function selectTabs(items, { getGroup = () => null, getName, getContent }
  * @template {keyof HTMLElementTagNameMap} K
  * @param {K} tag
  * @param {Record<string, string | number | boolean | undefined>} attrs
- * @param {(Element | string)[]} children
+ * @param {(Element | string | null | undefined)[]} children
  * @return {HTMLElementTagNameMap[K]}
  */
 export function el(tag, attrs = {}, children = []) {
-	const o = document.createElement(tag);
-	for (const [k, v] of Object.entries(attrs)) {
-		if (v === true) {
-			o.setAttribute(k, '');
-		} else if (v !== false && v !== undefined) {
-			o.setAttribute(k, String(v));
-		}
-	}
-	o.append(...children);
-	return o;
+  const o = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === true) {
+      o.setAttribute(k, '');
+    } else if (v !== false && v !== undefined) {
+      o.setAttribute(k, String(v));
+    }
+  }
+  for (const c of children) {
+    if (c !== undefined && c !== null) {
+      o.append(c);
+    }
+  }
+  return o;
 }
 
 /**
  * @template {keyof SVGElementTagNameMap} K
  * @param {K} tag
  * @param {Record<string, string | number | boolean | undefined>} attrs
- * @param {(Element | string)[]} children
+ * @param {(Element | string | null | undefined)[]} children
  * @return {SVGElementTagNameMap[K]}
  */
 export function svgEl(tag, attrs = {}, children = []) {
-	const o = document.createElementNS('http://www.w3.org/2000/svg', tag);
-	for (const [k, v] of Object.entries(attrs)) {
-		if (v === true) {
-			o.setAttribute(k, '');
-		} else if (v !== false && v !== undefined) {
-			o.setAttribute(k, String(v));
-		}
-	}
-	o.append(...children);
-	return o;
+  const o = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === true) {
+      o.setAttribute(k, '');
+    } else if (v !== false && v !== undefined) {
+      o.setAttribute(k, String(v));
+    }
+  }
+  for (const c of children) {
+    if (c !== undefined && c !== null) {
+      o.append(c);
+    }
+  }
+  return o;
 }
