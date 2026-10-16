@@ -170,15 +170,15 @@ KNOWN_EFFECTS.set('{5600f702-774c-11d3-baad0000861f4d01}', {
 			// TODO: extend bounds based on translation distance (need to know what size the target is)
 			x: x >= 0 ? '0%' : '-50%',
 			y: y >= 0 ? '0%' : '-50%',
-			width: '150%',
-			height: '150%',
+			width: x ? '150%' : '100%',
+			height: y ? '150%' : '100%',
 		}, [
 			svgEl('feOffset', { dx: x, dy: y, in: 'SourceAlpha' }),
 			svgEl('feGaussianBlur', { stdDeviation, result: 'b' }),
 			svgEl('feFlood', { 'flood-color': rgba(shadowCol) }),
 			svgEl('feComposite', { operator: 'out', in2: 'b' }),
 			knockout
-				? svgEl('feComposite', { operator: 'in', in: 'SourceAlpha' })
+				? svgEl('feComposite', { operator: 'in', in2: 'SourceAlpha' })
 				: svgEl('feComposite', { operator: 'atop', in2: 'SourceGraphic' }),
 		]));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
@@ -243,8 +243,8 @@ KNOWN_EFFECTS.set('{b90c950e-64df-11d8-aaf2000a9582f7d4}', {
 			// TODO: extend bounds based on translation distance (need to know what size the target is)
 			x: x >= 0 ? '0%' : '-50%',
 			y: y >= 0 ? '0%' : '-50%',
-			width: '150%',
-			height: '150%',
+			width: x ? '150%' : '100%',
+			height: y ? '150%' : '100%',
 		}, steps));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
@@ -879,8 +879,8 @@ KNOWN_EFFECTS.set('{538016b6-ffd6-418f-a10c590e6ee841ae}', {
 			// TODO: extend bounds based on translation distance (need to know what size the target is)
 			x: x >= 0 ? '0%' : '-50%',
 			y: y >= 0 ? '0%' : '-50%',
-			width: '150%',
-			height: '150%',
+			width: x ? '150%' : '100%',
+			height: y ? '150%' : '100%',
 		}, steps));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;

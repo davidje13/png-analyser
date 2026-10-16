@@ -88,6 +88,8 @@ export function renderAllFramesInPage(root, page, baseFilename) {
 	return hold;
 }
 
+let globalID = 0;
+
 /**
  * @param {rootv} root
  * @param {PDCv} page
@@ -131,8 +133,9 @@ export function renderFrame(root, page, frame, baseFilename = 'image') {
 			fill: page.backgroundColour.toCSS(),
 		}));
 	}
+	const selfID = globalID++; // avoid ID conflicts between images on the same page (e.g. multiple frames, pages, files)
 	let idInc = 0;
-	const nextID = () => String(idInc++);
+	const nextID = () => `${selfID}-${idInc++}`;
 	/** @type {ImageGlobals} */ const imageGlobals = {
 		root,
 		page,
@@ -257,17 +260,10 @@ export function renderElement(globals, { type, value }) {
 			}
 		}
 
-		if (value.opacity < 1) {
-			grouped ??= mustGroup();
-			grouped.setAttribute('opacity', value.opacity.toFixed(3));
-		}
 		const blend = value.blendMode?.value?.css;
 		if (blend) {
 			grouped ??= mustGroup();
 			grouped.style.mixBlendMode = blend;
-		} else if (value.blendMode?.value?.name === 'average') {
-			grouped ??= mustGroup();
-			grouped.setAttribute('opacity', ((value.opacity ?? 1) / 2).toFixed(3));
 		}
 
 		grouped ??= noGroup();
@@ -276,6 +272,11 @@ export function renderElement(globals, { type, value }) {
 		}
 		if (!value.visible) {
 			grouped.setAttribute('display', 'none');
+		}
+		if (value.blendMode?.value?.name === 'average') {
+			grouped.setAttribute('opacity', ((value.opacity ?? 1) / 2).toFixed(3));
+		} else if (value.opacity < 1) {
+			grouped.setAttribute('opacity', value.opacity.toFixed(3));
 		}
 	}
 	grouped ??= noGroup();
@@ -323,7 +324,7 @@ RENDERERS.set('PTHv', (globals, /** @type {PTHv} */ pthv) => {
 				pthv.pattern.brushPropertyList.textureEdge > 0 // TODO
 			)
 		) {
-			stroke.setAttribute('mask', `url(#${encodeURIComponent(makeTextureMask(globals, pthv.pattern.textureBrush.mask, pthv.textureOffset))})`);
+			stroke.setAttribute('mask', `url(#${encodeURIComponent(makeTextureMask(globals, pthv.pattern.textureBrush.mask, pthv.pattern.brushPropertyList.textureBlend, pthv.textureOffset))})`);
 		}
 	}
 	if (pthv.pattern.fillColour.a > 0) {
@@ -331,7 +332,7 @@ RENDERERS.set('PTHv', (globals, /** @type {PTHv} */ pthv) => {
 			d,
 			'fill-rule': pthv.evenOddFillRule ? 'evenodd' : undefined,
 		});
-		applyFill(globals, fill, pthv);
+		fill = applyFill(globals, fill, pthv);
 	}
 	if (fill && stroke) {
 		if (pthv.fillOnTop) {
@@ -574,10 +575,33 @@ function applyFill(globals, target, {
 }) {
 	const props = pattern.fillPatternProperties;
 	if (!props) {
-		return;
+		return target;
 	}
 	if (props.hardEdge) {
 		target.setAttribute('shape-rendering', 'crispEdges');
+	}
+	/** @type {SVGElement | null} */ let maskToShape = null;
+	if (props.feather > 0) {
+		const filterID = globals.addDef(svgEl('filter', {
+			// TODO: extend bounds based on blur amount (need to know what size the target is)
+			x: '-30%',
+			y: '-30%',
+			width: '160%',
+			height: '160%',
+		}, [
+			svgEl('feGaussianBlur', { stdDeviation: props.feather * 0.48 }),
+		]));
+		target.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		// if element ends up with both filter and mask, filter applies first
+		// (this means we can take this shortcut without breaking textureFill below)
+		if (props.shape !== 0) {
+			maskToShape = target;
+			target = svgEl('rect', { width: '100%', height: '100%' });
+		}
+	}
+	if (pattern.textureFill && props.textureBlend > 0 && props.stampingMode === 2) { // mask to white
+		maskToShape ??= target;
+		target = svgEl('rect', { width: '100%', height: '100%' });
 	}
 	// shift fill points 1px to match fireworks rendering
 	const fp1 = { x: fillPoint1.x, y: fillPoint1.y + 1 };
@@ -602,7 +626,7 @@ function applyFill(globals, target, {
 						spreadMethod: props.shape === 12 ? 'reflect' : undefined,
 					},
 					grad.rgba.map(({ position, colour }) => svgEl('stop', {
-						offset: `${position * 100}%`,
+						offset: `${(position * 100).toFixed(2)}%`,
 						'stop-color': colour.toCSS(),
 					})),
 				));
@@ -620,7 +644,7 @@ function applyFill(globals, target, {
 						r: Math.sqrt((fp2.x - fp1.x) ** 2 + (fp2.y - fp1.y) ** 2),
 					},
 					grad.rgba.map(({ position, colour }) => svgEl('stop', {
-						offset: `${position * 100}%`,
+						offset: `${(position * 100).toFixed(2)}%`,
 						'stop-color': colour.toCSS(),
 					})),
 				));
@@ -628,7 +652,15 @@ function applyFill(globals, target, {
 			}
 			break;
 		case 4: // conical
-			// TODO (not supported by SVG, but is supported by CSS - could use a foreignObject)
+			if (grad) {
+				maskToShape ??= target;
+				// SVG does not yet support conic gradients, so we must use a foreignObject to get it via CSS instead
+				const div = el('div', { xmlns: 'http://www.w3.org/1999/xhtml' });
+				div.style.height = '100%';
+				const angle = Math.atan2(fp2.x - fp1.x, fp1.y - fp2.y) * 180 / Math.PI;
+				div.style.background = `conic-gradient(from ${angle.toFixed(2)}deg at ${fp1.x}px ${fp1.y}px in sRGB,${grad.toMirroredCSSStops()})`;
+				target = svgEl('foreignObject', { width: '100%', height: '100%' }, [div]);
+			}
 			break;
 		case 9: // elliptical
 		case 13: // ripple
@@ -676,9 +708,20 @@ function applyFill(globals, target, {
 		}
 	}
 	if (pattern.textureFill && props.textureBlend > 0) {
-		// TODO: props.stampingMode
-		target.setAttribute('mask', `url(#${encodeURIComponent(makeTextureMask(globals, pattern.textureFill.mask, textureOffset))})`);
+		const textureID = makeTextureMask(globals, pattern.textureFill.mask, props.textureBlend, textureOffset);
+		if (props.stampingMode === 2) {
+			target.setAttribute('mask', `url(#${encodeURIComponent(textureID)})`);
+			target = svgEl('g', {}, [svgEl('rect', { width: '100%', height: '100%', fill: '#ffffff' }), target]);
+		} else {
+			(maskToShape ?? target).setAttribute('mask', `url(#${encodeURIComponent(textureID)})`);
+		}
 	}
+	if (maskToShape) {
+		maskToShape.setAttribute('fill', '#000000');
+		const maskID = globals.addDef(svgEl('mask', { 'mask-type': 'alpha' }, [maskToShape]));
+		target.setAttribute('mask', `url(#${encodeURIComponent(maskID)})`);
+	}
+	return target;
 }
 
 const TEXT_JUSTIFICATION = ['start', 'middle', 'end', 'start'];
@@ -734,14 +777,23 @@ function makePattern(
 /**
  * @param {ImageGlobals} globals
  * @param {MSKv} img
+ * @param {number} opacity
  * @param {{ x: number, y: number }} offset
  */
-function makeTextureMask(globals, img, offset = { x: 0, y: 0 }) {
-	return globals.addDef(svgEl('mask', {}, [svgEl('rect', {
-		fill: `url(#${encodeURIComponent(makePattern(globals, img, offset))})`,
-		width: '100%',
-		height: '100%',
-	})]));
+function makeTextureMask(globals, img, opacity = 1, offset = { x: 0, y: 0 }) {
+	return globals.addDef(svgEl('mask', {}, [
+		opacity < 1 ? svgEl('rect', {
+			fill: '#ffffff',
+			width: '100%',
+			height: '100%',
+		}) : null,
+		svgEl('rect', {
+			fill: `url(#${encodeURIComponent(makePattern(globals, img, offset))})`,
+			width: '100%',
+			height: '100%',
+			opacity,
+		}),
+	]));
 }
 
 /**
