@@ -461,6 +461,8 @@ function gammaLevsls(data) {
 KNOWN_EFFECTS.set('{d04ef8c1-71b4-11d1-8c8200a024cdc039}', {
 	name: 'Auto Levels',
 	apply: (globals, contents, data) => {
+		// TODO: seems auto levels just stores identity values rather than the computed levelling
+		// - need to analyse the image to find the levels to apply
 		const filterID = globals.addDef(svgEl('filter', {
 			x: '0%',
 			y: '0%',
@@ -780,7 +782,7 @@ KNOWN_EFFECTS.set('{2932d5a2-ca48-11d1-8561000502701850}', {
 					'0 0 0 0 0',
 					'0 0 0 0 0',
 					'0 0 0 0 0',
-					'-0.2126 -0.7152 -0.0722 1 0',
+					'-0.2125 -0.7154 -0.0721 1 0',
 				].join(' '),
 			}),
 		]));
@@ -1041,10 +1043,43 @@ KNOWN_EFFECTS.set('{1f2f2591-9db7-11d1-8cad00a024cdc039}', {
 KNOWN_EFFECTS.set('{e4c0f4bc-c0a3-4cb3-b3513822027e4d9f}', {
 	name: 'Add Noise',
 	apply: (globals, contents, data) => {
-		//"add_noise_amount" = "50"
-		//"add_noise_use_color" = "false"
+		const amount = (float(data['add_noise_amount']) ?? 0) * 0.02;
+		const colour = data['add_noise_use_color'] === 'true';
 
-		return contents; // TODO
+		const filterID = globals.addDef(svgEl('filter', {
+			x: '0%',
+			y: '0%',
+			width: '100%',
+			height: '100%',
+		}, [
+			svgEl('feComponentTransfer', { result: 'r' }, [ // unpremultiply alpha
+				svgEl('feFuncA', { type: 'linear', slope: 0, intercept: 1 }),
+			]),
+			svgEl('feTurbulence', {
+				numOctaves: 1,
+				baseFrequency: 0.75,
+				seed: 0,
+				type: 'fractalNoise',
+			}),
+			colour
+				? svgEl('feComponentTransfer', {}, [svgEl('feFuncA', { type: 'linear', slope: 0, intercept: 1 })])
+				: svgEl('feColorMatrix', { type: 'matrix', values: [
+					'1 0 0 0 0',
+					'1 0 0 0 0',
+					'1 0 0 0 0',
+					'0 0 0 0 1',
+				].join(' ') }),
+			svgEl('feComposite', {
+				operator: 'arithmetic',
+				in2: 'r',
+				k2: amount * 2,
+				k3: 1,
+				k4: -amount,
+			}),
+			svgEl('feComposite', { operator: 'in', in2: 'SourceAlpha' }), // re-multiply alpha
+		]));
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });
 
