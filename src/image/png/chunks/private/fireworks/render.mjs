@@ -21,6 +21,8 @@ import { URLv } from './nodes/URLv.mjs';
  *   page: PDCv;
  *   frame: number;
  *   svg: SVGSVGElement;
+ *   width: number;
+ *   height: number;
  *   nextID: () => string,
  *   addDef: (o: SVGElement) => string;
  * }} ImageGlobals
@@ -141,6 +143,8 @@ export function renderFrame(root, page, frame, baseFilename = 'image') {
 		page,
 		frame,
 		svg,
+		width: page.width,
+		height: page.height,
 		nextID,
 		addDef: (o) => {
 			const id = nextID();
@@ -360,54 +364,63 @@ RENDERERS.set('TXTv', (globals, /** @type {TXTv} */ txtv) => {
 		}
 	}
 	const approxScale = txtv.transformMatrix?.approximateScale ?? 1;
-	const text = svgEl('text', {
+	const hold = svgEl('text', {
 		'paint-order': txtv.fillOnTop ? 'stroke' : undefined,
 	});
 	if (txtv.pattern.brushPropertyList?.diameter) {
     // TODO: this is an approximation of the stroke, as it does not use the chosen brush
     // also it is applied before transforming, but Fireworks applies it AFTER any transform
-		text.setAttribute('stroke', txtv.pattern.brushColour.toCSS());
-		text.setAttribute('stroke-width', String(txtv.pattern.brushPropertyList.diameter / approxScale));
+		hold.setAttribute('stroke', txtv.pattern.brushColour.toCSS());
+		hold.setAttribute('stroke-width', String(txtv.pattern.brushPropertyList.diameter / approxScale));
 	}
-	if (txtv.autoEnlarge) {
+	/** @type {SVGElement} */ let target = hold;
+	if (txtv.flow === 2 && txtv.path) {
+		target = svgEl('textPath', {
+			href: '#' + globals.addDef(svgEl('path', {
+				d: txtv.path.path.bezierPoints.map(contourToSVG).join(''),
+			})),
+			startOffset: txtv.path.characterOffset || undefined,
+		});
+		hold.append(target);
+	} else if (txtv.autoEnlarge) {
 		if (txtv.leftAnchor !== undefined) {
-			text.setAttribute('x', String(txtv.leftAnchor));
+			hold.setAttribute('x', String(txtv.leftAnchor));
 		} else {
 			switch (txtv.formattedString[0]?.justification) {
 				case 0:
-					text.setAttribute('x', String(txtv.left));
+					hold.setAttribute('x', String(txtv.left));
 					break;
 				case 1:
-					text.setAttribute('x', String((txtv.left + txtv.right) * 0.5));
+					hold.setAttribute('x', String((txtv.left + txtv.right) * 0.5));
 					break;
 				case 2:
-					text.setAttribute('x', String(txtv.right));
+					hold.setAttribute('x', String(txtv.right));
 					break;
 			}
 		}
-		text.setAttribute('y', String(txtv.top + line1MaxFont - 1));
-		text.style.whiteSpace = 'pre';
+		hold.setAttribute('y', String(txtv.top + line1MaxFont - 1));
+		hold.style.whiteSpace = 'pre'; // this does not work in Chrome; could use `<tspan x="0" dy="<line height>">` instead of literal newlines
 	} else {
 		switch (txtv.formattedString[0]?.justification) {
 			case 0:
-				text.setAttribute('x', String(txtv.left));
+				hold.setAttribute('x', String(txtv.left));
 				break;
 			case 1:
-				text.setAttribute('x', String((txtv.left + txtv.right) * 0.5));
+				hold.setAttribute('x', String((txtv.left + txtv.right) * 0.5));
 				break;
 			case 2:
-				text.setAttribute('x', String(txtv.right));
+				hold.setAttribute('x', String(txtv.right));
 				break;
 			case 3:
-				text.setAttribute('x', String(txtv.left));
-				text.setAttribute('textLength', String(txtv.right - txtv.left));
+				hold.setAttribute('x', String(txtv.left));
+				hold.setAttribute('textLength', String(txtv.right - txtv.left));
 				break;
 		}
 		// TODO: what should this y position be? This works in some cases but not all
-		text.setAttribute('y', String(txtv.top + line1MaxFont * 2 - line1MaxLineHeight - 1));
+		hold.setAttribute('y', String(txtv.top + line1MaxFont * 2 - line1MaxLineHeight - 1));
 		// TODO: this does not work; probably need to do upfront line wrapping
-		text.style.width = `${txtv.right - txtv.left}px`;
-		text.style.whiteSpace = 'pre-wrap';
+		hold.style.width = `${txtv.right - txtv.left}px`;
+		hold.style.whiteSpace = 'pre-wrap';
 	}
 	for (const f of txtv.formattedString) {
 		const sz = f.pointSize;
@@ -431,17 +444,14 @@ RENDERERS.set('TXTv', (globals, /** @type {TXTv} */ txtv) => {
 		if (!f.autoKern) {
 			tspan.style.fontKerning = 'none';
 		}
-		text.append(tspan);
+		target.append(tspan);
 	}
-	// TODO: follow path, fit inside shape
-	//if (txtv.flow === 2 && txtv.path) {
-	//	txtv.path.path;
-	//}
 	if (txtv.transformMatrix) {
-		text.style.transform = txtv.transformMatrix.toCSS();
-		return [text];
+		// TODO: this works in Firefox but not Chrome or Safari - they seem to use a different default origin
+		hold.style.transform = txtv.transformMatrix.toCSS();
+		return [hold];
 	}
-	return text;
+	return hold;
 });
 RENDERERS.set('GRPv', (globals, /** @type {GRPv} */ grpv) => {
 	if (grpv.type === 0) {
@@ -656,7 +666,7 @@ function applyFill(globals, target, {
 				maskToShape ??= target;
 				// SVG does not yet support conic gradients, so we must use a foreignObject to get it via CSS instead
 				const div = el('div', { xmlns: 'http://www.w3.org/1999/xhtml' });
-				div.style.height = '100%';
+				div.style.height = `${globals.height}px`; // 100% works in Chrome & Firefox, but not Safari (would be nice to match the bounds of the shape anyway...)
 				const angle = Math.atan2(fp2.x - fp1.x, fp1.y - fp2.y) * 180 / Math.PI;
 				div.style.background = `conic-gradient(from ${angle.toFixed(2)}deg at ${fp1.x}px ${fp1.y}px in sRGB,${grad.toMirroredCSSStops()})`;
 				target = svgEl('foreignObject', { width: '100%', height: '100%' }, [div]);
