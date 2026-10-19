@@ -77,11 +77,11 @@ async function processFile(data, name) {
         colspace.append(el('option', { selected: i === 0 ? 'selected' : undefined }, [COLOURSPACES[i].name]));
       }
 
-      const transLabel = el('label');
-      const transparent = el('input', { type: 'checkbox', checked: 'checked' }, ['Transparent']);
+      const transparent = el('input', { type: 'checkbox', checked: 'checked' }, []);
+      const transLabel = el('label', {}, [transparent, 'Transparent']);
 
       const matte = el('input', { type: 'color', value: '#000000' });
-      const matteLabel = el('label', {}, [matte, 'Matte']);
+      const matteLabel = el('label', {}, ['Matte ', matte]);
 
       const amount = el('input', { type: 'range', min: 0, max: 1, step: 'any', value: '0.85' });
 

@@ -1287,7 +1287,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. For "Glow" and "Inner Glow", this is the glow opacity.
 
 Observed value range: `0`..`100`
 
@@ -1586,7 +1586,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Glow" filter. Set by "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" but ignored.
 
 Observed value range: `0`..`35`
 
@@ -1601,7 +1601,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Glow" filter. Set by "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" but ignored.
 
 Observed value range: `0`..`35`
 
@@ -1616,7 +1616,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
 A colour in "#rrggbb" format
 
@@ -1631,7 +1631,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
 A colour in "#rrggbbaa" format to apply when button is in the "hit" (hover) state
 
@@ -1646,7 +1646,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
 Value range: `0`..`360` (degrees)
 
@@ -1661,7 +1661,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
 Observed value range: `39`..`200`
 
@@ -1723,7 +1723,7 @@ Parent: [`EPSv`]
 
 Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
 
-A colour in "#rrggbb" format
+A colour in "#rrggbb" format. In "glow" mode, this sets the glow colour.
 
 Contains:
 
@@ -1766,7 +1766,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Drop Shadow", "Glow", "Inner Shadow" filters.
+Used by "Drop Shadow", "Inner Bevel", "Inset Emboss", "Inner Shadow", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
 A colour in "#rrggbbaa" or "#rrggbb" format
 
@@ -1814,7 +1814,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Inset Emboss", "Raised Emboss" filters. Set by "Glow", "Inner Bevel", and "Outer Bevel" but ignored.
 
 Contains:
 
@@ -1842,17 +1842,17 @@ Contains:
 
 Parent: [`EPSv`]
 
-Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
+Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored. Note that these transformations have different ranges; Fireworks maintains the maximum gradient as a constant between functions.
 
 Values:
 
-- `0`: flat
-- `1`: smooth
-- `2`: smooth inverted
-- `3`: zigzag
-- `4`: zigzag 2
-- `5`: ring
-- `6`: ruffle
+- `0`: flat (`0 1`)
+- `1`: smooth (quadratic: `v * (1 - v / 2)`)
+- `2`: smooth inverted (quadratic: `v * v / 2`)
+- `3`: zigzag (0 &rarr; 0; &frac23; &rarr; &frac23;; 1 &rarr; &frac13;)
+- `4`: zigzag 2 (0 &rarr; 0; 0.4 &rarr; 0.4; 0.7 &rarr; 0.4; 1 &rarr; 0.1)
+- `5`: ring (`sin(v * pi) / pi`)
+- `6`: ruffle (`abs(sin(v * 3 * pi)) / (3 * pi)`)
 
 Contains:
 
@@ -4062,15 +4062,15 @@ Stores arbitrary, possibly nested, data for JavaScript scripts, as set on `smart
 
 Contains:
 
-- [`DCEv` "`tooltips`"]?
-- [`DCEv` "`radius1`"]?
-- [`DCEv` "`radius0`"]?
 - [`DCEv` "`alrtmsg`"]?
 - [`DCEv` "`round0`"]?
-- [`DCEv` "`shapeName`"]?
-- [`DCEv` "`nodes`"]?
-- [`DCEv` "`constants`"]?
 - [`DCEv` "`round1`"]?
+- [`DCEv` "`shapeName`"]?
+- [`DCEv` "`constants`"]?
+- [`DCEv` "`tooltips`"]?
+- [`DCEv` "`radius0`"]?
+- [`DCEv` "`nodes`"]?
+- [`DCEv` "`radius1`"]?
 - [`DCEv` "`radius`"]?
 - [`DCEv` "`c2y`"]?
 - [`DCEv` "`clockwise`"]?
@@ -4982,15 +4982,15 @@ Parent: [`DCEv` "`alrtmsg`"] / [`DCEv` "`constants`"] / [`DCEv` "`custData`"] / 
 
 Contains:
 
-- [`DCEv` "`tooltips`"."`radius1`"]?
-- [`DCEv` "`tooltips`"."`radius0`"]?
-- [`DCEv` "`tooltips`"."`roundness1`"]?
-- [`DCEv` "`tooltips`"."`roundness2`"]?
-- [`DCEv` "`tooltips`"."`points`"]?
 - [`DCEv` "`alrtmsg`"."`maxmsg`"]?
 - [`DCEv` "`alrtmsg`"."`minmsg`"]?
 - [`DCEv` "`constants`"."`maxNodes`"]?
 - [`DCEv` "`constants`"."`minNodes`"]?
+- [`DCEv` "`tooltips`"."`points`"]?
+- [`DCEv` "`tooltips`"."`radius0`"]?
+- [`DCEv` "`tooltips`"."`roundness1`"]?
+- [`DCEv` "`tooltips`"."`radius1`"]?
+- [`DCEv` "`tooltips`"."`roundness2`"]?
 - [`DCEv` "`tooltips`"."`openclose`"]?
 - [`DCEv` "`tooltips`"."`spirals`"]?
 - [`DCEv` "`constants`"."`ppc`"]?
@@ -5121,11 +5121,11 @@ Contains:
 - [`OBNs`]? Object Name
 - [`DTAv`]? Data
 - [`IMGv`]? Image
+- [`ISSv`]? Smart Shape
 - [`EFLv`]? Effect List
 - [`MNAb`]? Mask Not Appear
 - [`MRMv`]?
 - [`LNKb`]? Linked
-- [`ISSv`]? Smart Shape
 - [`VISb`]? Visible
 - [`OPAi`]? Opacity
 - [`BLDi`]? Blend Mode

@@ -1,5 +1,5 @@
 import { el, svgEl, tilesAsCanvas } from '../../../../../display/pretty.mjs';
-import { applyEffect } from './effects.mjs';
+import { applyEffect } from './effects/index.mjs';
 import { ALSv } from './nodes/ALSv.mjs';
 import { ELMv } from './nodes/ELMv.mjs';
 import { GRPv } from './nodes/GRPv.mjs';
@@ -260,7 +260,13 @@ export function renderElement(globals, { type, value }) {
 		// note: do not apply effects to pre-rasterised images (they are already applied)
 		for (const effect of value.effectList?.effectPropertiess ?? []) {
 			if (effect.data['EffectIsVisible'] !== 'false') {
-				grouped = applyEffect(globals, grouped ?? mustGroup(), effect);
+				// each effect gets its own group so that the effects can stack
+				if (grouped) {
+					grouped = svgEl('g', {}, [grouped]);
+				} else {
+					grouped = mustGroup();
+				}
+				grouped = applyEffect(globals, grouped, effect);
 			}
 		}
 
@@ -274,11 +280,10 @@ export function renderElement(globals, { type, value }) {
 		if (value.name) {
 			grouped.dataset['name'] = value.name;
 		}
-		if (!value.visible) {
+		if (!value.visible || !value.opacity) {
 			grouped.setAttribute('display', 'none');
-		}
-		if (value.blendMode?.value?.name === 'average') {
-			grouped.setAttribute('opacity', ((value.opacity ?? 1) / 2).toFixed(3));
+		} else if (value.blendMode?.value?.name === 'average') {
+			grouped.setAttribute('opacity', (value.opacity / 2).toFixed(3));
 		} else if (value.opacity < 1) {
 			grouped.setAttribute('opacity', value.opacity.toFixed(3));
 		}
