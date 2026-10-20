@@ -1,9 +1,8 @@
 import { el, svgEl } from '../../../../../../display/pretty.mjs';
-import { LYLv } from '../nodes/LYLv.mjs';
 import { BaseAnimatedCanvas, MSTv } from '../nodes/MSTv.mjs';
 import { PDCv } from '../nodes/PDCv.mjs';
 import { rootv } from '../nodes/rootv.mjs';
-import { renderElements } from './element.mjs';
+import { renderLayer } from './element.mjs';
 
 /** @typedef {import('./globals.mjs').ImageGlobals} ImageGlobals */
 
@@ -229,51 +228,6 @@ export function renderFrame(root, canvas, frame, { width, height, left = 0, top 
 		svg.append(renderLayer(imageGlobals, layer) ?? '');
 	}
 	return svg;
-}
-
-/**
- * @param {ImageGlobals} globals
- * @param {LYLv[number]} layer
- * @return {SVGElement | null}
- */
-export function renderLayer(globals, layer) {
-	switch (layer.type) {
-		case 'MPLv': { // whole master page link
-			const v = layer.value;
-			const page = globals.root.getPage(v.pageId);
-			if (page && v.visibleInFrame(globals.frame)) {
-				return svgEl('g', {
-					'data-name': v.name,
-					'data-type': 'layer-master',
-				}, page.layerList.map((subLayer) => renderLayer(globals, subLayer)));
-			}
-			break;
-		}
-		case 'LSAv': { // "share across pages" layer
-			const v = layer.value;
-			const linked = globals.root.getSharedLayer(v.id);
-			if (linked) {
-				const linkedLayer = linked.layer;
-				if (linkedLayer.visibleInFrame(globals.frame)) {
-					return svgEl('g', {
-						'data-name': linked.layer.name,
-						'data-type': 'layer-shared',
-					}, renderElements(globals, linkedLayer.contentInFrame(globals.frame).elements));
-				}
-			}
-			break;
-		}
-		case 'LAYv': { // regular layer
-			const v = layer.value;
-			if (v.visibleInFrame(globals.frame)) {
-				return svgEl('g', {
-					'data-name': v.name,
-					'data-type': 'layer',
-				}, renderElements(globals, v.contentInFrame(globals.frame).elements));
-			}
-		}
-	}
-	return null;
 }
 
 /**

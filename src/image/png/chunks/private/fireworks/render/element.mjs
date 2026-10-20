@@ -13,8 +13,54 @@ import { applyFill } from './fills.mjs';
 import { rasterToDataURL } from './image.mjs';
 import { contourToSVG } from './path.mjs';
 import { makeTextureMask } from './texture.mjs';
+import { LYLv } from '../nodes/LYLv.mjs';
 
 /** @typedef {import('./globals.mjs').ImageGlobals} ImageGlobals */
+
+/**
+ * @param {ImageGlobals} globals
+ * @param {LYLv[number]} layer
+ * @return {SVGElement | null}
+ */
+export function renderLayer(globals, layer) {
+	switch (layer.type) {
+		case 'MPLv': { // whole master page link
+			const v = layer.value;
+			const page = globals.root.getPage(v.pageId);
+			if (page && v.visibleInFrame(globals.frame)) {
+				return svgEl('g', {
+					'data-name': v.name,
+					'data-type': 'layer-master',
+				}, page.layerList.map((subLayer) => renderLayer(globals, subLayer)));
+			}
+			break;
+		}
+		case 'LSAv': { // "share across pages" layer
+			const v = layer.value;
+			const linked = globals.root.getSharedLayer(v.id);
+			if (linked) {
+				const linkedLayer = linked.layer;
+				if (linkedLayer.visibleInFrame(globals.frame)) {
+					return svgEl('g', {
+						'data-name': linked.layer.name,
+						'data-type': 'layer-shared',
+					}, renderElements(globals, linkedLayer.contentInFrame(globals.frame).elements));
+				}
+			}
+			break;
+		}
+		case 'LAYv': { // regular layer
+			const v = layer.value;
+			if (v.visibleInFrame(globals.frame)) {
+				return svgEl('g', {
+					'data-name': v.name,
+					'data-type': 'layer',
+				}, renderElements(globals, v.contentInFrame(globals.frame).elements));
+			}
+		}
+	}
+	return null;
+}
 
 /**
  * @param {ImageGlobals} globals
@@ -366,7 +412,33 @@ RENDERERS.set('URLv', (globals, /** @type {URLv} */ urlv) => {
 	}
 });
 RENDERERS.set('ALSv', (globals, /** @type {ALSv} */ alsv) => {
-	return []; // TODO: symbols
+	const def = globals.root.getSymbol(alsv.id);
+	if (!def) {
+		console.warn(`unknown symbol: ${alsv.id}`);
+		return [];
+	}
+	const symbolGlobals = { ...globals, frame: 0 };
+	const symbolID = globals.addDef((id) => {
+		const hold = svgEl('g', {
+			id,
+			'data-type': 'symbol',
+			'data-name': def.name,
+		});
+		for (const layer of def.layerList) {
+			hold.append(renderLayer(symbolGlobals, layer) ?? '');
+		}
+		return hold;
+	}, `symbol:${alsv.id}`);
+
+	// TODO: if alsv.animationNumberOfFrames > 1, this symbol is shared into subsequent frames of the image (how to discover this when rendering those frames?)
+
+	// TODO: account for 9-slice guides when scaling
+	const element = svgEl('use', { href: `#${encodeURIComponent(symbolID)}` });
+	if (alsv.transformMatrix) {
+		element.style.transform = alsv.transformMatrix.toCSS();
+		return [element];
+	}
+	return element;
 });
 
 const TEXT_JUSTIFICATION = ['start', 'middle', 'end', 'start'];
