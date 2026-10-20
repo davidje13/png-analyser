@@ -1,9 +1,9 @@
 import { inflate } from '../../../../../data/inflate.mjs';
 import { el } from '../../../../../display/pretty.mjs';
 import { registerChunk } from '../../registry.mjs';
-import { displayRawStructure, populatePaths } from './display-raw.mjs';
+import { displayRawStructure, populatePaths } from './render/display-raw.mjs';
 import { parseRoot } from './parser.mjs';
-import { renderAllPages } from './render.mjs';
+import { renderAllPages } from './render/document.mjs';
 import { tokenise } from './tokeniser.mjs';
 
 /**

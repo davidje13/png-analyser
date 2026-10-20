@@ -101,7 +101,8 @@ registerEffect('{3439b08d-1922-11d3-9bde00e02910d580}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
-		}, steps));
+			'data-type': 'hue-saturation',
+		}, steps), `filter:huesat:${hue}:${saturation}:${lightness}:${colourise}`);
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},

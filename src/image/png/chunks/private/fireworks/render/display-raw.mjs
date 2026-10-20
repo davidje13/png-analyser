@@ -1,7 +1,7 @@
-/** @typedef {import('./tokeniser.mjs').NodeToken} NodeToken */
+/** @typedef {import('../tokeniser.mjs').NodeToken} NodeToken */
 
-import { disclosure, el } from '../../../../../display/pretty.mjs';
-import { makeID, NODE_INFO } from './node-info.mjs';
+import { disclosure, el } from '../../../../../../display/pretty.mjs';
+import { makeID, NODE_INFO } from '../node-info.mjs';
 
 /**
  * @param {HTMLElement} target
@@ -30,28 +30,28 @@ export function displayRawStructure(target, node, nameOverride = null, path = []
 		name.push(` ${info.name.replaceAll('**', '')}`);
 	}
 
-  /** @type {string} */ let v;
-  switch (node.type) {
-    case 'b':
-      v = node.value ? 'true' : 'false';
-      break;
-    case 'i':
+	/** @type {string} */ let v;
+	switch (node.type) {
+		case 'b':
+			v = node.value ? 'true' : 'false';
+			break;
+		case 'i':
 			if (info?.values?.has(node.value)) {
 				v = `${node.value.toString(10)} [${info.values.get(node.value)}]`;
 			} else if (node.value >= 0x80000000) {
-        v = `0x${node.value.toString(16).padStart(8, '0')} / ${node.value.toString(10)} / ${(node.value >> 0).toString(10)}`;
-      } else if (node.value >= 10) {
-        v = `0x${node.value.toString(16).padStart(8, '0')} / ${node.value.toString(10)}`;
-      } else {
-        v = node.value.toString(10);
-      }
-      break;
-    case 'f':
-      v = FLOAT_FORMAT.format(node.value);
-      break;
-    case 's':
-      v = JSON.stringify(node.value);
-      break;
+				v = `0x${node.value.toString(16).padStart(8, '0')} / ${node.value.toString(10)} / ${(node.value >> 0).toString(10)}`;
+			} else if (node.value >= 10) {
+				v = `0x${node.value.toString(16).padStart(8, '0')} / ${node.value.toString(10)}`;
+			} else {
+				v = node.value.toString(10);
+			}
+			break;
+		case 'f':
+			v = FLOAT_FORMAT.format(node.value);
+			break;
+		case 's':
+			v = JSON.stringify(node.value);
+			break;
 		case 'v':
 			if (node.value.length) {
 				const ul = el('ul', { id: node.path });
@@ -64,7 +64,7 @@ export function displayRawStructure(target, node, nameOverride = null, path = []
 			}
 			v = '[]';
 			break;
-  }
+	}
 	if (node.path) {
 		li.setAttribute('id', node.path);
 	}

@@ -9,6 +9,7 @@ registerEffect('{fc7093f1-f95c-11d0-8be200a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'find-edges',
 		}, [
 			svgEl('feConvolveMatrix', {
 				// match fireworks behaviour
@@ -20,7 +21,7 @@ registerEffect('{fc7093f1-f95c-11d0-8be200a024cdc039}', {
 				edgeMode: 'duplicate',
 				preserveAlpha: 'true',
 			}),
-		]));
+		]), 'filter:edges');
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},

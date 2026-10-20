@@ -96,6 +96,7 @@ registerEffect('{3439b08e-1923-11d3-9bde00e02910d580}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'curves',
 		}, [
 			svgEl('feComponentTransfer', {}, [
 				makeColourTable('feFuncR', combineMappings(makeCurveMapping(r), cRGB)),

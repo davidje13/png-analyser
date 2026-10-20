@@ -9,6 +9,7 @@ registerEffect('{c20952b1-fc76-11d0-8be700a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'sharpen',
 		}, [
 			svgEl('feConvolveMatrix', {
 				// match fireworks behaviour
@@ -18,7 +19,7 @@ registerEffect('{c20952b1-fc76-11d0-8be700a024cdc039}', {
 				divisor: 255,
 				edgeMode: 'duplicate',
 			}),
-		]));
+		]), 'filter:sharpen');
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},
@@ -33,6 +34,7 @@ registerEffect('{1f2f2591-9db7-11d1-8cad00a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'sharpen-more',
 		}, [
 			svgEl('feConvolveMatrix', {
 				// match fireworks behaviour
@@ -42,7 +44,7 @@ registerEffect('{1f2f2591-9db7-11d1-8cad00a024cdc039}', {
 				divisor: 255,
 				edgeMode: 'duplicate',
 			}),
-		]));
+		]), 'filter:sharpen-more');
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},

@@ -13,4 +13,4 @@ import './shadow.mjs';
 import './sharpen.mjs';
 import './to-alpha.mjs';
 
-export { applyEffect } from './registry.mjs';
+export { internalApplyEffect as applyEffect } from './registry.mjs';

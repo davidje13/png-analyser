@@ -240,6 +240,7 @@ function innerBevel(data) {
 		y: '-1%',
 		width: '102%',
 		height: '102%',
+		'data-type': 'inner-bevel',
 	}, steps);
 }
 
@@ -339,6 +340,7 @@ function outerBevel(data) {
 		y: '-30%',
 		width: '160%',
 		height: '160%',
+		'data-type': 'outer-bevel',
 	}, steps);
 }
 
@@ -450,6 +452,7 @@ function emboss(data, depth) {
 		y: '-30%',
 		width: '160%',
 		height: '160%',
+		'data-type': depth > 0 ? 'raised-emboss' : 'inset-emboss',
 	}, steps);
 }
 
@@ -477,7 +480,10 @@ function glow({
 		};
 	}
 
-	return svgEl('filter', bounds, [
+	return svgEl('filter', {
+		...bounds,
+		'data-type': inside ? 'inner-glow' : 'glow',
+	}, [
 		svgEl('feComponentTransfer', { in: 'SourceAlpha' }, [
 			svgEl('feFuncA', { type: 'linear', slope: 512, intercept: -threshold * 511 }),
 		]),

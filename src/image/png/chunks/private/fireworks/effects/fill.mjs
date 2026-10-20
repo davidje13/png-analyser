@@ -76,6 +76,7 @@ registerEffect('{dd54adc0-a279-11d3-b92a000502f3fdbe}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'color-fill',
 		}, steps));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;

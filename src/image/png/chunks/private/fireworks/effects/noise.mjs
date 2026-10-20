@@ -13,6 +13,8 @@ registerEffect('{e4c0f4bc-c0a3-4cb3-b3513822027e4d9f}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'add-noise',
+			'data-colour': colour ? 'rgb' : 'lum',
 		}, [
 			svgEl('feComponentTransfer', { result: 'r' }, [ // unpremultiply alpha
 				svgEl('feFuncA', { type: 'linear', slope: 0, intercept: 1 }),
@@ -39,7 +41,7 @@ registerEffect('{e4c0f4bc-c0a3-4cb3-b3513822027e4d9f}', {
 				k4: -amount,
 			}),
 			svgEl('feComposite', { operator: 'in', in2: 'SourceAlpha' }), // re-multiply alpha
-		]));
+		]), `filter:noise:${amount}:${colour}`);
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},

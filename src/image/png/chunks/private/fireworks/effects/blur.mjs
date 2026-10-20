@@ -10,6 +10,7 @@ registerEffect('{f1cfce41-718e-11d1-8c8200a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'blur',
 		}, [
 			svgEl('feConvolveMatrix', {
 				// match fireworks behaviour
@@ -19,7 +20,7 @@ registerEffect('{f1cfce41-718e-11d1-8c8200a024cdc039}', {
 				divisor: 255,
 				edgeMode: 'duplicate',
 			}),
-		]));
+		]), 'filter:blur');
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},
@@ -33,6 +34,7 @@ registerEffect('{f1cfce42-718e-11d1-8c8200a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'blur-more',
 		}, [
 			svgEl('feConvolveMatrix', {
 				// match fireworks behaviour
@@ -42,7 +44,7 @@ registerEffect('{f1cfce42-718e-11d1-8c8200a024cdc039}', {
 				divisor: 255,
 				edgeMode: 'duplicate',
 			}),
-		]));
+		]), 'filter:blur-more');
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},
@@ -62,6 +64,7 @@ registerEffect('{d04ef8c0-71b3-11d1-8c8200a024cdc039}', {
 			y: '-30%',
 			width: '160%',
 			height: '160%',
+			'data-type': 'gaussian-blur',
 		}, [
 			svgEl('feGaussianBlur', { stdDeviation }),
 		]));
@@ -114,6 +117,9 @@ registerEffect('{538016b6-ffd6-418f-a10c590e6ee841ae}', {
 			y: y >= 0 ? '0%' : '-50%',
 			width: x ? '150%' : '100%',
 			height: y ? '150%' : '100%',
+			'data-type': 'motion-blur',
+			'data-x': x,
+			'data-y': y,
 		}, steps));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
@@ -130,7 +136,7 @@ registerEffect('{d1c33142-2ad8-4215-a39fc5d934c8fc0c}', {
 		contents.setAttribute('id', sourceID);
 		contents.setAttribute('opacity', String(1 / (n * 2 + 1)));
 		contents.style.mixBlendMode = 'plus-lighter';
-		const hold = svgEl('g', {}, [contents]);
+		const hold = svgEl('g', { 'data-effect': 'radial-blur' }, [contents]);
 		hold.style.isolation = 'isolate';
 		for (let i = -n; i <= n; ++i) {
 			if (i) {
@@ -154,7 +160,7 @@ registerEffect('{94dbd663-9b2e-44bf-8064ab6efdd2d327}', {
 		contents.setAttribute('id', sourceID);
 		contents.setAttribute('opacity', String(1 / (n * 2 + 1)));
 		contents.style.mixBlendMode = 'plus-lighter';
-		const hold = svgEl('g', {}, [contents]);
+		const hold = svgEl('g', { 'data-effect': 'zoom-blur' }, [contents]);
 		hold.style.isolation = 'isolate';
 		for (let i = -n; i <= n; ++i) {
 			if (i) {

@@ -29,6 +29,8 @@ registerEffect('{a7944db8-6ce2-11d1-8c76000502701850}', {
 				y: '-30%',
 				width: '160%',
 				height: '160%',
+				'data-type': 'drop-shadow',
+				'data-knockout': 'true',
 			}, [
 				svgEl('feOffset', { dx: x, dy: y, in: 'SourceAlpha' }),
 				svgEl('feGaussianBlur', { stdDeviation }),
@@ -44,6 +46,7 @@ registerEffect('{a7944db8-6ce2-11d1-8c76000502701850}', {
 				y: '-30%',
 				width: '160%',
 				height: '160%',
+				'data-type': 'drop-shadow',
 			}, [
 				svgEl('feDropShadow', {
 					dx: x,
@@ -81,6 +84,8 @@ registerEffect('{5600f702-774c-11d3-baad0000861f4d01}', {
 			y: y >= 0 ? '0%' : '-50%',
 			width: x ? '150%' : '100%',
 			height: y ? '150%' : '100%',
+			'data-type': 'inner-shadow',
+			'data-knockout': knockout ? 'true' : undefined,
 		}, [
 			svgEl('feOffset', { dx: x, dy: y, in: 'SourceAlpha' }),
 			svgEl('feGaussianBlur', { stdDeviation, result: 'b' }),
@@ -154,6 +159,9 @@ registerEffect('{b90c950e-64df-11d8-aaf2000a9582f7d4}', {
 			y: y >= 0 ? '0%' : '-50%',
 			width: x ? '150%' : '100%',
 			height: y ? '150%' : '100%',
+			'data-type': 'solid-shadow',
+			'data-x': x,
+			'data-y': y,
 		}, steps));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;

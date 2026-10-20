@@ -1,7 +1,7 @@
 /**
  * @typedef {{
  *   nextID: () => string,
- *   addDef: (o: SVGElement) => string;
+ *   addDef: (o: SVGElement | ((id: string) => SVGElement), ref?: string) => string;
  * }} ImageGlobals
  */
 
@@ -14,7 +14,7 @@ import { str } from './readers.mjs';
  * @param {EPSv} epsv
  * @return {SVGElement}
  */
-export function applyEffect(globals, contents, epsv) {
+export function internalApplyEffect(globals, contents, epsv) {
 	const effect = KNOWN_EFFECTS.get(str(epsv.data['EffectMoaID']) ?? '')
 	return effect?.apply(globals, contents, epsv.data) ?? contents;
 }

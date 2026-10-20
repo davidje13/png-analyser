@@ -9,6 +9,7 @@ registerEffect('{2932d5a2-ca48-11d1-8561000502701850}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'to-alpha',
 		}, [
 			svgEl('feColorMatrix', { type: 'matrix', values: [
 				'0 0 0 0 0',
@@ -16,7 +17,7 @@ registerEffect('{2932d5a2-ca48-11d1-8561000502701850}', {
 				'0 0 0 0 0',
 				'-0.2125 -0.7154 -0.0721 1 0',
 			].join(' ') }),
-		]));
+		]), 'filter:to-alpha');
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},

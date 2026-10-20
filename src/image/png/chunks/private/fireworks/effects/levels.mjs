@@ -105,6 +105,7 @@ registerEffect('{d04ef8c1-71b4-11d1-8c8200a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'auto-levels',
 		}, gammaLevsls(data)));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
@@ -119,6 +120,7 @@ registerEffect('{d04ef8c2-71b5-11d1-8c8200a024cdc039}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'levels',
 		}, gammaLevsls(data)));
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;

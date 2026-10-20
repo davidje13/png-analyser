@@ -22,7 +22,7 @@ export class BaseAnimatedCanvas extends MapNode {
 export class MSTv extends BaseAnimatedCanvas {
 	id = this.required('MSNi');
 	name = this.optional('UNMs');
-	type = this.optional('MSYi');
+	type = this.optional('MSYi') ?? 0;
 	lastUpdateTime = this.optional('LUTs');
 	nineSliceGuide = this.optional('NGSv', NGSv);
 

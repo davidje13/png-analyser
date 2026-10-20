@@ -25,6 +25,7 @@ registerEffect('{3439b08c-1921-11d3-9bde00e02910d580}', {
 			y: '0%',
 			width: '100%',
 			height: '100%',
+			'data-type': 'brightness-contrast',
 		}, [
 			svgEl('feComponentTransfer', {}, [
 				svgEl('feFuncR', { type: 'linear', intercept: brightness }),
@@ -46,7 +47,7 @@ registerEffect('{3439b08c-1921-11d3-9bde00e02910d580}', {
 				svgEl('feFuncG', { type: 'gamma', exponent: e2 }),
 				svgEl('feFuncB', { type: 'gamma', exponent: e2 }),
 			]),
-		]));
+		]), `filter:bright:${brightness}:${slope}:${intercept}:${e1}`);
 		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
 		return contents;
 	},
