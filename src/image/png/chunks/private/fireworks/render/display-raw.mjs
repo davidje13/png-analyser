@@ -20,7 +20,9 @@ export function displayRawStructure(target, node, nameOverride = null, path = []
 		try {
 			li.append(printDCE(node, ''));
 			return;
-		} catch {}
+		} catch (e) {
+			console.warn(e);
+		}
 	}
 
 	/** @type {(HTMLElement | string)[]} */
@@ -86,12 +88,12 @@ function printDCE(node, indent) {
 			if (key === null) {
 				key = c.value;
 			} else {
-				console.warn('Non-standard DCEv node: multiple DCKs');
+				throw new Error('Non-standard DCEv node: multiple DCKs');
 			}
-		} else if (value === null) {
+		} else if (value === null || (typeof value === 'string' && c.id === 'GVRv')) {
 			value = c;
-		} else {
-			console.warn('Non-standard DCEv node: multiple values');
+		} else if (value.id !== 'GVRv' || c.id !== 'DCVs') {
+			throw new Error('Non-standard DCEv node: multiple values');
 		}
 	}
 	/** @type {string} */ let v;
@@ -100,16 +102,7 @@ function printDCE(node, indent) {
 	} else if (value.id === 'DCVs') {
 		v = JSON.stringify(value.value);
 	} else if (value.id === 'GDTv') {
-		const subIndent = indent + '  ';
-		const items = [];
-		for (const sub of value.value) {
-			if (sub.id === 'DCEv') {
-				items.push(printDCE(sub, subIndent));
-			} else {
-				items.push(`${subIndent}(unknown item type: ${sub.id}),`);
-			}
-		}
-		v = items.length > 0 ? `{\n${items.join('\n')}\n${indent}}` : '{}';
+		v = printGDT(value, indent);
 	} else if (value.id === 'GPLv') {
 		const items = [];
 		for (const sub of value.value) {
@@ -124,10 +117,39 @@ function printDCE(node, indent) {
 			items.push(`{ "x": ${item.get('XLCf')}, "y": ${item.get('YLCf')} }`);
 		}
 		v = `[${items.join(', ')}]`;
+	} else if (value.id === 'GVRv') {
+		const items = [];
+		const subIndent = indent + '  ';
+		for (const sub of value.value) {
+			if (sub.id !== 'GDTv') {
+				items.push(`(unknown item type: ${sub.id})`);
+				continue;
+			}
+			items.push(printGDT(sub, subIndent));
+		}
+		v = `[${items.map((v) => `\n${subIndent}${v}`).join(',')}\n${indent}]`;
 	} else {
 		v = `(unknown type: ${value.id})`;
 	}
 	return `${indent}${JSON.stringify(key)}: ${v},`;
+}
+
+/**
+ * @param {NodeToken & { type: 'v' }} node
+ * @param {string} indent
+ * @return {string}
+ */
+function printGDT(node, indent) {
+	const subIndent = indent + '  ';
+	const items = [];
+	for (const sub of node.value) {
+		if (sub.id === 'DCEv') {
+			items.push(printDCE(sub, subIndent));
+		} else {
+			items.push(`${subIndent}(unknown item type: ${sub.id}),`);
+		}
+	}
+	return items.length > 0 ? `{\n${items.join('\n')}\n${indent}}` : '{}';
 }
 
 /**

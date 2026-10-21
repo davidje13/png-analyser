@@ -106,6 +106,7 @@ export class TXTv extends BaseElement {
 	})();
 
 	//pathTemplated = this.required('PTTi');
+	//AIDi = this.optional('AIDi');
 	//FOAb = this.optional('FOAb');
 	//KRNf = this.required('KRNf');
 	//PCFb = this.optional('PCFb');

@@ -112,6 +112,8 @@ export function renderAllFramesInPage(root, page, baseFilename = 'image') {
 	} else if (page.linkedToMaster) {
 		hold.append(' ', internalLink('<linked to master page>', page.getChildNodePath('PILb')));
 	}
+	const left = page.viewX;
+	const top = page.viewY;
 	const width = page.width;
 	const height = page.height;
 	const scale = page.scaleAt72DPI;
@@ -151,7 +153,7 @@ export function renderAllFramesInPage(root, page, baseFilename = 'image') {
 			);
 		}
 
-		const svg = renderFrame(root, page, frame, { width, height, scale });
+		const svg = renderFrame(root, page, frame, { width, height, left, top, scale });
 		frameTarget.append(
 			el('div', { class: 'image-canvas' }, [svg]),
 			downloadSVGButton(svg, frameFilename),
@@ -190,6 +192,8 @@ export function renderFrame(root, canvas, frame, { width, height, left = 0, top 
 	}, [defs]);
 	if (canvas.backgroundColour.a > 0) {
 		svg.append(svgEl('rect', {
+			x: left,
+			y: top,
 			width: width,
 			height: height,
 			fill: canvas.backgroundColour.toCSS(),
@@ -203,6 +207,8 @@ export function renderFrame(root, canvas, frame, { width, height, left = 0, top 
 		root,
 		frame,
 		svg,
+		left,
+		top,
 		width,
 		height,
 		nextID,

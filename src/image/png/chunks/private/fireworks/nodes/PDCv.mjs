@@ -17,6 +17,8 @@ export class PDCv extends BaseAnimatedCanvas {
 	masterPage = this.optional('IMPb') ?? false;
 	linkedToMaster = this.optional('PILb') ?? false;
 
+	viewX = this.optional('XLCf') ?? 0;
+	viewY = this.optional('YLCf') ?? 0;
 	width = this.required('WIDf');
 	height = this.required('HITf');
 	resolution = this.optional('RESf') ?? 72;
@@ -34,8 +36,6 @@ export class PDCv extends BaseAnimatedCanvas {
 	//lastExportDirectory = this.optional('LXDs');
 	//lastExportFilename = this.optional('LXFs');
 
-	//xLocation = this.required('XLCf');
-	//yLocation = this.required('YLCf');
 	//VRSi = this.optional('VRSi');
 	//VRMi = this.optional('VRMi');
 	//RQNi = this.optional('RQNi');

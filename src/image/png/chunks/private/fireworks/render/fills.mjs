@@ -48,12 +48,12 @@ export function applyFill(globals, target, {
 		// (this means we can take this shortcut without breaking textureFill below)
 		if (props.shape !== 0) {
 			maskToShape = target;
-			target = svgEl('rect', { width: '100%', height: '100%' });
+			target = svgEl('rect', { x: globals.left || undefined, y: globals.top || undefined, width: '100%', height: '100%' });
 		}
 	}
 	if (pattern.textureFill && props.textureBlend > 0 && props.stampingMode === 2) { // mask to white
 		maskToShape ??= target;
-		target = svgEl('rect', { width: '100%', height: '100%' });
+		target = svgEl('rect', { x: globals.left || undefined, y: globals.top || undefined, width: '100%', height: '100%' });
 	}
 	// shift fill points 1px to match fireworks rendering
 	const fp1 = { x: fillPoint1.x, y: fillPoint1.y + 1 };
@@ -111,7 +111,7 @@ export function applyFill(globals, target, {
 				div.style.height = `${globals.height}px`; // 100% works in Chrome & Firefox, but not Safari (would be nice to match the bounds of the shape anyway...)
 				const angle = Math.atan2(fp2.x - fp1.x, fp1.y - fp2.y) * 180 / Math.PI;
 				div.style.background = `conic-gradient(from ${angle.toFixed(2)}deg at ${fp1.x}px ${fp1.y}px in sRGB,${grad.toMirroredCSSStops()})`;
-				target = svgEl('foreignObject', { width: '100%', height: '100%' }, [div]);
+				target = svgEl('foreignObject', { x: globals.left || undefined, y: globals.top || undefined, width: '100%', height: '100%' }, [div]);
 			}
 			break;
 		case 5: // satin
@@ -290,7 +290,7 @@ export function applyFill(globals, target, {
 		const textureID = makeTextureMask(globals, pattern.textureFill.mask, props.textureBlend, textureOffset);
 		if (props.stampingMode === 2) {
 			target.setAttribute('mask', `url(#${encodeURIComponent(textureID)})`);
-			target = svgEl('g', {}, [svgEl('rect', { width: '100%', height: '100%', fill: '#ffffff' }), target]);
+			target = svgEl('g', {}, [svgEl('rect', { x: globals.left || undefined, y: globals.top || undefined, width: '100%', height: '100%', fill: '#ffffff' }), target]);
 		} else {
 			(maskToShape ?? target).setAttribute('mask', `url(#${encodeURIComponent(textureID)})`);
 		}

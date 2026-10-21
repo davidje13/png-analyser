@@ -166,6 +166,10 @@ function innerBevel(data) {
 			break;
 	}
 
+	if (!scale) {
+		return null;
+	}
+
 	/** @type {SVGElement[]} */ const steps = [
 		svgEl('feComponentTransfer', { in: 'SourceAlpha' }, [
 			svgEl('feFuncA', { type: 'linear', slope: 512, intercept: -threshold * 511 }),
@@ -266,6 +270,10 @@ function outerBevel(data) {
 	const darkStrength = 1;
 	const lightStrength = 1.25;
 	const smoothing = maskSoftness * 0.25 + 0.5;
+
+	if (!scale) {
+		return null;
+	}
 
 	/** @type {SVGElement[]} */ const steps = [
 		svgEl('feComponentTransfer', { in: 'SourceAlpha' }, [
@@ -370,6 +378,10 @@ function emboss(data, depth) {
 	const darkStrength = 1;
 	const lightStrength = 1.25;
 	const smoothing = maskSoftness * 0.25 + 0.5;
+
+	if (!scale) {
+		return null;
+	}
 
 	/** @type {SVGElement[]} */ const steps = [
 		svgEl('feComponentTransfer', { in: 'SourceAlpha' }, [

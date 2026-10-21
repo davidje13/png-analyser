@@ -5,6 +5,8 @@ import { rootv } from '../nodes/rootv.mjs';
  *   root: rootv;
  *   frame: number;
  *   svg: SVGSVGElement;
+ *   left: number;
+ *   top: number;
  *   width: number;
  *   height: number;
  *   nextID: () => string,

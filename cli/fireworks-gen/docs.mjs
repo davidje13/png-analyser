@@ -250,7 +250,8 @@ function formatID(id) {
 	}
 	return id
 		.split('.')
-		.map((v) => v.startsWith('"') ? `"\`${v.substring(1, v.length - 1)}\`"` : `\`${v}\``)
+		.map((v) => v === '0' ? '\\[\\]' : v.startsWith('"') ? `"\`${v.substring(1, v.length - 1)}\`"` : `\`${v}\``)
 		.join('.')
-		.replace('`."`', '` "`');
+		.replaceAll('`."`', '` "`')
+		.replaceAll('.\\[\\]', '\\[\\]');
 }

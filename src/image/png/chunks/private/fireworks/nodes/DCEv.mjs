@@ -2,7 +2,7 @@ import { GPLv } from './GPLv.mjs';
 
 /** @typedef {import('./base/CoreNode.mjs').NodeToken} NodeToken */
 
-/** @typedef {string | GPLv | { readonly [k: string]: CustomData }} CustomData */
+/** @typedef {string | GPLv | { readonly [k: string]: CustomData }[] | { readonly [k: string]: CustomData }} CustomData */
 
 export class CustomDataNode {
 	/** @type {{ readonly [k: string]: CustomData }} */ data;
@@ -22,12 +22,13 @@ function DCEv(node) {
 		console.warn(`Unexpected non-DCEv node in data structure: ${node.id}`);
 		return null;
 	}
-	if (node.value.length !== 2) {
-		console.warn(`DCEv with unexpected number of child nodes: ${node.value.length}`);
+	if (node.value.length < 2) {
+		console.warn(`DCEv with too few child nodes: ${node.value.length}`);
 		return null;
 	}
 	/** @type {string | undefined} */ let key = undefined;
 	/** @type {CustomData | undefined} */ let value = undefined;
+	let isArray = false;
 	for (const sub of node.value) {
 		if (sub.id === 'DCKs') {
 			if (key !== undefined) {
@@ -37,8 +38,15 @@ function DCEv(node) {
 			key = sub.value;
 		} else {
 			if (value !== undefined) {
-				console.warn('Multiple values in DCEv');
-				return null;
+				if (sub.id === 'GVRv' && typeof value === 'string') {
+					// this is permitted; GVRv has a sibling "flattened" string value
+				} else if (sub.id === 'DCVs' && isArray) {
+					// this is permitted; GVRv has a sibling "flattened" string value
+					continue;
+				} else {
+					console.warn('Multiple values in DCEv');
+					return null;
+				}
 			}
 			switch (sub.id) {
 				case 'DCVs':
@@ -49,6 +57,16 @@ function DCEv(node) {
 					break;
 				case 'GPLv':
 					value = new GPLv(sub.value);
+					break;
+				case 'GVRv':
+					isArray = true;
+					value = sub.value.map((v) => {
+						if (v.id !== 'GDTv') {
+							console.warn('Unexpected non-GDTv in GVRv');
+							return null;
+						}
+						return Object.fromEntries(v.value.map(DCEv).filter((v) => v !== null));
+					}).filter((v) => v !== null);
 					break;
 			}
 		}

@@ -66,6 +66,18 @@ Values:
 - `false`: unknown - TODO
 - `true`: normal (TODO)
 
+## `AIDi`
+
+[`AIDi`]: #aidi
+
+Parent: [`TXTv`]
+
+Set on text in some symbols, unknown meaning
+
+Values:
+
+- `1`: unknown - TODO
+
 ## `ALNi`
 
 [`ALNi`]: #alni
@@ -94,12 +106,14 @@ Contains:
 - [`ANXf`] Animation X Shift
 - [`ANYf`] Animation Y Shift
 - [`ASCf`] Animation Scaling
-- [`ATMv`] Symbol Transform Matrix
+- [`ATMv`]? Symbol Transform Matrix
 - [`ALNi`]?
+- [`FILs`]? Label
+- [`IMGv`]? Image
 - [`ANRi`]? Animation Rotation
 - [`ASOi`]? Animation Start Opacity
 - [`AEOi`]? Animation End Opacity
-- [`IMGv`]? Image
+- [`WPVs`]? Widget Parameter Values
 
 ## `ALTs` **A**nchor **L**ink **T**arget
 
@@ -315,15 +329,18 @@ Parent: [`BPLv`]
 
 Value range: `0`..inf (pixels)
 
-## `BEEi`
+## `BEEi` **Be**haviour Trigger **E**vent
 
-[`BEEi`]: #beei
+[`BEEi`]: #beei-behaviour-trigger-event
 
 Parent: [`BEHv`]
 
 Values:
 
-- `0`: unknown - TODO
+- `0`: mouse over
+- `1`: click
+- `2`: mouse out
+- `3`: load
 
 ## `BEFi` **B**rush **E**dge **F**unction
 
@@ -346,53 +363,64 @@ Values:
 
 Parent: [`BEVv`]
 
-Used for popup menus. Possibly for other behaviours too.
+Used for popup menus, rollover effects, etc.
 
-For popup menus, [`TRNs`] contains the menu definition in the format:
+- For setting status text, the text to set is in [`UNMs`].
+- For swapping image, the frame to get the image from is in [`FRCi`]. The slice to change is referenced by [`MSNi`].
+- For nav bar changes, the frame to get the "down" image from is in [`FRCi`], the frame for "over while down" is in [`FRTi`] (or 3, by default). The slice to change is referenced by [`MSNi`].
+- For popup menus, [`TRNs`] contains the menu definition in the format:
 
-```text
-{{"Item 1","link","target",{{"Nested 1","nested link","nested target",{}}{"Nested 2","","",{{"Sub-nested","","",{}}}}}}{"Item 2","","",{}}}
-```
+  ```text
+  {{"Item 1","link","target",{{"Nested 1","nested link","nested target",{}}{"Nested 2","","",{{"Sub-nested","","",{}}}}}}{"Item 2","","",{}}}
+  ```
 
 Contains:
 
 - [`BETi`] Behaviour Type
-- [`BEEi`]
-- [`CDTs`]
-- [`XLCf`] X Location
-- [`YLCf`] Y Location
-- [`TRNs`] Text Run
-- [`BEHv`.`FCLi`] Menu Item Text Colour
-- [`BEHv`.`FETi`]
-- [`JSTi`] Justification
-- [`VERi`]
-- [`TMOi`] Menu Delay
-- [`XSLf`]
-- [`YSLf`]
-- [`RELb`]
-- [`CSPi`] Menu Item Cell Spacing
-- [`CPDi`] Menu Item Cell Padding
-- [`OPQb`]
-- [`HICi`] Highlight Colour
-- [`CSHi`] Colour Shadow
-- [`BOCi`] Border Colour
-- [`BOSi`] Border Size
-- [`OVWb`] Override Width
-- [`OVHb`] Override Height
-- [`MITi`] Menu Indent Text
-- [`MIVb`] Menu Items Vertical
-- [`MIDi`] Text Colour Hover
-- [`MIWi`] Menu Item Width
-- [`MIHi`] Menu Item Height
-- [`HIMb`]
-- [`BOLb`] Bold
-- [`ITLb`] Italic
-- [`FONs`] Font Family
-- [`PTSf`] Font Point Size
-- [`ATEb`] Auto-Enlarge
-- [`BEHv`.`BCLi`] Background Colour
-- [`BEHv`.`BCMi`] Background Colour Hover
-- [`ZSTv`]\*
+- [`BEEi`] Behaviour Trigger Event
+- [`ROLi`]? Roll Behaviour
+- [`MSNi`]? Symbol Unique Number
+- [`FRCi`]? Frame Count
+- [`PREb`]? Preload
+- [`CHKb`]? Checked ?
+- [`FRTi`]? Over While Down state number
+- [`RMOb`]? Remove
+- [`UNMs`]? User-facing Name
+- [`CDTs`]?
+- [`XLCf`]? X Location
+- [`YLCf`]? Y Location
+- [`TRNs`]? Text Run
+- [`BEHv`.`FCLi`]? Menu Item Text Colour
+- [`BEHv`.`FETi`]?
+- [`JSTi`]? Justification
+- [`VERi`]?
+- [`TMOi`]? Menu Delay
+- [`XSLf`]?
+- [`YSLf`]?
+- [`RELb`]?
+- [`CSPi`]? Menu Item Cell Spacing
+- [`CPDi`]? Menu Item Cell Padding
+- [`OPQb`]?
+- [`HICi`]? Highlight Colour
+- [`CSHi`]? Colour Shadow
+- [`BOCi`]? Border Colour
+- [`BOSi`]? Border Size
+- [`OVWb`]? Override Width
+- [`OVHb`]? Override Height
+- [`MITi`]? Menu Indent Text
+- [`MIVb`]? Menu Items Vertical
+- [`MIDi`]? Text Colour Hover
+- [`MIWi`]? Menu Item Width
+- [`MIHi`]? Menu Item Height
+- [`HIMb`]?
+- [`BOLb`]? Bold
+- [`ITLb`]? Italic
+- [`FONs`]? Font Family
+- [`PTSf`]? Font Point Size
+- [`ATEb`]? Auto-Enlarge
+- [`BEHv`.`BCLi`]? Background Colour
+- [`BEHv`.`BCMi`]? Background Colour Hover
+- [`ZSTv`]\* Saved Style
 
 ## `BEHv`.`BCLi` **B**ackground **C**o**l**our
 
@@ -442,6 +470,14 @@ Parent: [`BEHv`]
 
 Values:
 
+- `0`: set nav bar image
+- `1`: set text of status bar
+- `2`: swap image
+- `4`: nav bar down
+- `5`: swap image restore
+- `6`: nav bar over
+- `7`: nav bar restore
+- `8`: "simple rollover"
 - `9`: popup menu
 
 ## `BEVv` **Be**haviour List
@@ -452,7 +488,7 @@ Parent: [`URLv`]
 
 Contains:
 
-- [`BEHv`] Behaviour
+- [`BEHv`]+ Behaviour
 
 ## `BFBi` **Br**ush **F**eed**b**ack
 
@@ -888,6 +924,7 @@ Values:
 - `Distort`
 - `Noise`
 - `Other`
+- `Render`
 - `Shadow and Glow`
 - `Sharpen`
 - `Sketch`
@@ -940,6 +977,10 @@ Values:
 
 - `0`: fixed
 - `1`: scroll
+- `147391808`: unknown - TODO
+- `153798280`: unknown - TODO
+- `4294967040`: unknown - TODO
+- `4294967295`: unknown - TODO
 
 ## `CBHi` **C**ell **B**ackground (Slice) **H**orizontal Position
 
@@ -953,6 +994,10 @@ Values:
 - `1`: center
 - `2`: right
 - `3`: value ([`CHVi`])
+- `93142424`: unknown - TODO
+- `155681776`: unknown - TODO
+- `4294967040`: unknown - TODO
+- `4294967295`: unknown - TODO
 
 ## `CBRi` **C**ell **B**ackground (Slice) **R**epeat
 
@@ -966,6 +1011,9 @@ Values:
 - `1`: repeat-both
 - `2`: repeat-x
 - `3`: repeat-y
+- `146872424`: unknown - TODO
+- `154894800`: unknown - TODO
+- `4294967040`: unknown - TODO
 
 ## `CBTb`
 
@@ -995,6 +1043,12 @@ Values:
 - `1`: center
 - `2`: bottom
 - `3`: value ([`CVVi`])
+- `146872424`: unknown - TODO
+- `149946368`: unknown - TODO
+- `154730496`: unknown - TODO
+- `154894800`: unknown - TODO
+- `181076223`: unknown - TODO
+- `4294967040`: unknown - TODO
 
 ## `CDAi` HTML Page **A**lignment
 
@@ -1049,18 +1103,34 @@ Parent: [`TXTv`] / [`ZSTv`]
 
 Values:
 
+- `Arial`
 - `Arial-Black`
 - `ArialMT`
 - `Chalkboard-Bold`
 - `ChaparralPro-Bold`
 - `Cochin`
+- `CourierNewPSMT`
 - `Geneva`
 - `Helvetica`
 - `HelveticaNeue`
+- `Lucida Grande`
 - `MinionPro-Regular`
+- `Myriad Pro`
+- `Myriad Pro Bold`
 - `OCRAStd`
 - `RosewoodStd-Regular`
 - `TektonPro-BoldCond`
+- `Verdana`
+
+## `CHKb` **Ch**ec**k**ed ?
+
+[`CHKb`]: #chkb-checked
+
+Parent: [`BEHv`]
+
+Used by Set Nav Bar behaviour.
+
+"Show Down Image Upon Load"
 
 ## `CHOf` **Ch**aracter **O**ffset
 
@@ -1170,7 +1240,7 @@ Parent: [`ISSv`]
 
 Contains:
 
-- [`CPTv`] (x2 +) Control Point
+- [`CPTv`]+ Control Point
 
 ## `CPTv` **C**ontrol **P**oin**t**
 
@@ -1184,9 +1254,9 @@ Contains:
 - [`YLCf`] Y Location
 - [`CTYi`] Control Point Type
 - [`OBNs`]? Object Name
-- [`TTPs`]? Tooltip
 - [`TTDb`] Tooltip Tracks Drag
 - [`VISb`] Visible
+- [`TTPs`]? Tooltip
 
 ## `CRVb` Is **C**u**rv**e
 
@@ -1231,12 +1301,13 @@ Parent: [`BEHv`]
 
 Parent: [`CPTv`]
 
-Grab handle config controlled by `type` in JavaScript. Appears to control the colour of the handle.
+Grab handle config controlled by `type` in JavaScript. Appears to control the appearance of the handle.
 
 Values:
 
-- `0`: default (yellow)
-- `1`: defaultInverted (blue)
+- `0`: default (yellow diamond with blue border)
+- `1`: defaultInverted (blue diamond with yellow border)
+- `2`: crossHair (black crosshair on white background)
 
 ## `CVVi` **C**ell **V**ertical **V**alue
 
@@ -1355,6 +1426,7 @@ Values:
 - `12`: reflect
 - `13`: glow
 - `14`: freeze
+- `17`: invert background (ignores "Color" property)
 - `18`: soft light
 - `19`: negation
 - `21`: hue
@@ -1372,7 +1444,7 @@ Values:
 - `43`: interpolation
 - `44`: stamp
 - `45`: xor
-- `46`: invert
+- `46`: invert (behaves as add)
 - `47`: tint
 - `48`: erase
 - `51`: heat
@@ -1514,10 +1586,12 @@ Values:
 - `{d810e821-f86b-11d0-466c74724273526c}`: Bas Relief (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747243686c43}`: Chalk && Charcoal (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c74724368726d}`: Chrome (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472436c6473}`: Clouds (obsolete? - seen but unused in Fireworks Common Library symbol)
 - `{d810e821-f86b-11d0-466c7472436c7250}`: Colored Pencil (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472436e7443}`: Conté Crayon (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c74724372716c}`: Craquelure (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747243727368}`: Crosshatch (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747244667243}`: Difference Clouds (obsolete? - seen but unused in Fireworks Common Library symbol)
 - `{d810e821-f86b-11d0-466c747244667347}`: Diffuse Glow (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747244726b53}`: Dark Strokes (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747244727942}`: Dry Brush (obsolete / plugin? - seen in Fireworks MX file)
@@ -1539,6 +1613,7 @@ Values:
 - `{d810e821-f86b-11d0-466c74725274636c}`: Reticulation (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472536d6453}`: Smudge Stick (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472536d6965}`: Sumi-e (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747253706872}`: Spherize (obsolete? - seen but unused in Fireworks Common Library symbol)
 - `{d810e821-f86b-11d0-466c747253706e67}`: Sponge (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747253707253}`: Sprayed Strokes (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747253707420}`: Spatter (obsolete / plugin? - seen in Fireworks MX file)
@@ -1574,6 +1649,126 @@ Parent: [`EPSv`]
 Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
 
 A colour in "#rrggbbaa" format
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame2_SS_MarginID`"
+
+[`DCEv` "`Frame2_SS_MarginID`"]: #dcev-frame2-ss-marginid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `5`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame2_SS_OverhangID`"
+
+[`DCEv` "`Frame2_SS_OverhangID`"]: #dcev-frame2-ss-overhangid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `10`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame2_SS_WidthID`"
+
+[`DCEv` "`Frame2_SS_WidthID`"]: #dcev-frame2-ss-widthid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `10`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame3_SS_MarginID`"
+
+[`DCEv` "`Frame3_SS_MarginID`"]: #dcev-frame3-ss-marginid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `5`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame3_SS_OverhangID`"
+
+[`DCEv` "`Frame3_SS_OverhangID`"]: #dcev-frame3-ss-overhangid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `15`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame3_SS_WidthID`"
+
+[`DCEv` "`Frame3_SS_WidthID`"]: #dcev-frame3-ss-widthid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `5`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame_SS_FillPattern`"
+
+[`DCEv` "`Frame_SS_FillPattern`"]: #dcev-frame-ss-fillpattern
+
+Parent: [`DTAv`]
+
+Values:
+
+- `Sienna`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`Frame_SS_WidthID`"
+
+[`DCEv` "`Frame_SS_WidthID`"]: #dcev-frame-ss-widthid
+
+Parent: [`DTAv`]
+
+Values:
+
+- `24`: unknown - TODO
 
 Contains:
 
@@ -1663,7 +1858,7 @@ Parent: [`EPSv`]
 
 Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
-Observed value range: `39`..`200`
+Observed value range: `33`..`200`
 
 Contains:
 
@@ -1678,7 +1873,7 @@ Parent: [`EPSv`]
 
 Values:
 
-- `-1 -1`: unknown - TODO - observed in all files
+- `-1 -1`: unknown - TODO
 
 Contains:
 
@@ -2310,6 +2505,138 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`css`"
+
+[`DCEv` "`css`"]: #dcev-css
+
+Parent: [`DTAv`]
+
+Values:
+
+- ``: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`currentValues`"
+
+[`DCEv` "`currentValues`"]: #dcev-currentvalues
+
+Parent: [`DTAv`]
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GVRv`] Dictionary Value Array
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`currentValues`"\[\]."`name`"
+
+[`DCEv` "`currentValues`"\[\]."`name`"]: #dcev-currentvalues-name
+
+Parent: [`GDTv`]
+
+Values:
+
+- `Color`: unknown - TODO
+- `Cursor`: unknown - TODO
+- `Fill Color`: unknown - TODO
+- `Font`: unknown - TODO
+- `Label`: unknown - TODO
+- `MXML`: unknown - TODO
+- `Show Close`: unknown - TODO
+- `Show content`: unknown - TODO
+- `State`: unknown - TODO
+- `State (Left)`: unknown - TODO
+- `State (Right)`: unknown - TODO
+- `State (Thumb)`: unknown - TODO
+- `State (Track)`: unknown - TODO
+- `Thumb State`: unknown - TODO
+- `Thumb Type`: unknown - TODO
+- `buttonType`: unknown - TODO
+- `color`: unknown - TODO
+- `disabledColor`: unknown - TODO
+- `editable`: unknown - TODO
+- `enabled`: unknown - TODO
+- `label`: unknown - TODO
+- `selected`: unknown - TODO
+- `text`: unknown - TODO
+- `textFieldType`: unknown - TODO
+- `textRollOverColor`: unknown - TODO
+- `textSelectedColor`: unknown - TODO
+- `title`: unknown - TODO
+- `value`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`currentValues`"\[\]."`type`"
+
+[`DCEv` "`currentValues`"\[\]."`type`"]: #dcev-currentvalues-type
+
+Parent: [`GDTv`]
+
+Values:
+
+- `Boolean`: unknown - TODO
+- `Color`: unknown - TODO
+- `ComboBox`: unknown - TODO
+- `MXML`: unknown - TODO
+- `Text`: unknown - TODO
+- `boolean`: unknown - TODO
+- `color`: unknown - TODO
+- `combobox`: unknown - TODO
+- `font`: unknown - TODO
+- `mxml`: unknown - TODO
+- `number`: unknown - TODO
+- `text`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`currentValues`"\[\]."`value`"
+
+[`DCEv` "`currentValues`"\[\]."`value`"]: #dcev-currentvalues-value
+
+Parent: [`GDTv`]
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`curvature`"
+
+[`DCEv` "`curvature`"]: #dcev-curvature
+
+Parent: [`DTAv`]
+
+Observed value range: `6.9999956375149095`..`6.9999956375149095`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`curveRatio`"
+
+[`DCEv` "`curveRatio`"]: #dcev-curveratio
+
+Parent: [`DTAv`]
+
+Observed value range: `0.3695652173913043`..`0.3695652173913043`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`custData`"
 
 [`DCEv` "`custData`"]: #dcev-custdata
@@ -2557,6 +2884,36 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`flexClassName`"
+
+[`DCEv` "`flexClassName`"]: #dcev-flexclassname
+
+Parent: [`DTAv`]
+
+Values:
+
+- `Accordion`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`focalLength`"
+
+[`DCEv` "`focalLength`"]: #dcev-focallength
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `300`..`300`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`gamma_blue`"
 
 [`DCEv` "`gamma_blue`"]: #dcev-gamma-blue
@@ -2696,6 +3053,19 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`html`"
+
+[`DCEv` "`html`"]: #dcev-html
+
+Parent: [`DTAv`]
+
+HTML to use in place of this symbol when exporting as a page.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`hue_amount`"
 
 [`DCEv` "`hue_amount`"]: #dcev-hue-amount
@@ -2730,6 +3100,19 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`innerRatio`"
+
+[`DCEv` "`innerRatio`"]: #dcev-innerratio
+
+Parent: [`DTAv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`innerShadow`"
 
 [`DCEv` "`innerShadow`"]: #dcev-innershadow
@@ -2749,6 +3132,36 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`lastMouse`"
+
+[`DCEv` "`lastMouse`"]: #dcev-lastmouse
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+A mouse coordinate recorded as `{x:0, y:0}`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`lastMouseAngle`"
+
+[`DCEv` "`lastMouseAngle`"]: #dcev-lastmouseangle
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `2.677945044588987`..`2.677945044588987`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`lightness_amount`"
 
 [`DCEv` "`lightness_amount`"]: #dcev-lightness-amount
@@ -2758,6 +3171,45 @@ Parent: [`EPSv`]
 Used by "Hue/Saturation" filter.
 
 Value range: `-100`..`100` (percent)
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`lineAngle`"
+
+[`DCEv` "`lineAngle`"]: #dcev-lineangle
+
+Parent: [`DTAv`]
+
+Observed value range: `-0.26884042763972626`..`-0.26884042763972626`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`locX`"
+
+[`DCEv` "`locX`"]: #dcev-locx
+
+Parent: [`DTAv`]
+
+Observed value range: `172`..`172`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`locY`"
+
+[`DCEv` "`locY`"]: #dcev-locy
+
+Parent: [`DTAv`]
+
+Observed value range: `290`..`290`
 
 Contains:
 
@@ -2863,6 +3315,7 @@ Values:
 - `Patchwork...`
 - `Photocopy...`
 - `Photoshop Live Effects`
+- `PhotoshopEffects...`
 - `Plaster...`
 - `Plastic Wrap...`
 - `Radial Blur...`
@@ -2874,6 +3327,7 @@ Values:
 - `Smudge Stick...`
 - `Solid Shadow...`
 - `Spatter...`
+- `Spherize...`
 - `Sponge...`
 - `Sprayed Strokes...`
 - `Stamp...`
@@ -2928,6 +3382,21 @@ Parent: [`EPSv`]
 Used by "Motion Blur" filter.
 
 Observed value range: `1`..`100`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`mouse`"
+
+[`DCEv` "`mouse`"]: #dcev-mouse
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+A mouse coordinate recorded as `{x:0, y:0}`
 
 Contains:
 
@@ -3012,6 +3481,483 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`origPoints3D`"
+
+[`DCEv` "`origPoints3D`"]: #dcev-origpoints3d
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p0`"
+
+[`DCEv` "`origPoints3D`"."`p0`"]: #dcev-origpoints3d-p0
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p0`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p0`"."`_x`"]: #dcev-origpoints3d-p0-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p0`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p0`"."`_y`"]: #dcev-origpoints3d-p0-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p0`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p0`"."`_z`"]: #dcev-origpoints3d-p0-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p1`"
+
+[`DCEv` "`origPoints3D`"."`p1`"]: #dcev-origpoints3d-p1
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p1`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p1`"."`_x`"]: #dcev-origpoints3d-p1-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p1`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p1`"."`_y`"]: #dcev-origpoints3d-p1-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p1`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p1`"."`_z`"]: #dcev-origpoints3d-p1-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p2`"
+
+[`DCEv` "`origPoints3D`"."`p2`"]: #dcev-origpoints3d-p2
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p2`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p2`"."`_x`"]: #dcev-origpoints3d-p2-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p2`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p2`"."`_y`"]: #dcev-origpoints3d-p2-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p2`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p2`"."`_z`"]: #dcev-origpoints3d-p2-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p3`"
+
+[`DCEv` "`origPoints3D`"."`p3`"]: #dcev-origpoints3d-p3
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p3`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p3`"."`_x`"]: #dcev-origpoints3d-p3-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p3`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p3`"."`_y`"]: #dcev-origpoints3d-p3-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p3`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p3`"."`_z`"]: #dcev-origpoints3d-p3-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p4`"
+
+[`DCEv` "`origPoints3D`"."`p4`"]: #dcev-origpoints3d-p4
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p4`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p4`"."`_x`"]: #dcev-origpoints3d-p4-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p4`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p4`"."`_y`"]: #dcev-origpoints3d-p4-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p4`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p4`"."`_z`"]: #dcev-origpoints3d-p4-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p5`"
+
+[`DCEv` "`origPoints3D`"."`p5`"]: #dcev-origpoints3d-p5
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p5`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p5`"."`_x`"]: #dcev-origpoints3d-p5-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p5`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p5`"."`_y`"]: #dcev-origpoints3d-p5-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p5`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p5`"."`_z`"]: #dcev-origpoints3d-p5-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p6`"
+
+[`DCEv` "`origPoints3D`"."`p6`"]: #dcev-origpoints3d-p6
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p6`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p6`"."`_x`"]: #dcev-origpoints3d-p6-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p6`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p6`"."`_y`"]: #dcev-origpoints3d-p6-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p6`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p6`"."`_z`"]: #dcev-origpoints3d-p6-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p7`"
+
+[`DCEv` "`origPoints3D`"."`p7`"]: #dcev-origpoints3d-p7
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`origPoints3D`"."`p7`"."`_x`"
+
+[`DCEv` "`origPoints3D`"."`p7`"."`_x`"]: #dcev-origpoints3d-p7-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p7`"."`_y`"
+
+[`DCEv` "`origPoints3D`"."`p7`"."`_y`"]: #dcev-origpoints3d-p7-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`origPoints3D`"."`p7`"."`_z`"
+
+[`DCEv` "`origPoints3D`"."`p7`"."`_z`"]: #dcev-origpoints3d-p7-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`outerGlow`"
 
 [`DCEv` "`outerGlow`"]: #dcev-outerglow
@@ -3044,6 +3990,513 @@ This is an "&"-separated string, for example:
 ```text
 0&1&100.000000&100.000000&0.000000&0.000000&normal&Bubbles&b7334da0-122f-11d4-8bb5-e27e45023b5f
 ```
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"
+
+[`DCEv` "`points3D`"]: #dcev-points3d
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p0`"
+
+[`DCEv` "`points3D`"."`p0`"]: #dcev-points3d-p0
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p0`"."`_x`"
+
+[`DCEv` "`points3D`"."`p0`"."`_x`"]: #dcev-points3d-p0-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p0`"."`_y`"
+
+[`DCEv` "`points3D`"."`p0`"."`_y`"]: #dcev-points3d-p0-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p0`"."`_z`"
+
+[`DCEv` "`points3D`"."`p0`"."`_z`"]: #dcev-points3d-p0-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p1`"
+
+[`DCEv` "`points3D`"."`p1`"]: #dcev-points3d-p1
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p1`"."`_x`"
+
+[`DCEv` "`points3D`"."`p1`"."`_x`"]: #dcev-points3d-p1-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p1`"."`_y`"
+
+[`DCEv` "`points3D`"."`p1`"."`_y`"]: #dcev-points3d-p1-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p1`"."`_z`"
+
+[`DCEv` "`points3D`"."`p1`"."`_z`"]: #dcev-points3d-p1-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p2`"
+
+[`DCEv` "`points3D`"."`p2`"]: #dcev-points3d-p2
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p2`"."`_x`"
+
+[`DCEv` "`points3D`"."`p2`"."`_x`"]: #dcev-points3d-p2-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p2`"."`_y`"
+
+[`DCEv` "`points3D`"."`p2`"."`_y`"]: #dcev-points3d-p2-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p2`"."`_z`"
+
+[`DCEv` "`points3D`"."`p2`"."`_z`"]: #dcev-points3d-p2-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p3`"
+
+[`DCEv` "`points3D`"."`p3`"]: #dcev-points3d-p3
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p3`"."`_x`"
+
+[`DCEv` "`points3D`"."`p3`"."`_x`"]: #dcev-points3d-p3-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p3`"."`_y`"
+
+[`DCEv` "`points3D`"."`p3`"."`_y`"]: #dcev-points3d-p3-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p3`"."`_z`"
+
+[`DCEv` "`points3D`"."`p3`"."`_z`"]: #dcev-points3d-p3-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p4`"
+
+[`DCEv` "`points3D`"."`p4`"]: #dcev-points3d-p4
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p4`"."`_x`"
+
+[`DCEv` "`points3D`"."`p4`"."`_x`"]: #dcev-points3d-p4-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p4`"."`_y`"
+
+[`DCEv` "`points3D`"."`p4`"."`_y`"]: #dcev-points3d-p4-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p4`"."`_z`"
+
+[`DCEv` "`points3D`"."`p4`"."`_z`"]: #dcev-points3d-p4-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p5`"
+
+[`DCEv` "`points3D`"."`p5`"]: #dcev-points3d-p5
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p5`"."`_x`"
+
+[`DCEv` "`points3D`"."`p5`"."`_x`"]: #dcev-points3d-p5-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p5`"."`_y`"
+
+[`DCEv` "`points3D`"."`p5`"."`_y`"]: #dcev-points3d-p5-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p5`"."`_z`"
+
+[`DCEv` "`points3D`"."`p5`"."`_z`"]: #dcev-points3d-p5-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p6`"
+
+[`DCEv` "`points3D`"."`p6`"]: #dcev-points3d-p6
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p6`"."`_x`"
+
+[`DCEv` "`points3D`"."`p6`"."`_x`"]: #dcev-points3d-p6-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p6`"."`_y`"
+
+[`DCEv` "`points3D`"."`p6`"."`_y`"]: #dcev-points3d-p6-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p6`"."`_z`"
+
+[`DCEv` "`points3D`"."`p6`"."`_z`"]: #dcev-points3d-p6-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p7`"
+
+[`DCEv` "`points3D`"."`p7`"]: #dcev-points3d-p7
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`] Nested Dictionary
+
+### `DCEv` "`points3D`"."`p7`"."`_x`"
+
+[`DCEv` "`points3D`"."`p7`"."`_x`"]: #dcev-points3d-p7-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p7`"."`_y`"
+
+[`DCEv` "`points3D`"."`p7`"."`_y`"]: #dcev-points3d-p7-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `50`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`points3D`"."`p7`"."`_z`"
+
+[`DCEv` "`points3D`"."`p7`"."`_z`"]: #dcev-points3d-p7-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-50`..`-50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`pressMouse`"
+
+[`DCEv` "`pressMouse`"]: #dcev-pressmouse
+
+Parent: [`DTAv`]
+
+Used internally by "3D Box" autoshape.
+
+A mouse coordinate recorded as `{x:0, y:0}`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`radial`"
+
+[`DCEv` "`radial`"]: #dcev-radial
+
+Parent: [`DTAv`]
+
+Values:
+
+- `1`: unknown - TODO
 
 Contains:
 
@@ -3151,7 +4604,53 @@ Contains:
 
 Parent: [`DTAv`]
 
-Internal data used by Polygon autoshape.
+Internal data used by Polygon, 3D Box autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GDTv`]? Nested Dictionary
+- [`DCVs`]? Dictionary Entry String Value
+
+### `DCEv` "`rotation`"."`_x`"
+
+[`DCEv` "`rotation`"."`_x`"]: #dcev-rotation-x
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `0.5599999999999999`..`0.5599999999999999`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`rotation`"."`_y`"
+
+[`DCEv` "`rotation`"."`_y`"]: #dcev-rotation-y
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `-0.44`..`-0.44`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`rotation`"."`_z`"
+
+[`DCEv` "`rotation`"."`_z`"]: #dcev-rotation-z
+
+Parent: [`GDTv`]
+
+Used internally by "3D Box" autoshape.
+
+Observed value range: `0`..`0`
 
 Contains:
 
@@ -3457,6 +4956,21 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`style`"
+
+[`DCEv` "`style`"]: #dcev-style
+
+Parent: [`DTAv`]
+
+Values:
+
+- `0`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`t1`"
 
 [`DCEv` "`t1`"]: #dcev-t1
@@ -3477,6 +4991,85 @@ Contains:
 Parent: [`DTAv`]
 
 Internal data used by Arrow Tool autoshape.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`tags`"
+
+[`DCEv` "`tags`"]: #dcev-tags
+
+Parent: [`DTAv`]
+
+Values:
+
+- `[  ]`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`GVRv`] Dictionary Value Array
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`text`"
+
+[`DCEv` "`text`"]: #dcev-text
+
+Parent: [`DTAv`]
+
+Text to show in Annotation autoshape, in a JSON structure:
+
+```json
+{
+  initialAttrs: {
+    alignment:"left"
+    antiAliasSharpness:200
+    antiAliasStrength:64
+    baselineShift:0
+    bold:false
+    face:"ArialMT"
+    fillColor:"#000000"
+    horizontalScale:1
+    italic:false
+    leading:1
+    leadingMode:"percentage"
+    overSample:16
+    paragraphIndent:0
+    paragraphSpacingAfter:0
+    paragraphSpacingBefore:0
+    rangeKerning:0
+    size:"12pt"
+    underline:false
+  }
+  textRuns: [
+    {
+      changedAttrs: {
+        alignment:"left"
+        antiAliasSharpness:200
+        antiAliasStrength:64
+        baselineShift:0
+        bold:false
+        face:"ArialMT"
+        fillColor:"#000000"
+        horizontalScale:1
+        italic:false
+        leading:1
+        leadingMode:"percentage"
+        overSample:16
+        paragraphIndent:0
+        paragraphSpacingAfter:0
+        paragraphSpacingBefore:0
+        rangeKerning:0
+        size:"12pt"
+        underline:false
+      }
+      characters:"Edit this text using the Text or Subselection tools."
+    }
+  ]
+}
+```
 
 Contains:
 
@@ -3808,6 +5401,22 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`type`"
+
+[`DCEv` "`type`"]: #dcev-type
+
+Parent: [`DTAv`]
+
+Values:
+
+- `Button`: unknown - TODO
+- `TextField`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`unsharp_mask_amount`"
 
 [`DCEv` "`unsharp_mask_amount`"]: #dcev-unsharp-mask-amount
@@ -3865,6 +5474,19 @@ Values:
 
 - `false`: shadow colour is extension of edge colour
 - `true`: shadow colour is set by [`DCEv` "`color`"]
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`wavelength`"
+
+[`DCEv` "`wavelength`"]: #dcev-wavelength
+
+Parent: [`DTAv`]
+
+Observed value range: `33.00001272903228`..`33.00001272903228`
 
 Contains:
 
@@ -3970,7 +5592,7 @@ Contains:
 
 [`DCKs`]: #dcks-dictionary-entry-key
 
-Parent: [`DCEv` "`AngleSoftness`"] / [`DCEv` "`BevelContrast`"] / [`DCEv` "`BevelType`"] / [`DCEv` "`BevelWidth`"] / [`DCEv` "`Blendmode`"] / [`DCEv` "`ButtonState`"] / [`DCEv` "`Color`"] / [`DCEv` "`Dict`"] / [`DCEv` "`DownBlendColor`"] / [`DCEv` "`EdgeThreshold`"] / [`DCEv` "`EffectIsVisible`"] / [`DCEv` "`EffectMoaID`"] / [`DCEv` "`EmbossFaceColor`"] / [`DCEv` "`GlowStartDistance`"] / [`DCEv` "`GlowWidth`"] / [`DCEv` "`HiliteColor`"] / [`DCEv` "`HitBlendColor`"] / [`DCEv` "`LightAngle`"] / [`DCEv` "`LightDistance`"] / [`DCEv` "`MB_filter_preview_tile_size`"] / [`DCEv` "`MaskSoftness`"] / [`DCEv` "`Opacity`"] / [`DCEv` "`OuterBevelColor`"] / [`DCEv` "`ShadowAngle`"] / [`DCEv` "`ShadowBlur`"] / [`DCEv` "`ShadowColor`"] / [`DCEv` "`ShadowDistance`"] / [`DCEv` "`ShadowType`"] / [`DCEv` "`ShowObject`"] / [`DCEv` "`SlopeMultiplier`"] / [`DCEv` "`SlopeType`"] / [`DCEv` "`add_noise_amount`"] / [`DCEv` "`add_noise_use_color`"] / [`DCEv` "`alrtmsg`"] / [`DCEv` "`alrtmsg`"."`maxmsg`"] / [`DCEv` "`alrtmsg`"."`minmsg`"] / [`DCEv` "`angle`"] / [`DCEv` "`arrowLength`"] / [`DCEv` "`arrowTip`"] / [`DCEv` "`arrowWidth`"] / [`DCEv` "`atMin`"] / [`DCEv` "`awMin`"] / [`DCEv` "`bevelEmboss`"] / [`DCEv` "`blue_points`"] / [`DCEv` "`brightness_amount`"] / [`DCEv` "`c2y`"] / [`DCEv` "`category`"] / [`DCEv` "`clockwise`"] / [`DCEv` "`cloud_color`"] / [`DCEv` "`color`"] / [`DCEv` "`constants`"] / [`DCEv` "`constants`"."`maxB`"] / [`DCEv` "`constants`"."`maxNodes`"] / [`DCEv` "`constants`"."`minB`"] / [`DCEv` "`constants`"."`minNodes`"] / [`DCEv` "`constants`"."`ppc`"] / [`DCEv` "`contrast_amount`"] / [`DCEv` "`corner0`"] / [`DCEv` "`corner1`"] / [`DCEv` "`corner2`"] / [`DCEv` "`corner3`"] / [`DCEv` "`custData`"] / [`DCEv` "`custData`"."`box`"] / [`DCEv` "`custData`"."`head1`"] / [`DCEv` "`custData`"."`head2`"] / [`DCEv` "`custData`"."`none`"] / [`DCEv` "`custData`"."`tail`"] / [`DCEv` "`dest_high_blue`"] / [`DCEv` "`dest_high_green`"] / [`DCEv` "`dest_high_red`"] / [`DCEv` "`dest_high_rgb`"] / [`DCEv` "`dest_low_blue`"] / [`DCEv` "`dest_low_green`"] / [`DCEv` "`dest_low_red`"] / [`DCEv` "`dest_low_rgb`"] / [`DCEv` "`distance`"] / [`DCEv` "`dropShadow`"] / [`DCEv` "`gamma_blue`"] / [`DCEv` "`gamma_green`"] / [`DCEv` "`gamma_red`"] / [`DCEv` "`gamma_rgb`"] / [`DCEv` "`gaussian_blur_radius`"] / [`DCEv` "`gradientFill`"] / [`DCEv` "`green_points`"] / [`DCEv` "`height`"] / [`DCEv` "`hls_colorize`"] / [`DCEv` "`hue_amount`"] / [`DCEv` "`innerGlow`"] / [`DCEv` "`innerShadow`"] / [`DCEv` "`lightness_amount`"] / [`DCEv` "`locked`"] / [`DCEv` "`maxNodes`"] / [`DCEv` "`minNodes`"] / [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"] / [`DCEv` "`mode`"] / [`DCEv` "`motion_blur_angle`"] / [`DCEv` "`motion_blur_distance`"] / [`DCEv` "`name`"] / [`DCEv` "`nodes`"] / [`DCEv` "`offset1`"] / [`DCEv` "`offset2`"] / [`DCEv` "`outerGlow`"] / [`DCEv` "`patternFill`"] / [`DCEv` "`radial_blur_amount`"] / [`DCEv` "`radial_blur_quality`"] / [`DCEv` "`radius`"] / [`DCEv` "`radius0`"] / [`DCEv` "`radius1`"] / [`DCEv` "`red_points`"] / [`DCEv` "`rgb_points`"] / [`DCEv` "`rotation`"] / [`DCEv` "`round0`"] / [`DCEv` "`round1`"] / [`DCEv` "`roundness`"] / [`DCEv` "`satin`"] / [`DCEv` "`saturation_amount`"] / [`DCEv` "`shapeName`"] / [`DCEv` "`sides`"] / [`DCEv` "`sky_color`"] / [`DCEv` "`solidFill`"] / [`DCEv` "`source_high_blue`"] / [`DCEv` "`source_high_green`"] / [`DCEv` "`source_high_red`"] / [`DCEv` "`source_high_rgb`"] / [`DCEv` "`source_low_blue`"] / [`DCEv` "`source_low_green`"] / [`DCEv` "`source_low_red`"] / [`DCEv` "`source_low_rgb`"] / [`DCEv` "`split`"] / [`DCEv` "`stroke`"] / [`DCEv` "`t1`"] / [`DCEv` "`t2`"] / [`DCEv` "`thickness`"] / [`DCEv` "`toolTips`"] / [`DCEv` "`toolTips`"."`angle`"] / [`DCEv` "`toolTips`"."`drag`"] / [`DCEv` "`toolTips`"."`head`"] / [`DCEv` "`toolTips`"."`inch`"] / [`DCEv` "`toolTips`"."`length`"] / [`DCEv` "`toolTips`"."`of`"] / [`DCEv` "`toolTips`"."`px`"] / [`DCEv` "`toolTips`"."`resize`"] / [`DCEv` "`tooltips`"] / [`DCEv` "`tooltips`"."`altopt`"] / [`DCEv` "`tooltips`"."`inner`"] / [`DCEv` "`tooltips`"."`openclose`"] / [`DCEv` "`tooltips`"."`points`"] / [`DCEv` "`tooltips`"."`radius`"] / [`DCEv` "`tooltips`"."`radius0`"] / [`DCEv` "`tooltips`"."`radius1`"] / [`DCEv` "`tooltips`"."`reset`"] / [`DCEv` "`tooltips`"."`roundness1`"] / [`DCEv` "`tooltips`"."`roundness2`"] / [`DCEv` "`tooltips`"."`scale`"] / [`DCEv` "`tooltips`"."`sections`"] / [`DCEv` "`tooltips`"."`sides`"] / [`DCEv` "`tooltips`"."`spirals`"] / [`DCEv` "`unsharp_mask_amount`"] / [`DCEv` "`unsharp_mask_radius`"] / [`DCEv` "`unsharp_mask_threshold`"] / [`DCEv` "`usecolor`"] / [`DCEv` "`width`"] / [`DCEv` "`x1`"] / [`DCEv` "`x2`"] / [`DCEv` "`y1`"] / [`DCEv` "`y2`"] / [`DCEv` "`zoom_blur_amount`"] / [`DCEv` "`zoom_blur_quality`"]
+Parent: [`DCEv` "`AngleSoftness`"] / [`DCEv` "`BevelContrast`"] / [`DCEv` "`BevelType`"] / [`DCEv` "`BevelWidth`"] / [`DCEv` "`Blendmode`"] / [`DCEv` "`ButtonState`"] / [`DCEv` "`Color`"] / [`DCEv` "`Dict`"] / [`DCEv` "`DownBlendColor`"] / [`DCEv` "`EdgeThreshold`"] / [`DCEv` "`EffectIsVisible`"] / [`DCEv` "`EffectMoaID`"] / [`DCEv` "`EmbossFaceColor`"] / [`DCEv` "`Frame2_SS_MarginID`"] / [`DCEv` "`Frame2_SS_OverhangID`"] / [`DCEv` "`Frame2_SS_WidthID`"] / [`DCEv` "`Frame3_SS_MarginID`"] / [`DCEv` "`Frame3_SS_OverhangID`"] / [`DCEv` "`Frame3_SS_WidthID`"] / [`DCEv` "`Frame_SS_FillPattern`"] / [`DCEv` "`Frame_SS_WidthID`"] / [`DCEv` "`GlowStartDistance`"] / [`DCEv` "`GlowWidth`"] / [`DCEv` "`HiliteColor`"] / [`DCEv` "`HitBlendColor`"] / [`DCEv` "`LightAngle`"] / [`DCEv` "`LightDistance`"] / [`DCEv` "`MB_filter_preview_tile_size`"] / [`DCEv` "`MaskSoftness`"] / [`DCEv` "`Opacity`"] / [`DCEv` "`OuterBevelColor`"] / [`DCEv` "`ShadowAngle`"] / [`DCEv` "`ShadowBlur`"] / [`DCEv` "`ShadowColor`"] / [`DCEv` "`ShadowDistance`"] / [`DCEv` "`ShadowType`"] / [`DCEv` "`ShowObject`"] / [`DCEv` "`SlopeMultiplier`"] / [`DCEv` "`SlopeType`"] / [`DCEv` "`add_noise_amount`"] / [`DCEv` "`add_noise_use_color`"] / [`DCEv` "`alrtmsg`"] / [`DCEv` "`alrtmsg`"."`maxmsg`"] / [`DCEv` "`alrtmsg`"."`minmsg`"] / [`DCEv` "`angle`"] / [`DCEv` "`arrowLength`"] / [`DCEv` "`arrowTip`"] / [`DCEv` "`arrowWidth`"] / [`DCEv` "`atMin`"] / [`DCEv` "`awMin`"] / [`DCEv` "`bevelEmboss`"] / [`DCEv` "`blue_points`"] / [`DCEv` "`brightness_amount`"] / [`DCEv` "`c2y`"] / [`DCEv` "`category`"] / [`DCEv` "`clockwise`"] / [`DCEv` "`cloud_color`"] / [`DCEv` "`color`"] / [`DCEv` "`constants`"] / [`DCEv` "`constants`"."`maxB`"] / [`DCEv` "`constants`"."`maxNodes`"] / [`DCEv` "`constants`"."`minB`"] / [`DCEv` "`constants`"."`minNodes`"] / [`DCEv` "`constants`"."`ppc`"] / [`DCEv` "`contrast_amount`"] / [`DCEv` "`corner0`"] / [`DCEv` "`corner1`"] / [`DCEv` "`corner2`"] / [`DCEv` "`corner3`"] / [`DCEv` "`css`"] / [`DCEv` "`currentValues`"] / [`DCEv` "`currentValues`"\[\]."`name`"] / [`DCEv` "`currentValues`"\[\]."`type`"] / [`DCEv` "`currentValues`"\[\]."`value`"] / [`DCEv` "`curvature`"] / [`DCEv` "`curveRatio`"] / [`DCEv` "`custData`"] / [`DCEv` "`custData`"."`box`"] / [`DCEv` "`custData`"."`head1`"] / [`DCEv` "`custData`"."`head2`"] / [`DCEv` "`custData`"."`none`"] / [`DCEv` "`custData`"."`tail`"] / [`DCEv` "`dest_high_blue`"] / [`DCEv` "`dest_high_green`"] / [`DCEv` "`dest_high_red`"] / [`DCEv` "`dest_high_rgb`"] / [`DCEv` "`dest_low_blue`"] / [`DCEv` "`dest_low_green`"] / [`DCEv` "`dest_low_red`"] / [`DCEv` "`dest_low_rgb`"] / [`DCEv` "`distance`"] / [`DCEv` "`dropShadow`"] / [`DCEv` "`flexClassName`"] / [`DCEv` "`focalLength`"] / [`DCEv` "`gamma_blue`"] / [`DCEv` "`gamma_green`"] / [`DCEv` "`gamma_red`"] / [`DCEv` "`gamma_rgb`"] / [`DCEv` "`gaussian_blur_radius`"] / [`DCEv` "`gradientFill`"] / [`DCEv` "`green_points`"] / [`DCEv` "`height`"] / [`DCEv` "`hls_colorize`"] / [`DCEv` "`html`"] / [`DCEv` "`hue_amount`"] / [`DCEv` "`innerGlow`"] / [`DCEv` "`innerRatio`"] / [`DCEv` "`innerShadow`"] / [`DCEv` "`lastMouse`"] / [`DCEv` "`lastMouseAngle`"] / [`DCEv` "`lightness_amount`"] / [`DCEv` "`lineAngle`"] / [`DCEv` "`locX`"] / [`DCEv` "`locY`"] / [`DCEv` "`locked`"] / [`DCEv` "`maxNodes`"] / [`DCEv` "`minNodes`"] / [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"] / [`DCEv` "`mode`"] / [`DCEv` "`motion_blur_angle`"] / [`DCEv` "`motion_blur_distance`"] / [`DCEv` "`mouse`"] / [`DCEv` "`name`"] / [`DCEv` "`nodes`"] / [`DCEv` "`offset1`"] / [`DCEv` "`offset2`"] / [`DCEv` "`origPoints3D`"] / [`DCEv` "`origPoints3D`"."`p0`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p1`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p2`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p3`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p4`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p5`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p6`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p7`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_z`"] / [`DCEv` "`outerGlow`"] / [`DCEv` "`patternFill`"] / [`DCEv` "`points3D`"] / [`DCEv` "`points3D`"."`p0`"] / [`DCEv` "`points3D`"."`p0`"."`_x`"] / [`DCEv` "`points3D`"."`p0`"."`_y`"] / [`DCEv` "`points3D`"."`p0`"."`_z`"] / [`DCEv` "`points3D`"."`p1`"] / [`DCEv` "`points3D`"."`p1`"."`_x`"] / [`DCEv` "`points3D`"."`p1`"."`_y`"] / [`DCEv` "`points3D`"."`p1`"."`_z`"] / [`DCEv` "`points3D`"."`p2`"] / [`DCEv` "`points3D`"."`p2`"."`_x`"] / [`DCEv` "`points3D`"."`p2`"."`_y`"] / [`DCEv` "`points3D`"."`p2`"."`_z`"] / [`DCEv` "`points3D`"."`p3`"] / [`DCEv` "`points3D`"."`p3`"."`_x`"] / [`DCEv` "`points3D`"."`p3`"."`_y`"] / [`DCEv` "`points3D`"."`p3`"."`_z`"] / [`DCEv` "`points3D`"."`p4`"] / [`DCEv` "`points3D`"."`p4`"."`_x`"] / [`DCEv` "`points3D`"."`p4`"."`_y`"] / [`DCEv` "`points3D`"."`p4`"."`_z`"] / [`DCEv` "`points3D`"."`p5`"] / [`DCEv` "`points3D`"."`p5`"."`_x`"] / [`DCEv` "`points3D`"."`p5`"."`_y`"] / [`DCEv` "`points3D`"."`p5`"."`_z`"] / [`DCEv` "`points3D`"."`p6`"] / [`DCEv` "`points3D`"."`p6`"."`_x`"] / [`DCEv` "`points3D`"."`p6`"."`_y`"] / [`DCEv` "`points3D`"."`p6`"."`_z`"] / [`DCEv` "`points3D`"."`p7`"] / [`DCEv` "`points3D`"."`p7`"."`_x`"] / [`DCEv` "`points3D`"."`p7`"."`_y`"] / [`DCEv` "`points3D`"."`p7`"."`_z`"] / [`DCEv` "`pressMouse`"] / [`DCEv` "`radial`"] / [`DCEv` "`radial_blur_amount`"] / [`DCEv` "`radial_blur_quality`"] / [`DCEv` "`radius`"] / [`DCEv` "`radius0`"] / [`DCEv` "`radius1`"] / [`DCEv` "`red_points`"] / [`DCEv` "`rgb_points`"] / [`DCEv` "`rotation`"] / [`DCEv` "`rotation`"."`_x`"] / [`DCEv` "`rotation`"."`_y`"] / [`DCEv` "`rotation`"."`_z`"] / [`DCEv` "`round0`"] / [`DCEv` "`round1`"] / [`DCEv` "`roundness`"] / [`DCEv` "`satin`"] / [`DCEv` "`saturation_amount`"] / [`DCEv` "`shapeName`"] / [`DCEv` "`sides`"] / [`DCEv` "`sky_color`"] / [`DCEv` "`solidFill`"] / [`DCEv` "`source_high_blue`"] / [`DCEv` "`source_high_green`"] / [`DCEv` "`source_high_red`"] / [`DCEv` "`source_high_rgb`"] / [`DCEv` "`source_low_blue`"] / [`DCEv` "`source_low_green`"] / [`DCEv` "`source_low_red`"] / [`DCEv` "`source_low_rgb`"] / [`DCEv` "`split`"] / [`DCEv` "`stroke`"] / [`DCEv` "`style`"] / [`DCEv` "`t1`"] / [`DCEv` "`t2`"] / [`DCEv` "`tags`"] / [`DCEv` "`text`"] / [`DCEv` "`thickness`"] / [`DCEv` "`toolTips`"] / [`DCEv` "`toolTips`"."`angle`"] / [`DCEv` "`toolTips`"."`drag`"] / [`DCEv` "`toolTips`"."`head`"] / [`DCEv` "`toolTips`"."`inch`"] / [`DCEv` "`toolTips`"."`length`"] / [`DCEv` "`toolTips`"."`of`"] / [`DCEv` "`toolTips`"."`px`"] / [`DCEv` "`toolTips`"."`resize`"] / [`DCEv` "`tooltips`"] / [`DCEv` "`tooltips`"."`altopt`"] / [`DCEv` "`tooltips`"."`inner`"] / [`DCEv` "`tooltips`"."`openclose`"] / [`DCEv` "`tooltips`"."`points`"] / [`DCEv` "`tooltips`"."`radius`"] / [`DCEv` "`tooltips`"."`radius0`"] / [`DCEv` "`tooltips`"."`radius1`"] / [`DCEv` "`tooltips`"."`reset`"] / [`DCEv` "`tooltips`"."`roundness1`"] / [`DCEv` "`tooltips`"."`roundness2`"] / [`DCEv` "`tooltips`"."`scale`"] / [`DCEv` "`tooltips`"."`sections`"] / [`DCEv` "`tooltips`"."`sides`"] / [`DCEv` "`tooltips`"."`spirals`"] / [`DCEv` "`type`"] / [`DCEv` "`unsharp_mask_amount`"] / [`DCEv` "`unsharp_mask_radius`"] / [`DCEv` "`unsharp_mask_threshold`"] / [`DCEv` "`usecolor`"] / [`DCEv` "`wavelength`"] / [`DCEv` "`width`"] / [`DCEv` "`x1`"] / [`DCEv` "`x2`"] / [`DCEv` "`y1`"] / [`DCEv` "`y2`"] / [`DCEv` "`zoom_blur_amount`"] / [`DCEv` "`zoom_blur_quality`"]
 
 The key name for a key-value pair.
 
@@ -3978,7 +5600,7 @@ The key name for a key-value pair.
 
 [`DCVs`]: #dcvs-dictionary-entry-string-value
 
-Parent: [`DCEv` "`AngleSoftness`"] / [`DCEv` "`BevelContrast`"] / [`DCEv` "`BevelType`"] / [`DCEv` "`BevelWidth`"] / [`DCEv` "`Blendmode`"] / [`DCEv` "`ButtonState`"] / [`DCEv` "`Color`"] / [`DCEv` "`Dict`"] / [`DCEv` "`DownBlendColor`"] / [`DCEv` "`EdgeThreshold`"] / [`DCEv` "`EffectIsVisible`"] / [`DCEv` "`EffectMoaID`"] / [`DCEv` "`EmbossFaceColor`"] / [`DCEv` "`GlowStartDistance`"] / [`DCEv` "`GlowWidth`"] / [`DCEv` "`HiliteColor`"] / [`DCEv` "`HitBlendColor`"] / [`DCEv` "`LightAngle`"] / [`DCEv` "`LightDistance`"] / [`DCEv` "`MB_filter_preview_tile_size`"] / [`DCEv` "`MaskSoftness`"] / [`DCEv` "`Opacity`"] / [`DCEv` "`OuterBevelColor`"] / [`DCEv` "`ShadowAngle`"] / [`DCEv` "`ShadowBlur`"] / [`DCEv` "`ShadowColor`"] / [`DCEv` "`ShadowDistance`"] / [`DCEv` "`ShadowType`"] / [`DCEv` "`ShowObject`"] / [`DCEv` "`SlopeMultiplier`"] / [`DCEv` "`SlopeType`"] / [`DCEv` "`add_noise_amount`"] / [`DCEv` "`add_noise_use_color`"] / [`DCEv` "`alrtmsg`"."`maxmsg`"] / [`DCEv` "`alrtmsg`"."`minmsg`"] / [`DCEv` "`angle`"] / [`DCEv` "`arrowLength`"] / [`DCEv` "`arrowTip`"] / [`DCEv` "`arrowWidth`"] / [`DCEv` "`atMin`"] / [`DCEv` "`awMin`"] / [`DCEv` "`bevelEmboss`"] / [`DCEv` "`brightness_amount`"] / [`DCEv` "`c2y`"] / [`DCEv` "`category`"] / [`DCEv` "`clockwise`"] / [`DCEv` "`cloud_color`"] / [`DCEv` "`color`"] / [`DCEv` "`constants`"."`maxB`"] / [`DCEv` "`constants`"."`maxNodes`"] / [`DCEv` "`constants`"."`minB`"] / [`DCEv` "`constants`"."`minNodes`"] / [`DCEv` "`constants`"."`ppc`"] / [`DCEv` "`contrast_amount`"] / [`DCEv` "`corner0`"] / [`DCEv` "`corner1`"] / [`DCEv` "`corner2`"] / [`DCEv` "`corner3`"] / [`DCEv` "`custData`"."`box`"] / [`DCEv` "`custData`"."`head1`"] / [`DCEv` "`custData`"."`head2`"] / [`DCEv` "`custData`"."`none`"] / [`DCEv` "`custData`"."`tail`"] / [`DCEv` "`dest_high_blue`"] / [`DCEv` "`dest_high_green`"] / [`DCEv` "`dest_high_red`"] / [`DCEv` "`dest_high_rgb`"] / [`DCEv` "`dest_low_blue`"] / [`DCEv` "`dest_low_green`"] / [`DCEv` "`dest_low_red`"] / [`DCEv` "`dest_low_rgb`"] / [`DCEv` "`distance`"] / [`DCEv` "`dropShadow`"] / [`DCEv` "`gamma_blue`"] / [`DCEv` "`gamma_green`"] / [`DCEv` "`gamma_red`"] / [`DCEv` "`gamma_rgb`"] / [`DCEv` "`gaussian_blur_radius`"] / [`DCEv` "`gradientFill`"] / [`DCEv` "`height`"] / [`DCEv` "`hls_colorize`"] / [`DCEv` "`hue_amount`"] / [`DCEv` "`innerGlow`"] / [`DCEv` "`innerShadow`"] / [`DCEv` "`lightness_amount`"] / [`DCEv` "`locked`"] / [`DCEv` "`maxNodes`"] / [`DCEv` "`minNodes`"] / [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"] / [`DCEv` "`mode`"] / [`DCEv` "`motion_blur_angle`"] / [`DCEv` "`motion_blur_distance`"] / [`DCEv` "`name`"] / [`DCEv` "`nodes`"] / [`DCEv` "`offset1`"] / [`DCEv` "`offset2`"] / [`DCEv` "`outerGlow`"] / [`DCEv` "`patternFill`"] / [`DCEv` "`radial_blur_amount`"] / [`DCEv` "`radial_blur_quality`"] / [`DCEv` "`radius`"] / [`DCEv` "`radius0`"] / [`DCEv` "`radius1`"] / [`DCEv` "`rotation`"] / [`DCEv` "`round0`"] / [`DCEv` "`round1`"] / [`DCEv` "`roundness`"] / [`DCEv` "`satin`"] / [`DCEv` "`saturation_amount`"] / [`DCEv` "`shapeName`"] / [`DCEv` "`sides`"] / [`DCEv` "`sky_color`"] / [`DCEv` "`solidFill`"] / [`DCEv` "`source_high_blue`"] / [`DCEv` "`source_high_green`"] / [`DCEv` "`source_high_red`"] / [`DCEv` "`source_high_rgb`"] / [`DCEv` "`source_low_blue`"] / [`DCEv` "`source_low_green`"] / [`DCEv` "`source_low_red`"] / [`DCEv` "`source_low_rgb`"] / [`DCEv` "`split`"] / [`DCEv` "`stroke`"] / [`DCEv` "`t1`"] / [`DCEv` "`t2`"] / [`DCEv` "`thickness`"] / [`DCEv` "`toolTips`"."`angle`"] / [`DCEv` "`toolTips`"."`drag`"] / [`DCEv` "`toolTips`"."`head`"] / [`DCEv` "`toolTips`"."`inch`"] / [`DCEv` "`toolTips`"."`length`"] / [`DCEv` "`toolTips`"."`of`"] / [`DCEv` "`toolTips`"."`px`"] / [`DCEv` "`toolTips`"."`resize`"] / [`DCEv` "`tooltips`"."`altopt`"] / [`DCEv` "`tooltips`"."`inner`"] / [`DCEv` "`tooltips`"."`openclose`"] / [`DCEv` "`tooltips`"."`points`"] / [`DCEv` "`tooltips`"."`radius`"] / [`DCEv` "`tooltips`"."`radius0`"] / [`DCEv` "`tooltips`"."`radius1`"] / [`DCEv` "`tooltips`"."`reset`"] / [`DCEv` "`tooltips`"."`roundness1`"] / [`DCEv` "`tooltips`"."`roundness2`"] / [`DCEv` "`tooltips`"."`scale`"] / [`DCEv` "`tooltips`"."`sections`"] / [`DCEv` "`tooltips`"."`sides`"] / [`DCEv` "`tooltips`"."`spirals`"] / [`DCEv` "`unsharp_mask_amount`"] / [`DCEv` "`unsharp_mask_radius`"] / [`DCEv` "`unsharp_mask_threshold`"] / [`DCEv` "`usecolor`"] / [`DCEv` "`width`"] / [`DCEv` "`x1`"] / [`DCEv` "`x2`"] / [`DCEv` "`y1`"] / [`DCEv` "`y2`"] / [`DCEv` "`zoom_blur_amount`"] / [`DCEv` "`zoom_blur_quality`"]
+Parent: [`DCEv` "`AngleSoftness`"] / [`DCEv` "`BevelContrast`"] / [`DCEv` "`BevelType`"] / [`DCEv` "`BevelWidth`"] / [`DCEv` "`Blendmode`"] / [`DCEv` "`ButtonState`"] / [`DCEv` "`Color`"] / [`DCEv` "`Dict`"] / [`DCEv` "`DownBlendColor`"] / [`DCEv` "`EdgeThreshold`"] / [`DCEv` "`EffectIsVisible`"] / [`DCEv` "`EffectMoaID`"] / [`DCEv` "`EmbossFaceColor`"] / [`DCEv` "`Frame2_SS_MarginID`"] / [`DCEv` "`Frame2_SS_OverhangID`"] / [`DCEv` "`Frame2_SS_WidthID`"] / [`DCEv` "`Frame3_SS_MarginID`"] / [`DCEv` "`Frame3_SS_OverhangID`"] / [`DCEv` "`Frame3_SS_WidthID`"] / [`DCEv` "`Frame_SS_FillPattern`"] / [`DCEv` "`Frame_SS_WidthID`"] / [`DCEv` "`GlowStartDistance`"] / [`DCEv` "`GlowWidth`"] / [`DCEv` "`HiliteColor`"] / [`DCEv` "`HitBlendColor`"] / [`DCEv` "`LightAngle`"] / [`DCEv` "`LightDistance`"] / [`DCEv` "`MB_filter_preview_tile_size`"] / [`DCEv` "`MaskSoftness`"] / [`DCEv` "`Opacity`"] / [`DCEv` "`OuterBevelColor`"] / [`DCEv` "`ShadowAngle`"] / [`DCEv` "`ShadowBlur`"] / [`DCEv` "`ShadowColor`"] / [`DCEv` "`ShadowDistance`"] / [`DCEv` "`ShadowType`"] / [`DCEv` "`ShowObject`"] / [`DCEv` "`SlopeMultiplier`"] / [`DCEv` "`SlopeType`"] / [`DCEv` "`add_noise_amount`"] / [`DCEv` "`add_noise_use_color`"] / [`DCEv` "`alrtmsg`"."`maxmsg`"] / [`DCEv` "`alrtmsg`"."`minmsg`"] / [`DCEv` "`angle`"] / [`DCEv` "`arrowLength`"] / [`DCEv` "`arrowTip`"] / [`DCEv` "`arrowWidth`"] / [`DCEv` "`atMin`"] / [`DCEv` "`awMin`"] / [`DCEv` "`bevelEmboss`"] / [`DCEv` "`brightness_amount`"] / [`DCEv` "`c2y`"] / [`DCEv` "`category`"] / [`DCEv` "`clockwise`"] / [`DCEv` "`cloud_color`"] / [`DCEv` "`color`"] / [`DCEv` "`constants`"."`maxB`"] / [`DCEv` "`constants`"."`maxNodes`"] / [`DCEv` "`constants`"."`minB`"] / [`DCEv` "`constants`"."`minNodes`"] / [`DCEv` "`constants`"."`ppc`"] / [`DCEv` "`contrast_amount`"] / [`DCEv` "`corner0`"] / [`DCEv` "`corner1`"] / [`DCEv` "`corner2`"] / [`DCEv` "`corner3`"] / [`DCEv` "`css`"] / [`DCEv` "`currentValues`"] / [`DCEv` "`currentValues`"\[\]."`name`"] / [`DCEv` "`currentValues`"\[\]."`type`"] / [`DCEv` "`currentValues`"\[\]."`value`"] / [`DCEv` "`curvature`"] / [`DCEv` "`curveRatio`"] / [`DCEv` "`custData`"."`box`"] / [`DCEv` "`custData`"."`head1`"] / [`DCEv` "`custData`"."`head2`"] / [`DCEv` "`custData`"."`none`"] / [`DCEv` "`custData`"."`tail`"] / [`DCEv` "`dest_high_blue`"] / [`DCEv` "`dest_high_green`"] / [`DCEv` "`dest_high_red`"] / [`DCEv` "`dest_high_rgb`"] / [`DCEv` "`dest_low_blue`"] / [`DCEv` "`dest_low_green`"] / [`DCEv` "`dest_low_red`"] / [`DCEv` "`dest_low_rgb`"] / [`DCEv` "`distance`"] / [`DCEv` "`dropShadow`"] / [`DCEv` "`flexClassName`"] / [`DCEv` "`focalLength`"] / [`DCEv` "`gamma_blue`"] / [`DCEv` "`gamma_green`"] / [`DCEv` "`gamma_red`"] / [`DCEv` "`gamma_rgb`"] / [`DCEv` "`gaussian_blur_radius`"] / [`DCEv` "`gradientFill`"] / [`DCEv` "`height`"] / [`DCEv` "`hls_colorize`"] / [`DCEv` "`html`"] / [`DCEv` "`hue_amount`"] / [`DCEv` "`innerGlow`"] / [`DCEv` "`innerRatio`"] / [`DCEv` "`innerShadow`"] / [`DCEv` "`lastMouse`"] / [`DCEv` "`lastMouseAngle`"] / [`DCEv` "`lightness_amount`"] / [`DCEv` "`lineAngle`"] / [`DCEv` "`locX`"] / [`DCEv` "`locY`"] / [`DCEv` "`locked`"] / [`DCEv` "`maxNodes`"] / [`DCEv` "`minNodes`"] / [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"] / [`DCEv` "`mode`"] / [`DCEv` "`motion_blur_angle`"] / [`DCEv` "`motion_blur_distance`"] / [`DCEv` "`mouse`"] / [`DCEv` "`name`"] / [`DCEv` "`nodes`"] / [`DCEv` "`offset1`"] / [`DCEv` "`offset2`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_z`"] / [`DCEv` "`outerGlow`"] / [`DCEv` "`patternFill`"] / [`DCEv` "`points3D`"."`p0`"."`_x`"] / [`DCEv` "`points3D`"."`p0`"."`_y`"] / [`DCEv` "`points3D`"."`p0`"."`_z`"] / [`DCEv` "`points3D`"."`p1`"."`_x`"] / [`DCEv` "`points3D`"."`p1`"."`_y`"] / [`DCEv` "`points3D`"."`p1`"."`_z`"] / [`DCEv` "`points3D`"."`p2`"."`_x`"] / [`DCEv` "`points3D`"."`p2`"."`_y`"] / [`DCEv` "`points3D`"."`p2`"."`_z`"] / [`DCEv` "`points3D`"."`p3`"."`_x`"] / [`DCEv` "`points3D`"."`p3`"."`_y`"] / [`DCEv` "`points3D`"."`p3`"."`_z`"] / [`DCEv` "`points3D`"."`p4`"."`_x`"] / [`DCEv` "`points3D`"."`p4`"."`_y`"] / [`DCEv` "`points3D`"."`p4`"."`_z`"] / [`DCEv` "`points3D`"."`p5`"."`_x`"] / [`DCEv` "`points3D`"."`p5`"."`_y`"] / [`DCEv` "`points3D`"."`p5`"."`_z`"] / [`DCEv` "`points3D`"."`p6`"."`_x`"] / [`DCEv` "`points3D`"."`p6`"."`_y`"] / [`DCEv` "`points3D`"."`p6`"."`_z`"] / [`DCEv` "`points3D`"."`p7`"."`_x`"] / [`DCEv` "`points3D`"."`p7`"."`_y`"] / [`DCEv` "`points3D`"."`p7`"."`_z`"] / [`DCEv` "`pressMouse`"] / [`DCEv` "`radial`"] / [`DCEv` "`radial_blur_amount`"] / [`DCEv` "`radial_blur_quality`"] / [`DCEv` "`radius`"] / [`DCEv` "`radius0`"] / [`DCEv` "`radius1`"] / [`DCEv` "`rotation`"] / [`DCEv` "`rotation`"."`_x`"] / [`DCEv` "`rotation`"."`_y`"] / [`DCEv` "`rotation`"."`_z`"] / [`DCEv` "`round0`"] / [`DCEv` "`round1`"] / [`DCEv` "`roundness`"] / [`DCEv` "`satin`"] / [`DCEv` "`saturation_amount`"] / [`DCEv` "`shapeName`"] / [`DCEv` "`sides`"] / [`DCEv` "`sky_color`"] / [`DCEv` "`solidFill`"] / [`DCEv` "`source_high_blue`"] / [`DCEv` "`source_high_green`"] / [`DCEv` "`source_high_red`"] / [`DCEv` "`source_high_rgb`"] / [`DCEv` "`source_low_blue`"] / [`DCEv` "`source_low_green`"] / [`DCEv` "`source_low_red`"] / [`DCEv` "`source_low_rgb`"] / [`DCEv` "`split`"] / [`DCEv` "`stroke`"] / [`DCEv` "`style`"] / [`DCEv` "`t1`"] / [`DCEv` "`t2`"] / [`DCEv` "`tags`"] / [`DCEv` "`text`"] / [`DCEv` "`thickness`"] / [`DCEv` "`toolTips`"."`angle`"] / [`DCEv` "`toolTips`"."`drag`"] / [`DCEv` "`toolTips`"."`head`"] / [`DCEv` "`toolTips`"."`inch`"] / [`DCEv` "`toolTips`"."`length`"] / [`DCEv` "`toolTips`"."`of`"] / [`DCEv` "`toolTips`"."`px`"] / [`DCEv` "`toolTips`"."`resize`"] / [`DCEv` "`tooltips`"."`altopt`"] / [`DCEv` "`tooltips`"."`inner`"] / [`DCEv` "`tooltips`"."`openclose`"] / [`DCEv` "`tooltips`"."`points`"] / [`DCEv` "`tooltips`"."`radius`"] / [`DCEv` "`tooltips`"."`radius0`"] / [`DCEv` "`tooltips`"."`radius1`"] / [`DCEv` "`tooltips`"."`reset`"] / [`DCEv` "`tooltips`"."`roundness1`"] / [`DCEv` "`tooltips`"."`roundness2`"] / [`DCEv` "`tooltips`"."`scale`"] / [`DCEv` "`tooltips`"."`sections`"] / [`DCEv` "`tooltips`"."`sides`"] / [`DCEv` "`tooltips`"."`spirals`"] / [`DCEv` "`type`"] / [`DCEv` "`unsharp_mask_amount`"] / [`DCEv` "`unsharp_mask_radius`"] / [`DCEv` "`unsharp_mask_threshold`"] / [`DCEv` "`usecolor`"] / [`DCEv` "`wavelength`"] / [`DCEv` "`width`"] / [`DCEv` "`x1`"] / [`DCEv` "`x2`"] / [`DCEv` "`y1`"] / [`DCEv` "`y2`"] / [`DCEv` "`zoom_blur_amount`"] / [`DCEv` "`zoom_blur_quality`"]
 
 A string value for a key-value pair.
 
@@ -4062,10 +5684,49 @@ Stores arbitrary, possibly nested, data for JavaScript scripts, as set on `smart
 
 Contains:
 
+- [`DCEv` "`height`"]?
+- [`DCEv` "`curvature`"]?
+- [`DCEv` "`lineAngle`"]?
+- [`DCEv` "`wavelength`"]?
+- [`DCEv` "`style`"]?
+- [`DCEv` "`radial`"]?
+- [`DCEv` "`innerRatio`"]?
+- [`DCEv` "`curveRatio`"]?
+- [`DCEv` "`Frame3_SS_WidthID`"]?
+- [`DCEv` "`Frame3_SS_OverhangID`"]?
+- [`DCEv` "`Frame3_SS_MarginID`"]?
+- [`DCEv` "`Frame2_SS_WidthID`"]?
+- [`DCEv` "`Frame2_SS_OverhangID`"]?
+- [`DCEv` "`Frame2_SS_MarginID`"]?
+- [`DCEv` "`Frame_SS_FillPattern`"]?
+- [`DCEv` "`Frame_SS_WidthID`"]?
+- [`DCEv` "`text`"]?
+- [`DCEv` "`width`"]?
+- [`DCEv` "`locX`"]?
+- [`DCEv` "`locY`"]?
+- [`DCEv` "`mouse`"]?
+- [`DCEv` "`points3D`"]?
+- [`DCEv` "`origPoints3D`"]?
+- [`DCEv` "`rotation`"]?
+- [`DCEv` "`focalLength`"]?
+- [`DCEv` "`lastMouse`"]?
+- [`DCEv` "`pressMouse`"]?
+- [`DCEv` "`lastMouseAngle`"]?
+- [`DCEv` "`corner1`"]?
+- [`DCEv` "`locked`"]?
+- [`DCEv` "`shapeName`"]?
+- [`DCEv` "`corner3`"]?
+- [`DCEv` "`corner0`"]?
+- [`DCEv` "`corner2`"]?
+- [`DCEv` "`currentValues`"]?
+- [`DCEv` "`css`"]?
+- [`DCEv` "`html`"]?
+- [`DCEv` "`tags`"]?
+- [`DCEv` "`type`"]?
+- [`DCEv` "`flexClassName`"]?
 - [`DCEv` "`alrtmsg`"]?
 - [`DCEv` "`round0`"]?
 - [`DCEv` "`round1`"]?
-- [`DCEv` "`shapeName`"]?
 - [`DCEv` "`constants`"]?
 - [`DCEv` "`tooltips`"]?
 - [`DCEv` "`radius0`"]?
@@ -4074,18 +5735,10 @@ Contains:
 - [`DCEv` "`radius`"]?
 - [`DCEv` "`c2y`"]?
 - [`DCEv` "`clockwise`"]?
-- [`DCEv` "`rotation`"]?
 - [`DCEv` "`split`"]?
 - [`DCEv` "`sides`"]?
 - [`DCEv` "`maxNodes`"]?
 - [`DCEv` "`minNodes`"]?
-- [`DCEv` "`width`"]?
-- [`DCEv` "`height`"]?
-- [`DCEv` "`corner2`"]?
-- [`DCEv` "`corner3`"]?
-- [`DCEv` "`corner0`"]?
-- [`DCEv` "`corner1`"]?
-- [`DCEv` "`locked`"]?
 - [`DCEv` "`y2`"]?
 - [`DCEv` "`x2`"]?
 - [`DCEv` "`y1`"]?
@@ -4152,7 +5805,7 @@ Preset effects / defaults offered in the UI
 
 Contains:
 
-- [`EFLv`]+ Effect List
+- [`EFLv`]\* Effect List
 
 ## `EFLv` **Ef**fect **L**ist
 
@@ -4198,8 +5851,8 @@ Contains:
 - [`PTHv`]\* Path
 - [`TXTv`]\* Text
 - [`GRPv`]\* Group
-- [`LSLv`]\* Layer Sub-Layer
 - [`URLv`]\* Image Slice / Hotspot
+- [`LSLv`]\* Layer Sub-Layer
 - [`ALSv`]\* Symbol Instance
 
 ## `ENCi` HTML **Enc**oding
@@ -4331,7 +5984,7 @@ Contains:
 
 [`EXPv`]: #expv-export-options
 
-Parent: [`MKBv`] / [`PDCv`] / [`URLv`]
+Parent: [`MKBv`] / [`MSTv`] / [`PDCv`] / [`URLv`]
 
 Contains:
 
@@ -4423,10 +6076,6 @@ Parent: [`ZSTv`]
 
 A **signed** 32-bit number, relating to Bottom.
 
-Values:
-
-- `4294935296`: unknown - TODO
-
 ## `FALi`
 
 [`FALi`]: #fali
@@ -4434,10 +6083,6 @@ Values:
 Parent: [`ZSTv`]
 
 A **signed** 32-bit number, relating to Left.
-
-Values:
-
-- `32000`: unknown - TODO
 
 ## `FARi`
 
@@ -4447,10 +6092,6 @@ Parent: [`ZSTv`]
 
 A **signed** 32-bit number, relating to Right.
 
-Values:
-
-- `4294935296`: unknown - TODO
-
 ## `FATi`
 
 [`FATi`]: #fati
@@ -4458,10 +6099,6 @@ Values:
 Parent: [`ZSTv`]
 
 A **signed** 32-bit number, relating to Top.
-
-Values:
-
-- `32000`: unknown - TODO
 
 ## `FCLi` **F**ill **C**o**l**our
 
@@ -4582,6 +6219,7 @@ Contains:
 - [`INMs`] Internal Name
 - [`FGVv`] Fill Gradient Vertices
 - [`FGYv`]? Fill Gradient RGB + Alpha
+- [`UNMs`]? User-facing Name
 
 ## `FGPf` **F**ill **G**radient Control Point **P**osition
 
@@ -4597,6 +6235,8 @@ Observed value range: `0`..`1`
 
 Parent: [`FGLv`]
 
+Used by old versions; has a single list of stops with RGBA values at each stop. Ignored if [`FGYv`] is present.
+
 Contains:
 
 - [`FNCi`] Fill Gradient Number of Control Points
@@ -4608,6 +6248,8 @@ Contains:
 
 Parent: [`FGLv`]
 
+Used by newer versions; has separate RGB and Alpha gradients. Replaces [`FGVv`].
+
 Contains:
 
 - [`FG0v`] Fill Gradient 0 (RGB)
@@ -4617,7 +6259,7 @@ Contains:
 
 [`FILs`]: #fils-label
 
-Parent: [`ISSv`] / [`URLv`]
+Parent: [`ALSv`] / [`ISSv`] / [`URLv`]
 
 ## `FLDv` **F**i**l**l Type **D**efinitions
 
@@ -4709,6 +6351,7 @@ Parent: [`TXTv`]
 Values:
 
 - `false`: unknown - TODO
+- `true`: unknown - TODO
 
 ## `FONs` **Fon**t Family
 
@@ -4718,6 +6361,7 @@ Parent: [`BEHv`] / [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
 Values:
 
+- ``
 - `Arial`
 - `Arial Black`
 - `Arial-Black`
@@ -4747,10 +6391,15 @@ Values:
 - `HoratioDMed`
 - `Impact`
 - `Italic`
+- `Lucida Grande`
+- `LucidaGrande`
 - `MS Sans Serif`
 - `Minion Pro`
 - `MinionPro-Regular`
 - `Monotype Corsiva`
+- `Myriad Pro`
+- `MyriadPro-Bold`
+- `MyriadPro-Regular`
 - `OCR A Std`
 - `OCRAStd`
 - `Ringbearer`
@@ -4759,7 +6408,9 @@ Values:
 - `SimHei`
 - `Tekton Pro`
 - `TektonPro-BoldCond`
+- `Times`
 - `Times New Roman`
+- `Verdana`
 - `Verdana, Arial, Helvetica, sans-serif`
 
 ## `FOTb` **F**ill **O**n **T**op
@@ -4827,9 +6478,9 @@ Contains:
 
 [`FRCi`]: #frci-frame-count
 
-Parent: [`MKBv`] / [`MSTv`] / [`PDCv`]
+Parent: [`BEHv`] / [`MKBv`] / [`MSTv`] / [`PDCv`]
 
-The number of animation frames. It is not clear why this node is duplicated.
+The number of animation frames. It is not clear why this node is duplicated. In [`BEHv`], this is used as a frame reference.
 
 ## `FRDb`
 
@@ -4850,6 +6501,14 @@ Parent: [`FPLv`]
 Values:
 
 - `0`: unknown - TODO - observed in all files
+
+## `FRTi` Over While Down state number
+
+[`FRTi`]: #frti-over-while-down-state-number
+
+Parent: [`BEHv`]
+
+Frame/state number to use as the over-while-down ("hit") state.
 
 ## `FSHi` **F**ill **Sh**ape
 
@@ -4978,10 +6637,80 @@ Contains:
 
 [`GDTv`]: #gdtv-nested-dictionary
 
-Parent: [`DCEv` "`alrtmsg`"] / [`DCEv` "`constants`"] / [`DCEv` "`custData`"] / [`DCEv` "`toolTips`"] / [`DCEv` "`tooltips`"]
+Parent: [`DCEv` "`alrtmsg`"] / [`DCEv` "`constants`"] / [`DCEv` "`custData`"] / [`DCEv` "`origPoints3D`"] / [`DCEv` "`origPoints3D`"."`p0`"] / [`DCEv` "`origPoints3D`"."`p1`"] / [`DCEv` "`origPoints3D`"."`p2`"] / [`DCEv` "`origPoints3D`"."`p3`"] / [`DCEv` "`origPoints3D`"."`p4`"] / [`DCEv` "`origPoints3D`"."`p5`"] / [`DCEv` "`origPoints3D`"."`p6`"] / [`DCEv` "`origPoints3D`"."`p7`"] / [`DCEv` "`points3D`"] / [`DCEv` "`points3D`"."`p0`"] / [`DCEv` "`points3D`"."`p1`"] / [`DCEv` "`points3D`"."`p2`"] / [`DCEv` "`points3D`"."`p3`"] / [`DCEv` "`points3D`"."`p4`"] / [`DCEv` "`points3D`"."`p5`"] / [`DCEv` "`points3D`"."`p6`"] / [`DCEv` "`points3D`"."`p7`"] / [`DCEv` "`rotation`"] / [`DCEv` "`toolTips`"] / [`DCEv` "`tooltips`"] / [`GVRv`]
 
 Contains:
 
+- [`DCEv` "`points3D`"."`p0`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p0`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p0`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p1`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p1`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p1`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p2`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p2`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p2`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p3`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p3`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p3`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p4`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p4`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p4`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p5`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p5`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p5`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p6`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p6`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p6`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p7`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p7`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p7`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p0`"]?
+- [`DCEv` "`points3D`"."`p1`"]?
+- [`DCEv` "`points3D`"."`p2`"]?
+- [`DCEv` "`points3D`"."`p3`"]?
+- [`DCEv` "`points3D`"."`p4`"]?
+- [`DCEv` "`points3D`"."`p5`"]?
+- [`DCEv` "`points3D`"."`p6`"]?
+- [`DCEv` "`points3D`"."`p7`"]?
+- [`DCEv` "`origPoints3D`"."`p0`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p0`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p0`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p1`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p1`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p1`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p2`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p2`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p2`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p3`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p3`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p3`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p4`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p4`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p4`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p5`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p5`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p5`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p6`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p6`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p6`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p7`"."`_x`"]?
+- [`DCEv` "`origPoints3D`"."`p7`"."`_y`"]?
+- [`DCEv` "`origPoints3D`"."`p7`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p0`"]?
+- [`DCEv` "`origPoints3D`"."`p1`"]?
+- [`DCEv` "`origPoints3D`"."`p2`"]?
+- [`DCEv` "`origPoints3D`"."`p3`"]?
+- [`DCEv` "`origPoints3D`"."`p4`"]?
+- [`DCEv` "`origPoints3D`"."`p5`"]?
+- [`DCEv` "`origPoints3D`"."`p6`"]?
+- [`DCEv` "`origPoints3D`"."`p7`"]?
+- [`DCEv` "`rotation`"."`_x`"]?
+- [`DCEv` "`rotation`"."`_y`"]?
+- [`DCEv` "`rotation`"."`_z`"]?
+- [`DCEv` "`currentValues`"\[\]."`name`"]?
+- [`DCEv` "`currentValues`"\[\]."`value`"]?
+- [`DCEv` "`currentValues`"\[\]."`type`"]?
 - [`DCEv` "`alrtmsg`"."`maxmsg`"]?
 - [`DCEv` "`alrtmsg`"."`minmsg`"]?
 - [`DCEv` "`constants`"."`maxNodes`"]?
@@ -5048,7 +6777,7 @@ Gradients which are offered in the UI as "presets".
 
 Contains:
 
-- [`FGLv`] (x13) Fill Gradient
+- [`FGLv`]+ Fill Gradient
 
 ## `GLTi` **G**IF **L**oss
 
@@ -5124,10 +6853,10 @@ Contains:
 - [`ISSv`]? Smart Shape
 - [`EFLv`]? Effect List
 - [`MNAb`]? Mask Not Appear
-- [`MRMv`]?
-- [`LNKb`]? Linked
 - [`VISb`]? Visible
 - [`OPAi`]? Opacity
+- [`MRMv`]?
+- [`LNKb`]? Linked
 - [`BLDi`]? Blend Mode
 
 ## `GRTi` **Gr**oup **T**ype
@@ -5163,6 +6892,16 @@ Parent: [`GRDv`]
 [`GSYf`]: #gsyf-grid-size-y
 
 Parent: [`GRDv`]
+
+## `GVRv` Dictionary **V**alue **A**rray
+
+[`GVRv`]: #gvrv-dictionary-value-array
+
+Parent: [`DCEv` "`currentValues`"] / [`DCEv` "`tags`"]
+
+Contains:
+
+- [`GDTv`]\* Nested Dictionary
 
 ## `HICi` **Hi**ghlight **C**olour
 
@@ -5252,6 +6991,7 @@ Parent: [`MSTv`]
 Values:
 
 - `false`: unknown - TODO
+- `true`: unknown - TODO
 
 ## `ILLb`
 
@@ -5293,12 +7033,12 @@ Contains:
 - [`TSZi`] Tile Size
 - [`TILv`] Tile ID List
 - [`DTAv`]? Data
+- [`VISb`]? Visible
+- [`OBNs`]? Object Name
 - [`EFLv`]? Effect List
 - [`IMGv`]? Image
 - [`BLDi`]? Blend Mode
 - [`OPAi`]? Opacity
-- [`VISb`]? Visible
-- [`OBNs`]? Object Name
 
 ## `IMPb` **I**s **M**aster **P**age
 
@@ -5316,8 +7056,10 @@ Parent: [`BPLv`] / [`EFLv`] / [`FGLv`] / [`FPLv`] / [`FPTv`] / [`TXBv`] / [`TXFv
 
 Values:
 
+- `+Flat`
 - `1-Pixel Hard`
 - `1-Pixel Soft`
+- `1px 30 transparent`
 - `3D Glow`
 - `Accented Edges...`
 - `Add Noise...`
@@ -5401,6 +7143,7 @@ Values:
 - `Ink Outlines...`
 - `Inner Glow`
 - `Inner Shadow`
+- `Interlace Soft`
 - `Invert`
 - `Leaves`
 - `Levels...`
@@ -5428,6 +7171,7 @@ Values:
 - `Mossy Rock`
 - `Motion Blur...`
 - `Motion Trail...`
+- `NN_slash_r08`
 - `Neon Glow...`
 - `Note Paper...`
 - `Ocean Ripple...`
@@ -5445,6 +7189,7 @@ Values:
 - `Pattern`
 - `Photocopy...`
 - `Photoshop Live Effects`
+- `PhotoshopEffects...`
 - `Piano Keys`
 - `Pinch`
 - `Pits-Green`
@@ -5476,6 +7221,7 @@ Values:
 - `Solid`
 - `Solid Shadow...`
 - `Spatter...`
+- `Spherize...`
 - `Sponge...`
 - `Sprayed Strokes...`
 - `Stamp...`
@@ -5561,6 +7307,7 @@ Values:
 - `cn_BlueYellowBlue`
 - `cn_Cobalt Blue`
 - `cn_Copper`
+- `cn_Custom`
 - `cn_Emerald Green`
 - `cn_Pastels`
 - `cn_RedBlue`
@@ -5597,6 +7344,7 @@ Values:
 - `fn_Satin`
 - `fn_Waves`
 - `fn_WebDither`
+- `tmt_stucco4`
 
 ## `IODb`
 
@@ -5607,6 +7355,7 @@ Parent: [`MSTv`]
 Values:
 
 - `false`: unknown - TODO
+- `true`: unknown - TODO
 
 ## `ISCb` **Is** **C**losed
 
@@ -5752,6 +7501,7 @@ Values:
 - `1`: centre
 - `2`: right
 - `3`: fully justified
+- `4`: unknown - TODO
 
 ## `JSVv` **J**ava**S**cript Script
 
@@ -5763,7 +7513,7 @@ A JavaScript script, potentially split into multiple [`JSSs`] pieces which must 
 
 Contains:
 
-- [`JSSs`]+ JavaScript Substring
+- [`JSSs`]\* JavaScript Substring
 
 ## `KRNf`
 
@@ -5823,7 +7573,7 @@ Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
 Line height, in units defined by [`LDMi`]
 
-Observed value range: `1`..`40`
+Observed value range: `0.8`..`40`
 
 ## `LFAf` **L**e**f**t **A**nchor
 
@@ -5833,7 +7583,15 @@ Parent: [`TXTv`]
 
 This is the location of the text anchor point, which for left-aligned text or text with an explicit width is typically the same as [`LFTf`]. For centred and right-aligned text without an explicit width, `LFTf` will be set to the left bounds of the text, making it less than `LFAf`. This property is also independent of paragraph indents (see [`PINf`])
 
-Observed value range: `-30`..`962`
+Observed value range: `-282`..`962`
+
+## `LFNs` **F**ile **N**ame
+
+[`LFNs`]: #lfns-file-name
+
+Parent: [`MSTv`]
+
+Some file path (as a URI) related to the symbol, perhaps a Linked File Name?
 
 ## `LFTf` **L**e**ft**
 
@@ -5850,6 +7608,14 @@ Distance (pixels) from left of container to left of entity.
 Parent: [`LAYv`] / [`LSLv`]
 
 Appears to be the indentation level for the layer, counting from `0` for root-level layers.
+
+## `LMNi`
+
+[`LMNi`]: #lmni
+
+Parent: [`MSTv`]
+
+Observed value range: `0x00cd7c6a`..`0x7d78b795` (`13466730`..`2105063317`)
 
 ## `LNKb` **L**i**nk**ed
 
@@ -6185,7 +7951,7 @@ Contains:
 - [`GLDv`]? Gradient List Definitions
 - [`EFDv`]? Effect Definitions
 - [`MSLv`]? Symbol Definition List
-- [`ZSLv`]?
+- [`ZSLv`]? Saved Style List
 - [`PATv`]? Pattern
 - [`EXPv`]? Export Options
 - [`MNFv`]?
@@ -6228,7 +7994,7 @@ Parent: [`MKBv`] / [`PDCv`]
 
 Contains:
 
-- [`MNDs`] Default ALT Tag
+- [`MNDs`]? Default ALT Tag
 
 ## `MOXf`
 
@@ -6313,11 +8079,11 @@ Contains:
 
 [`MSNi`]: #msni-symbol-unique-number
 
-Parent: [`ALSv`] / [`MSTv`] / [`URLv`]
+Parent: [`ALSv`] / [`BEHv`] / [`MSTv`] / [`URLv`]
 
-A 32-bit number which uniquely defines a symbol in the document. Used to link [`ALSv`] instances to [`MSTv`] definitions.
+A 32-bit number which uniquely defines a symbol / entity in the document. Used to link [`ALSv`] instances to [`MSTv`] definitions, and [`BEHv`] actions to [`URLv`] slices.
 
-Observed value range: `0x01d850af`..`0x7fa4d095` (`30953647`..`2141507733`)
+Observed value range: `0x00103c95`..`0x7fbbc439` (`1064085`..`2143011897`)
 
 ## `MSTv` **S**ymbol Definition
 
@@ -6333,6 +8099,8 @@ Contains:
 - [`MSNi`] Symbol Unique Number
 - [`MOXf`]
 - [`MOYf`]
+- [`LFNs`]? File Name
+- [`LMNi`]?
 - [`LUTs`] Last Update Time
 - [`LYLv`] Layer List
 - [`GRDv`] Grid
@@ -6347,6 +8115,8 @@ Contains:
 - [`IODb`]
 - [`MSYi`]? Symbol Type
 - [`NGSv`]? Nine Slice Guide
+- [`WJSs`]? Widget JavaScript
+- [`EXPv`]? Export Options
 
 ## `MSYi` **S**ymbol T**y**pe
 
@@ -6658,8 +8428,8 @@ Contains:
 - [`BCLi`] Brush Colour
 - [`FCLi`] Fill Colour
 - [`FPLv`]? Fill Pattern Properties
-- [`TXBv`] Texture Brush
-- [`TXFv`] Texture Fill
+- [`TXBv`]? Texture Brush
+- [`TXFv`]? Texture Fill
 - [`BPLv`]? Brush Property List
 
 ## `PBLv` **P**ath **B**ezier **L**ist
@@ -6725,7 +8495,7 @@ List of interpolated paths. The source of truth for this is a [`PBLv`].
 
 Contains:
 
-- [`PPLv`]+ Path Point List
+- [`PPLv`]\* Path Point List
 
 ## `PDCv` **P**age
 
@@ -6757,7 +8527,7 @@ Contains:
 - [`MNFv`]
 - [`PGNs`] Page Name
 - [`IMPb`] Is Master Page
-- [`PILb`] Page Is Linked
+- [`PILb`]? Page Is Linked
 - [`PIDs`] Page ID
 - [`LSMv`] Layer Shared Definitions
 - [`LYLv`] Layer List
@@ -6842,7 +8612,7 @@ Preset brushes offered in the UI
 
 Contains:
 
-- [`BPLv`]+ Brush Property List
+- [`BPLv`] (x2 +) Brush Property List
 
 ## `PLNi` **P**a**l**ette **N**umber of entries
 
@@ -6925,6 +8695,14 @@ Contains:
 - [`DURi`]? Duration
 - [`RNDi`] Random Seed
 - [`ONCb`]? On Control Point
+
+## `PREb` **Pre**load
+
+[`PREb`]: #preb-preload
+
+Parent: [`BEHv`]
+
+If true, target images will be preloaded when the page loads.
 
 ## `PRIv` **Pri**mitive
 
@@ -7014,11 +8792,12 @@ Contains:
 - [`AGMb`]?
 - [`IMGv`]? Image
 - [`OBNs`]? Object Name
+- [`EFLv`]? Effect List
+- [`OPAi`]? Opacity
 - [`BLDi`]? Blend Mode
 - [`PRIv`]? Primitive
-- [`EFLv`]? Effect List
 - [`VISb`]? Visible
-- [`OPAi`]? Opacity
+- [`ZSNs`]? Saved Style Name
 
 ## `PTNi` **P**alette **T**ra**n**sparency Type
 
@@ -7141,13 +8920,36 @@ Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
 Observed value range: `-1`..`5`
 
+## `RMOb` **R**e**mo**ve
+
+[`RMOb`]: #rmob-remove
+
+Parent: [`BEHv`]
+
+If true, swapped images will automatically be reverted on mouse out.
+
 ## `RNDi` **R**a**nd**om Seed
 
 [`RNDi`]: #rndi-random-seed
 
 Parent: [`PBTv`] / [`PPTv`] / [`PTHv`] / [`TXTv`]
 
-Observed value range: `0x00000000`..`0x0f0474c5` (`0`..`251950277`)
+Observed value range: `0x00000000`..`0x71e1fd14` (`0`..`1910635796`)
+
+## `ROLi` **Rol**l Behaviour
+
+[`ROLi`]: #roli-roll-behaviour
+
+Parent: [`BEHv`]
+
+Used by Set Nav Bar behaviour.
+
+Values:
+
+- `0`: over (state 2) + down (state 3)
+- `1`: over (state 2) + down (state 3) + over-while-down (state 4)
+- `2`: down (state 3)
+- `3`: down (state 3) + over-while-down (state 4)
 
 ## `RQNi`
 
@@ -7658,7 +9460,7 @@ Menu delay in milliseconds
 
 Parent: [`TXTv`]
 
-Observed value range: `2`..`997`
+Observed value range: `-82.365051`..`997`
 
 ## `TOPf` **Top**
 
@@ -7839,6 +9641,7 @@ Contains:
 - [`TFSv`] Text Formatted String
 - [`DTAv`]? Data
 - [`IMGv`]? Image
+- [`MTXv`]? Matrix
 - [`PCFb`]?
 - [`PSXf`]? Fill Point 1 (S) X
 - [`PSYf`]? Fill Point 1 (S) Y
@@ -7846,11 +9649,11 @@ Contains:
 - [`PEYf`]? Fill Point 2 (E) Y
 - [`PFXf`]? Fill Point 3 (F) X
 - [`PFYf`]? Fill Point 3 (F) Y
-- [`TAPv`]? Text Along Path
 - [`OBNs`]? Object Name
+- [`AIDi`]?
 - [`OPAi`]? Opacity
+- [`TAPv`]? Text Along Path
 - [`EFLv`]? Effect List
-- [`MTXv`]? Matrix
 - [`VISb`]? Visible
 - [`BLDi`]? Blend Mode
 
@@ -7877,89 +9680,7 @@ Values:
 
 [`UNMs`]: #unms-user-facing-name
 
-Parent: [`BPLv`] / [`FPLv`] / [`MSTv`] / [`TXFv`]
-
-Values:
-
-- `1-Pixel Hard`
-- `1-Pixel Soft`
-- `3D`
-- `3D Glow`
-- `Bamboo`
-- `Bars`
-- `Basic`
-- `Basic Dash`
-- `Bristle`
-- `Broad Splatter`
-- `Chameleon`
-- `Colored Pencil`
-- `Confetti`
-- `Conical`
-- `Contour`
-- `Creamy`
-- `Dark Marker`
-- `Dash Double`
-- `Dash Triple`
-- `Dots`
-- `Dotted`
-- `Elliptical`
-- `Fluid Splatter`
-- `Fur`
-- `Graphite`
-- `Hard Dash`
-- `Hard Line`
-- `Hard Rounded`
-- `Heavy`
-- `Heavy Dash`
-- `Highlighter`
-- `Light Marker`
-- `Linear Smooth`
-- `Outline`
-- `Paint Splatter`
-- `Pastel`
-- `Pattern`
-- `Pinch`
-- `Quill`
-- `Radial`
-- `Rake`
-- `Rectangular`
-- `Ribbon`
-- `Ripple`
-- `RockTileFine`
-- `Satin`
-- `Soft`
-- `Soft Line`
-- `Soft Rounded`
-- `Solid`
-- `Splatter`
-- `Squares`
-- `Strands`
-- `Textured`
-- `Textured Bristle`
-- `Thick`
-- `Thin`
-- `Toothpaste`
-- `Toxic Waste`
-- `Viscous Alien Paint`
-- `Waves`
-- `Web Dither`
-- `Wet`
-- `Yarn`
-- `fn_Bars`
-- `fn_Conical`
-- `fn_ContourGrad`
-- `fn_Elliptical`
-- `fn_Folds`
-- `fn_Linear`
-- `fn_Normal`
-- `fn_Pattern`
-- `fn_Pinch`
-- `fn_Radial`
-- `fn_Rectangular`
-- `fn_Ripple`
-- `fn_Satin`
-- `fn_Waves`
-- `fn_WebDither`
+Parent: [`BEHv`] / [`BPLv`] / [`FGLv`] / [`FPLv`] / [`MSTv`] / [`TXFv`]
 
 ## `URLb`
 
@@ -7980,20 +9701,14 @@ Parent: [`ELMv`]
 
 Contains:
 
-- [`INMs`]? Internal Name
-- [`A2Ts`]? Anchor Link Alt Text
-- [`ALTs`]? Anchor Link Target
 - [`FCLi`] Fill Colour
 - [`URSi`] URL Hotspot Shape
 - [`LFTf`] Left
 - [`TOPf`] Top
 - [`RITf`] Right
 - [`BOTf`] Bottom
-- [`PBPv`]? Path Bezier Points
-- [`OBNs`]? Object Name
-- [`DTAv`]? Data
-- [`LCKb`]? Lock
 - [`BEVv`]? Behaviour List
+- [`FILs`]? Label
 - [`TSLi`]? Type of Slice
 - [`MSNi`]? Symbol Unique Number
 - [`CBTb`]?
@@ -8003,8 +9718,14 @@ Contains:
 - [`CHVi`]? Cell Horizontal Value
 - [`CBVi`]? Cell Background (Slice) Vertical Position
 - [`CVVi`]? Cell Vertical Value
-- [`FILs`]? Label
+- [`DTAv`]? Data
+- [`LCKb`]? Lock
 - [`TDTs`]? Cell (TD) Text
+- [`INMs`]? Internal Name
+- [`A2Ts`]? Anchor Link Alt Text
+- [`ALTs`]? Anchor Link Target
+- [`PBPv`]? Path Bezier Points
+- [`OBNs`]? Object Name
 - [`EXPv`]? Export Options
 
 ## `URSi` **UR**L Hotspot **S**hape
@@ -8088,6 +9809,20 @@ Parent: [`MKBv`] / [`PDCv`]
 
 The width of the document (pixels).
 
+## `WJSs` **W**idget **J**ava**S**cript
+
+[`WJSs`]: #wjss-widget-javascript
+
+Parent: [`MSTv`]
+
+## `WPVs` **W**idget **P**arameter **V**alues
+
+[`WPVs`]: #wpvs-widget-parameter-values
+
+Parent: [`ALSv`]
+
+Possibly a legacy version of [`DTAv`], using the format `name1&|&value1&|&type1&;&name2&|&value2&|&type2` (i.e. `&;&` separates fields, `&|&` separates properties within a field, and each field is defined by a name, value, and type).
+
 ## `WPXi` **W**idth **P**i**x**els
 
 [`WPXi`]: #wpxi-width-pixels
@@ -8118,6 +9853,7 @@ Parent: [`ALSv`] / [`TXTv`]
 Values:
 
 - `0`: unknown - TODO
+- `1`: unknown - TODO
 
 ## `XFSi` E**x**port **F**ormat **S**election
 
@@ -8258,25 +9994,23 @@ Parent: [`ZSTv`]
 Values:
 
 - `447`: unknown - TODO
+- `511`: unknown - TODO
 
-## `ZSLv`
+## `ZSLv` Saved **S**tyle **L**ist
 
-[`ZSLv`]: #zslv
+[`ZSLv`]: #zslv-saved-style-list
 
 Parent: [`MKBv`]
 
-No observed child nodes.
+Contains:
 
-## `ZSNs`
+- [`ZSTv`]\* Saved Style
 
-[`ZSNs`]: #zsns
+## `ZSNs` Saved **S**tyle **N**ame
 
-Parent: [`ZSTv`]
+[`ZSNs`]: #zsns-saved-style-name
 
-Values:
-
-- `Style 3`: unknown - TODO
-- `Style 5`: unknown - TODO
+Parent: [`PTHv`] / [`ZSTv`]
 
 ## `ZSOi`
 
@@ -8287,16 +10021,17 @@ Parent: [`ZSTv`]
 Values:
 
 - `8`: unknown - TODO
+- `31`: unknown - TODO
 
-## `ZSTv`
+## `ZSTv` Saved **St**yle
 
-[`ZSTv`]: #zstv
+[`ZSTv`]: #zstv-saved-style
 
-Parent: [`BEHv`]
+Parent: [`BEHv`] / [`ZSLv`]
 
 Contains:
 
-- [`ZSNs`]
+- [`ZSNs`] Saved Style Name
 - [`ZSFi`]
 - [`ZSOi`]
 - [`PATv`] Pattern
@@ -8312,7 +10047,7 @@ Contains:
 - [`FATi`]
 - [`FARi`]
 - [`FABi`]
-- [`EFLv`] Effect List
+- [`EFLv`]? Effect List
 - [`FONs`] Font Family
 - [`CFTs`] Font Typeface
 - [`PTSf`] Font Point Size
