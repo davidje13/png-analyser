@@ -251,7 +251,7 @@ with a variety of byte layouts (`RGBA`, `ABGR`, `ARGB`).
 [FireworksNodes.md](./FireworksNodes.md) attempts to document the various node
 types, and is based on observations from a large number of real Fireworks
 documents created by Macromedia Fireworks 8 and Adobe Fireworks CS4 (and a
-couple from Macromedia Fireworks MX). The long names and descriptions are
+small selection from 4, MX, and CS3). The long names and descriptions are
 guessed / inferred, and may be incorrect / misleading. The value ranges are
 based on observations and UI limits and may be incomplete.
 
@@ -313,7 +313,10 @@ See the [full node rundown](./FireworksNodes.md) for much more detail.
 [`BPLv`.`BCMi`]: ./FireworksNodes.md#bplvbcmi-brush-tip-colouring-mode
 [`BEHv`.`BCMi`]: ./FireworksNodes.md#behvbcmi-background-colour-hover
 
----
+## Other sources of information
+
+- <http://fileformats.archiveteam.org/wiki/Fireworks_PNG>
+- [PRONOM sample files](https://github.com/digital-preservation/PRONOM_Research/tree/main/Submissions/Adobe%20Fireworks/Samples)
 
 Credit to [this StackOverflow answer](https://stackoverflow.com/a/51683285) for
 spotting that the private chunks are mostly zlib-compressed data.

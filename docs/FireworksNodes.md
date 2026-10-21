@@ -4581,7 +4581,7 @@ Contains:
 - [`CATs`] Category
 - [`INMs`] Internal Name
 - [`FGVv`] Fill Gradient Vertices
-- [`FGYv`] Fill Gradient RGB + Alpha
+- [`FGYv`]? Fill Gradient RGB + Alpha
 
 ## `FGPf` **F**ill **G**radient Control Point **P**osition
 
@@ -7147,7 +7147,7 @@ Observed value range: `-1`..`5`
 
 Parent: [`PBTv`] / [`PPTv`] / [`PTHv`] / [`TXTv`]
 
-Observed value range: `0x00000000`..`0x08719d5e` (`0`..`141663582`)
+Observed value range: `0x00000000`..`0x0f0474c5` (`0`..`251950277`)
 
 ## `RQNi`
 
@@ -7528,7 +7528,7 @@ Parent: [`EXPv`]
 
 Values:
 
-- `0`: unknown - TODO - observed in all files
+- `0`: unknown - TODO
 
 ## `TAMi` **T**ext **A**lign**m**ent
 
@@ -7833,12 +7833,12 @@ Contains:
 - [`LEDf`] Line Height
 - [`LDMi`] Line Height Unit
 - [`JSTi`] Justification
-- [`PINf`] Paragraph Indent
-- [`PSBf`] Paragraph Space Before
-- [`PSAf`] Paragraph Space After
+- [`PINf`]? Paragraph Indent
+- [`PSBf`]? Paragraph Space Before
+- [`PSAf`]? Paragraph Space After
 - [`TFSv`] Text Formatted String
 - [`DTAv`]? Data
-- [`IMGv`] Image
+- [`IMGv`]? Image
 - [`PCFb`]?
 - [`PSXf`]? Fill Point 1 (S) X
 - [`PSYf`]? Fill Point 1 (S) Y
