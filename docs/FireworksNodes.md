@@ -199,9 +199,9 @@ Initial opacity for animation-type symbol.
 
 Value range: `0` (transparent) .. `1000` (opaque)
 
-## `ASTi`
+## `ASTi` Websnap Tolerance
 
-[`ASTi`]: #asti
+[`ASTi`]: #asti-websnap-tolerance
 
 Parent: [`EXPv`]
 
@@ -293,15 +293,13 @@ Parent: [`BPLv`]
 
 Value range: `0`..`1000` (per mille)
 
-## `BBLi`
+## `BBLi` **B**rush **Bl**eed
 
-[`BBLi`]: #bbli
+[`BBLi`]: #bbli-brush-bleed
 
 Parent: [`BPLv`]
 
-Values:
-
-- `0`: unknown - TODO - observed in all files
+Observed value range: `0x00000000`..`0x00000000` (`0`..`0`)
 
 ## `BCLi` **B**rush **C**o**l**our
 
@@ -384,7 +382,7 @@ Contains:
 - [`PREb`]? Preload
 - [`CHKb`]? Checked ?
 - [`FRTi`]? Over While Down state number
-- [`RMOb`]? Remove
+- [`RMOb`]? Revert on Mouse Out
 - [`UNMs`]? User-facing Name
 - [`CDTs`]?
 - [`XLCf`]? X Location
@@ -687,7 +685,7 @@ Contains:
 
 - [`CATs`] Category
 - [`INMs`] Internal Name
-- [`RDOb`]
+- [`RDOb`] Read-Only
 - [`BANi`] Brush Angle
 - [`BASi`] Brush Aspect
 - [`BDIi`] Brush Diameter
@@ -696,7 +694,7 @@ Contains:
 - [`BSEi`] Brush Soft Edges
 - [`BSFi`] Brush Soft Edges Function
 - [`BSHi`] Brush Shape
-- [`BBLi`]
+- [`BBLi`] Brush Bleed
 - [`BBKi`] Brush Blackness
 - [`BCNi`] Brush Concentration
 - [`BEFi`] Brush Edge Function
@@ -5019,52 +5017,52 @@ Contains:
 
 Parent: [`DTAv`]
 
-Text to show in Annotation autoshape, in a JSON structure:
+Text to show in Annotation autoshape, in a JSON-like structure (without key quoting):
 
-```json
+```javascript
 {
   initialAttrs: {
-    alignment:"left"
-    antiAliasSharpness:200
-    antiAliasStrength:64
-    baselineShift:0
-    bold:false
-    face:"ArialMT"
-    fillColor:"#000000"
-    horizontalScale:1
-    italic:false
-    leading:1
-    leadingMode:"percentage"
-    overSample:16
-    paragraphIndent:0
-    paragraphSpacingAfter:0
-    paragraphSpacingBefore:0
-    rangeKerning:0
-    size:"12pt"
+    alignment:"left",
+    antiAliasSharpness:200,
+    antiAliasStrength:64,
+    baselineShift:0,
+    bold:false,
+    face:"ArialMT",
+    fillColor:"#000000",
+    horizontalScale:1,
+    italic:false,
+    leading:1,
+    leadingMode:"percentage",
+    overSample:16,
+    paragraphIndent:0,
+    paragraphSpacingAfter:0,
+    paragraphSpacingBefore:0,
+    rangeKerning:0,
+    size:"12pt",
     underline:false
-  }
+  },
   textRuns: [
     {
-      changedAttrs: {
-        alignment:"left"
-        antiAliasSharpness:200
-        antiAliasStrength:64
-        baselineShift:0
-        bold:false
-        face:"ArialMT"
-        fillColor:"#000000"
-        horizontalScale:1
-        italic:false
-        leading:1
-        leadingMode:"percentage"
-        overSample:16
-        paragraphIndent:0
-        paragraphSpacingAfter:0
-        paragraphSpacingBefore:0
-        rangeKerning:0
-        size:"12pt"
+      changedAttrs: {,
+        alignment:"left",
+        antiAliasSharpness:200,
+        antiAliasStrength:64,
+        baselineShift:0,
+        bold:false,
+        face:"ArialMT",
+        fillColor:"#000000",
+        horizontalScale:1,
+        italic:false,
+        leading:1,
+        leadingMode:"percentage",
+        overSample:16,
+        paragraphIndent:0,
+        paragraphSpacingAfter:0,
+        paragraphSpacingBefore:0,
+        rangeKerning:0,
+        size:"12pt",
         underline:false
-      }
+      },
       characters:"Edit this text using the Text or Subselection tools."
     }
   ]
@@ -6002,7 +6000,7 @@ Contains:
 - [`APSb`]
 - [`AACb`] Export GIF Animation Crop
 - [`AADb`] Export GIF Animation Diff
-- [`ASTi`]
+- [`ASTi`] Websnap Tolerance
 - [`PLDi`] Palette Dither Level
 - [`GLTi`] GIF Loss
 - [`JPQi`] JPEG Quality
@@ -6435,7 +6433,7 @@ Contains:
 - [`CATs`] Category
 - [`INMs`] Internal Name
 - [`UNMs`] User-facing Name
-- [`RDOb`]
+- [`RDOb`] Read-Only
 - [`FTBi`] Fill Texture Blend
 - [`FEFi`] Feather Fill Amount
 - [`FSMi`] Fill Stamping Mode
@@ -7554,9 +7552,9 @@ Values:
 - `false`: the parent node is not locked and can be manipulated
 - `true`: the parent node is locked and cannot be manipulated in the editor
 
-## `LDMi` **L**ine Height Unit
+## `LDMi` **L**ea**d**ing **M**ode
 
-[`LDMi`]: #ldmi-line-height-unit
+[`LDMi`]: #ldmi-leading-mode
 
 Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
@@ -7565,9 +7563,9 @@ Values:
 - `0`: em
 - `1`: pixels
 
-## `LEDf` **L**ine Height
+## `LEDf` **Le**a**d**ing (Line Height)
 
-[`LEDf`]: #ledf-line-height
+[`LEDf`]: #ledf-leading-line-height
 
 Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
@@ -8856,15 +8854,11 @@ Values:
 - `false`: [`RDSf`] remains constant; radius is proportional to shape size
 - `true`: [`RDSf`] is recalculated when the shape is resized to maintain a constant absolute radius
 
-## `RDOb`
+## `RDOb` **R**ea**d**-**O**nly
 
-[`RDOb`]: #rdob
+[`RDOb`]: #rdob-read-only
 
 Parent: [`BPLv`] / [`FPLv`]
-
-Values:
-
-- `false`: unknown - TODO - observed in all files
 
 ## `RDSf` Border **R**a**d**iu**s**
 
@@ -8920,9 +8914,9 @@ Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
 Observed value range: `-1`..`5`
 
-## `RMOb` **R**e**mo**ve
+## `RMOb` **R**evert on **M**ouse **O**ut
 
-[`RMOb`]: #rmob-remove
+[`RMOb`]: #rmob-revert-on-mouse-out
 
 Parent: [`BEHv`]
 
@@ -9383,8 +9377,8 @@ Contains:
 - [`HSCf`]\* Horizontal Scale
 - [`RKNf`]\* Kerning
 - [`BLSf`]\* Baseline Shift
-- [`LEDf`]\* Line Height
-- [`LDMi`]\* Line Height Unit
+- [`LEDf`]\* Leading (Line Height)
+- [`LDMi`]\* Leading Mode
 - [`JSTi`]\* Justification
 - [`FCLi`]\* Fill Colour
 - [`PINf`]\* Paragraph Indent
@@ -9470,9 +9464,9 @@ Parent: [`CDMv`] / [`NGMv`] / [`NGVv`] / [`RCTv`] / [`TXTv`] / [`URLv`]
 
 Distance (pixels) from top of container to top of entity.
 
-## `TOSi` **T**ext Anti-Aliasing **S**amples
+## `TOSi` **T**ext Anti-Aliasing **O**ver-**S**ample
 
-[`TOSi`]: #tosi-text-anti-aliasing-samples
+[`TOSi`]: #tosi-text-anti-aliasing-over-sample
 
 Parent: [`TXTv`] / [`ZSTv`]
 
@@ -9619,7 +9613,7 @@ Contains:
 - [`TAAi`] Text Anti-Alias
 - [`TA1i`]? Text Anti-Aliasing Sharpness
 - [`TA2i`]? Text Anti-Aliasing Strength
-- [`TOSi`]? Text Anti-Aliasing Samples
+- [`TOSi`]? Text Anti-Aliasing Over-Sample
 - [`ATEb`] Auto-Enlarge
 - [`ATKb`] Auto-Kern
 - [`FONs`] Font Family
@@ -9632,8 +9626,8 @@ Contains:
 - [`KRNf`]
 - [`RKNf`] Kerning
 - [`BLSf`] Baseline Shift
-- [`LEDf`] Line Height
-- [`LDMi`] Line Height Unit
+- [`LEDf`] Leading (Line Height)
+- [`LDMi`] Leading Mode
 - [`JSTi`] Justification
 - [`PINf`]? Paragraph Indent
 - [`PSBf`]? Paragraph Space Before
@@ -10057,14 +10051,14 @@ Contains:
 - [`JSTi`] Justification
 - [`HSCf`] Horizontal Scale
 - [`RKNf`] Kerning
-- [`LEDf`] Line Height
-- [`LDMi`] Line Height Unit
+- [`LEDf`] Leading (Line Height)
+- [`LDMi`] Leading Mode
 - [`ATKb`] Auto-Kern
 - [`TIAb`]
 - [`TAAi`] Text Anti-Alias
 - [`TA1i`] Text Anti-Aliasing Sharpness
 - [`TA2i`] Text Anti-Aliasing Strength
-- [`TOSi`] Text Anti-Aliasing Samples
+- [`TOSi`] Text Anti-Aliasing Over-Sample
 - [`IMGv`] (x2) Image
 
 [`mkBT`]: ./Fireworks.md#mkbt
