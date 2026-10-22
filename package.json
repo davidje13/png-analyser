@@ -27,9 +27,8 @@
     "@rollup/plugin-node-resolve": "16.x",
     "@rollup/plugin-terser": "1.x",
     "@types/node": "24.x",
-    "@types/pako": "2.x",
     "lean-test": "2.x",
-    "pako": "2.1.0",
+    "pako": "3.x",
     "rollup": "4.x",
     "typescript": "6.0.x",
     "web-listener": "1.5.x"
