@@ -27,7 +27,6 @@ export const ORDERED_VERSIONS = [
 export async function processFiles(inputs) {
 	/** @type {string[]} */ const filteredPaths = [];
 	/** @type {Map<string, Observed>} */ const nodes = new Map();
-	/** @type {Set<string>} */ const allSoftware = new Set();
 
 	for await (const path of allInputFiles(inputs)) {
 		if (!path.toLowerCase().endsWith('.png')) {
@@ -55,9 +54,6 @@ export async function processFiles(inputs) {
 		} else if (!ORDERED_VERSIONS.includes(software)) {
 			process.stderr.write(`software version unknown in ${path}: ${software}\n`);
 		}
-		if (software) {
-			allSoftware.add(software);
-		}
 		if (mkbs?.raw) {
 			analyseNodes(software, '', mkbs.raw, nodes);
 		}
@@ -66,7 +62,7 @@ export async function processFiles(inputs) {
 		}
 	}
 
-	return { paths: filteredPaths, nodes, allSoftware };
+	return { paths: filteredPaths, nodes };
 }
 
 /**

@@ -135,8 +135,7 @@ function innerBevel(data) {
 	const slope = BEVEL_SLOPE_TYPES.get(str(data['SlopeType']) ?? '') ?? LINEAR;
 	const slopeMultiplier = float(data['SlopeMultiplier']) ?? 1;
 	const buttonState = str(data['ButtonState']) ?? '0';
-	const maskSoftness = float(data['MaskSoftness']) ?? 0;
-	//const angleSoftness = float(data['AngleSoftness']) ?? 0;
+	const angleSoftness = (float(data['AngleSoftness']) ?? 0) * 0.1; // TODO: is this actually /6 ?
 	//const lightDistance = float(data['LightDistance']) ?? 0;
 	//const highlightCol = col(data['HiliteColor']); // always #ffffff ?
 	//const shadowCol = col(data['ShadowColor']); // always #000000 ?
@@ -147,7 +146,7 @@ function innerBevel(data) {
 	const lightAngleAdjust = -0.1;
 	const darkStrength = 1;
 	const lightStrength = 1.25;
-	const smoothing = maskSoftness * 0.25 + 0.5;
+	const smoothing = angleSoftness + 0.5;
 
 	let blend = 0;
 	switch (buttonState) {
@@ -256,9 +255,8 @@ function outerBevel(data) {
 	const azimuth = -(float(data['LightAngle']) ?? 0) * Math.PI / 180;
 	const slope = BEVEL_SLOPE_TYPES.get(str(data['SlopeType']) ?? '') ?? LINEAR;
 	const slopeMultiplier = float(data['SlopeMultiplier']) ?? 1;
-	const maskSoftness = float(data['MaskSoftness']) ?? 0;
 	const colour = col(data['OuterBevelColor']) ?? 0;
-	//const angleSoftness = float(data['AngleSoftness']) ?? 0;
+	const angleSoftness = (float(data['AngleSoftness']) ?? 0) * 0.1; // TODO: is this actually /6 ?
 	//const lightDistance = float(data['LightDistance']) ?? 0;
 	//const highlightCol = col(data['HiliteColor']); // always #ffffff ?
 	//const shadowCol = col(data['ShadowColor']); // always #000000 ?
@@ -269,7 +267,7 @@ function outerBevel(data) {
 	const lightAngleAdjust = -0.1;
 	const darkStrength = 1;
 	const lightStrength = 1.25;
-	const smoothing = maskSoftness * 0.25 + 0.5;
+	const smoothing = angleSoftness + 0.5;
 
 	if (!scale) {
 		return null;
@@ -363,10 +361,9 @@ function emboss(data, depth) {
 	const azimuth = -(float(data['LightAngle']) ?? 0) * Math.PI / 180;
 	const slope = BEVEL_SLOPE_TYPES.get(str(data['SlopeType']) ?? '') ?? LINEAR;
 	const slopeMultiplier = float(data['SlopeMultiplier']) ?? 1;
-	const maskSoftness = float(data['MaskSoftness']) ?? 0;
+	const angleSoftness = (float(data['AngleSoftness']) ?? 0) * 0.1; // TODO: is this actually /6 ?
 	const embossFaceCol = col(data['EmbossFaceColor']);
 	const showObject = data['ShowObject'] === 'true';
-	//const angleSoftness = float(data['AngleSoftness']) ?? 0;
 	//const lightDistance = float(data['LightDistance']) ?? 0;
 	//const highlightCol = col(data['HiliteColor']); // always #ffffff ?
 	//const shadowCol = col(data['ShadowColor']); // always #000000 ?
@@ -377,7 +374,7 @@ function emboss(data, depth) {
 	const lightAngleAdjust = -0.1;
 	const darkStrength = 1;
 	const lightStrength = 1.25;
-	const smoothing = maskSoftness * 0.25 + 0.5;
+	const smoothing = angleSoftness + 0.5;
 
 	if (!scale) {
 		return null;
@@ -536,6 +533,7 @@ registerEffect('{7fe61102-6ce2-11d1-8c76000502701850}', {
 				filter = emboss(data, -1);
 				break;
 			case '4': {
+				// TODO: glow actually renders a solid block from GlowStartDistance of size GlowWidth, then blurs it with MaskSoftness (*0.1? /6?)
 				const rawWidth = float(data['GlowWidth']) ?? 0;
 				const rawDistance = float(data['GlowStartDistance']) ?? 0;
 				// adjustments judged by eye to match Fireworks' behaviour

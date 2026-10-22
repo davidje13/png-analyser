@@ -117,7 +117,7 @@ Contains:
 - [`ASCf`] Animation Scaling
 - [`MSNi`] Symbol Unique Number
 - [`MTXv`] Matrix
-- [`XFMi`]
+- [`XFMi`] Transform Mode
 - [`A2Ts`]? Anchor Link Alt Text
 - [`AEOi`]? Animation End Opacity
 - [`ALNi`]?
@@ -468,7 +468,7 @@ Contains:
 
 ## `BEHv`.`BCLi` **B**ackground **C**o**l**our
 
-[`BEHv`.`BCLi`]: #behv-bcli-background-colour
+[`BEHv`.`BCLi`]: #behvbcli-background-colour
 
 Parent: [`BEHv`]
 
@@ -480,7 +480,7 @@ Value range: `0x00000000`..`0xffffffff`
 
 ## `BEHv`.`BCMi` **B**ackground **C**olour Hover
 
-[`BEHv`.`BCMi`]: #behv-bcmi-background-colour-hover
+[`BEHv`.`BCMi`]: #behvbcmi-background-colour-hover
 
 Parent: [`BEHv`]
 
@@ -492,7 +492,7 @@ Value range: `0x00000000`..`0xffffffff`
 
 ## `BEHv`.`FCLi` **M**enu **I**tem **T**ext Colour
 
-[`BEHv`.`FCLi`]: #behv-fcli-menu-item-text-colour
+[`BEHv`.`FCLi`]: #behvfcli-menu-item-text-colour
 
 Parent: [`BEHv`]
 
@@ -504,7 +504,7 @@ Value range: `0x00000000`..`0xffffffff`
 
 ## `BEHv`.`FETi`
 
-[`BEHv`.`FETi`]: #behv-feti
+[`BEHv`.`FETi`]: #behvfeti
 
 Parent: [`BEHv`]
 
@@ -820,7 +820,7 @@ Contains:
 
 ## `BPLv`.`BCMi` **B**rush Tip **C**olouring **M**ode
 
-[`BPLv`.`BCMi`]: #bplv-bcmi-brush-tip-colouring-mode
+[`BPLv`.`BCMi`]: #bplvbcmi-brush-tip-colouring-mode
 
 Parent: [`BPLv`]
 
@@ -1312,8 +1312,8 @@ Parent: [`PBTv`]
 
 Values:
 
-- `false`: line is straight (points are forced to be colinear)
-- `true`: line is a curve
+- `false`: control points are unconstrained (vertex can be a sharp point)
+- `true`: control point angle is constrained to maintain gradient through point (vertex is smooth)
 
 ## `CSGv` **CS**6 **G**roup
 
@@ -1427,10 +1427,7 @@ Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" fi
 
 Observed value range: `0`..`65`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`BevelContrast`"
 
@@ -1442,10 +1439,7 @@ Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Rai
 
 Observed value range: `0`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`BevelType`"
 
@@ -1463,10 +1457,7 @@ Values:
 - `3`: inset emboss
 - `4`: glow effect
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`BevelWidth`"
 
@@ -1478,10 +1469,7 @@ Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" fi
 
 Observed value range: `0`..`133`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Blendmode`"
 
@@ -1531,10 +1519,7 @@ Values:
 - `51`: heat
 - `53`: additive
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ButtonState`"
 
@@ -1551,10 +1536,7 @@ Values:
 - `2`: down
 - `3`: hit
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Color`"
 
@@ -1566,10 +1548,7 @@ Used by "Color Fill" filter.
 
 A colour in "#rrggbb" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Dict`"
 
@@ -1581,10 +1560,7 @@ Used by "Photoshop Live Effects" filter. Always "10". Possibly a version indicat
 
 Observed value range: `10`..`10`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`DownBlendColor`"
 
@@ -1596,10 +1572,7 @@ Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" fi
 
 A colour in "#rrggbbaa" format to apply when button is in the "down" state.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`EdgeThreshold`"
 
@@ -1613,10 +1586,7 @@ Alpha threshold for detected edges. "Glow" uses a value of `1`; all other filter
 
 Value range: `0` (fully transparent) .. `1` (fully opaque)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`EffectIsVisible`"
 
@@ -1629,10 +1599,7 @@ Values:
 - `false`: effect is not applied
 - `true`: effect is applied
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`EffectMoaID`"
 
@@ -2007,10 +1974,7 @@ Values:
 - `{fc7093f1-f95c-11d0-8be200a024cdc039}`: Find Edges
 - `{ff84d00c-4494-11d8-a072000a9582f7d4}`: Clouds
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`EmbossFaceColor`"
 
@@ -2022,14 +1986,11 @@ Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" fi
 
 A colour in "#rrggbbaa" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame2_SS_MarginID`"
 
-[`DCEv` "`Frame2_SS_MarginID`"]: #dcev-frame2-ss-marginid
+[`DCEv` "`Frame2_SS_MarginID`"]: #dcev-frame2_ss_marginid
 
 Parent: [`DTAv`]
 
@@ -2037,14 +1998,11 @@ Values:
 
 - `5`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame2_SS_OverhangID`"
 
-[`DCEv` "`Frame2_SS_OverhangID`"]: #dcev-frame2-ss-overhangid
+[`DCEv` "`Frame2_SS_OverhangID`"]: #dcev-frame2_ss_overhangid
 
 Parent: [`DTAv`]
 
@@ -2052,14 +2010,11 @@ Values:
 
 - `10`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame2_SS_WidthID`"
 
-[`DCEv` "`Frame2_SS_WidthID`"]: #dcev-frame2-ss-widthid
+[`DCEv` "`Frame2_SS_WidthID`"]: #dcev-frame2_ss_widthid
 
 Parent: [`DTAv`]
 
@@ -2067,14 +2022,11 @@ Values:
 
 - `10`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame3_SS_MarginID`"
 
-[`DCEv` "`Frame3_SS_MarginID`"]: #dcev-frame3-ss-marginid
+[`DCEv` "`Frame3_SS_MarginID`"]: #dcev-frame3_ss_marginid
 
 Parent: [`DTAv`]
 
@@ -2082,14 +2034,11 @@ Values:
 
 - `5`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame3_SS_OverhangID`"
 
-[`DCEv` "`Frame3_SS_OverhangID`"]: #dcev-frame3-ss-overhangid
+[`DCEv` "`Frame3_SS_OverhangID`"]: #dcev-frame3_ss_overhangid
 
 Parent: [`DTAv`]
 
@@ -2097,14 +2046,11 @@ Values:
 
 - `15`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame3_SS_WidthID`"
 
-[`DCEv` "`Frame3_SS_WidthID`"]: #dcev-frame3-ss-widthid
+[`DCEv` "`Frame3_SS_WidthID`"]: #dcev-frame3_ss_widthid
 
 Parent: [`DTAv`]
 
@@ -2112,14 +2058,11 @@ Values:
 
 - `5`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame_SS_FillPattern`"
 
-[`DCEv` "`Frame_SS_FillPattern`"]: #dcev-frame-ss-fillpattern
+[`DCEv` "`Frame_SS_FillPattern`"]: #dcev-frame_ss_fillpattern
 
 Parent: [`DTAv`]
 
@@ -2127,14 +2070,11 @@ Values:
 
 - `Sienna`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Frame_SS_WidthID`"
 
-[`DCEv` "`Frame_SS_WidthID`"]: #dcev-frame-ss-widthid
+[`DCEv` "`Frame_SS_WidthID`"]: #dcev-frame_ss_widthid
 
 Parent: [`DTAv`]
 
@@ -2142,10 +2082,7 @@ Values:
 
 - `24`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`GlowStartDistance`"
 
@@ -2157,10 +2094,7 @@ Used by "Glow" filter. Set by "Inner Bevel", "Inner Glow", "Inset Emboss", "Oute
 
 Observed value range: `0`..`35`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`GlowWidth`"
 
@@ -2172,10 +2106,7 @@ Used by "Glow" filter. Set by "Inner Bevel", "Inner Glow", "Inset Emboss", "Oute
 
 Observed value range: `0`..`35`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`HiliteColor`"
 
@@ -2187,10 +2118,7 @@ Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. S
 
 A colour in "#rrggbb" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`HitBlendColor`"
 
@@ -2202,10 +2130,7 @@ Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. S
 
 A colour in "#rrggbbaa" format to apply when button is in the "hit" (hover) state
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`LightAngle`"
 
@@ -2217,10 +2142,7 @@ Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. S
 
 Value range: `0`..`360` (degrees)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`LightDistance`"
 
@@ -2232,14 +2154,11 @@ Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. S
 
 Observed value range: `1`..`1299`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`MB_filter_preview_tile_size`"
 
-[`DCEv` "`MB_filter_preview_tile_size`"]: #dcev-mb-filter-preview-tile-size
+[`DCEv` "`MB_filter_preview_tile_size`"]: #dcev-mb_filter_preview_tile_size
 
 Parent: [`EPSv`]
 
@@ -2247,10 +2166,7 @@ Values:
 
 - `-1 -1`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`MaskSoftness`"
 
@@ -2262,10 +2178,7 @@ Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Rai
 
 Observed value range: `0`..`60`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`Opacity`"
 
@@ -2277,10 +2190,7 @@ Used by "Color Fill" filter.
 
 Value range: `0`..`100` (percent)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`OuterBevelColor`"
 
@@ -2292,10 +2202,7 @@ Used by "Glow", "Inner Bevel", "Inner Glow", "Inset Emboss", "Outer Bevel", "Rai
 
 A colour in "#rrggbb" format. In "glow" mode, this sets the glow colour.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ShadowAngle`"
 
@@ -2307,10 +2214,7 @@ Used by "Drop Shadow", "Inner Shadow" filters.
 
 Value range: `0`..`360` (degrees)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ShadowBlur`"
 
@@ -2322,10 +2226,7 @@ Used by "Drop Shadow", "Inner Shadow" filters.
 
 Observed value range: `0`..`62`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ShadowColor`"
 
@@ -2337,10 +2238,7 @@ Used by "Drop Shadow", "Inner Bevel", "Inset Emboss", "Inner Shadow", "Outer Bev
 
 A colour in "#rrggbbaa" or "#rrggbb" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ShadowDistance`"
 
@@ -2352,10 +2250,7 @@ Used by "Drop Shadow", "Inner Shadow" filters.
 
 Observed value range: `0`..`122`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ShadowType`"
 
@@ -2370,10 +2265,7 @@ Values:
 - `0`: normal
 - `1`: knockout
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ShowObject`"
 
@@ -2383,10 +2275,7 @@ Parent: [`EPSv`]
 
 Used by "Inset Emboss", "Raised Emboss" filters. Set by "Glow", "Inner Bevel", and "Outer Bevel" but ignored.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`SlopeMultiplier`"
 
@@ -2398,10 +2287,7 @@ Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" fi
 
 Observed value range: `1`..`1`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`SlopeType`"
 
@@ -2421,14 +2307,11 @@ Values:
 - `5`: ring (`sin(v * pi) / pi`)
 - `6`: ruffle (`abs(sin(v * 3 * pi)) / (3 * pi)`)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`add_noise_amount`"
 
-[`DCEv` "`add_noise_amount`"]: #dcev-add-noise-amount
+[`DCEv` "`add_noise_amount`"]: #dcev-add_noise_amount
 
 Parent: [`EPSv`]
 
@@ -2436,14 +2319,11 @@ Used by "Add Noise" filter.
 
 Value range: `0`..`400` (percent)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`add_noise_use_color`"
 
-[`DCEv` "`add_noise_use_color`"]: #dcev-add-noise-use-color
+[`DCEv` "`add_noise_use_color`"]: #dcev-add_noise_use_color
 
 Parent: [`EPSv`]
 
@@ -2454,10 +2334,7 @@ Values:
 - `false`: use grayscale noise
 - `true`: use rgb noise
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`alrtmsg`"
 
@@ -2467,36 +2344,27 @@ Parent: [`DTAv`]
 
 Internal data used by Star autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`alrtmsg`"."`maxmsg`"
 
-[`DCEv` "`alrtmsg`"."`maxmsg`"]: #dcev-alrtmsg-maxmsg
+[`DCEv` "`alrtmsg`"."`maxmsg`"]: #dcev-alrtmsgmaxmsg
 
 Parent: [`GDTv`]
 
 Internal data used by Star autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`alrtmsg`"."`minmsg`"
 
-[`DCEv` "`alrtmsg`"."`minmsg`"]: #dcev-alrtmsg-minmsg
+[`DCEv` "`alrtmsg`"."`minmsg`"]: #dcev-alrtmsgminmsg
 
 Parent: [`GDTv`]
 
 Internal data used by Star autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`angle`"
 
@@ -2508,10 +2376,7 @@ Used by "Solid Shadow" filter.
 
 Value range: `0`..`360` (degrees)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`arrowLength`"
 
@@ -2521,10 +2386,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`arrowTip`"
 
@@ -2534,10 +2396,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`arrowWidth`"
 
@@ -2547,10 +2406,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`atMin`"
 
@@ -2560,10 +2416,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`awMin`"
 
@@ -2573,10 +2426,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`bevelEmboss`"
 
@@ -2617,27 +2467,21 @@ Fields:
 21. Unknown; always "noshape"
 22. Unknown; always "notexture"
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`blue_points`"
 
-[`DCEv` "`blue_points`"]: #dcev-blue-points
+[`DCEv` "`blue_points`"]: #dcev-blue_points
 
 Parent: [`EPSv`]
 
 Used by "Curves" filter.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GPLv`] Grab Point List
+Data Type: [`GPLv`]
 
 ### `DCEv` "`brightness_amount`"
 
-[`DCEv` "`brightness_amount`"]: #dcev-brightness-amount
+[`DCEv` "`brightness_amount`"]: #dcev-brightness_amount
 
 Parent: [`EPSv`]
 
@@ -2645,10 +2489,7 @@ Used by "Brightness/Contrast" filter. Though it looks like a percentage due to t
 
 Value range: `-100`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`c2y`"
 
@@ -2658,10 +2499,7 @@ Parent: [`DTAv`]
 
 Internal data used by Spiral autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`category`"
 
@@ -2669,10 +2507,7 @@ Contains:
 
 Parent: [`EPSv`]
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`clockwise`"
 
@@ -2682,14 +2517,11 @@ Parent: [`DTAv`]
 
 Internal data used by Spiral autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`cloud_color`"
 
-[`DCEv` "`cloud_color`"]: #dcev-cloud-color
+[`DCEv` "`cloud_color`"]: #dcev-cloud_color
 
 Parent: [`EPSv`]
 
@@ -2697,10 +2529,7 @@ Used by "Clouds" filter.
 
 A colour in "#rrggbb" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`color`"
 
@@ -2712,10 +2541,7 @@ Used by "Solid Shadow" filter.
 
 A colour in "#rrggbbaa" or "#rrggbb" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`constants`"
 
@@ -2725,79 +2551,61 @@ Parent: [`DTAv`]
 
 Internal data used by Star, Spiral autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`constants`"."`maxB`"
 
-[`DCEv` "`constants`"."`maxB`"]: #dcev-constants-maxb
+[`DCEv` "`constants`"."`maxB`"]: #dcev-constantsmaxb
 
 Parent: [`GDTv`]
 
 Internal data used by Spiral autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`constants`"."`maxNodes`"
 
-[`DCEv` "`constants`"."`maxNodes`"]: #dcev-constants-maxnodes
+[`DCEv` "`constants`"."`maxNodes`"]: #dcev-constantsmaxnodes
 
 Parent: [`GDTv`]
 
 Internal data used by Star, Polygon autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`constants`"."`minB`"
 
-[`DCEv` "`constants`"."`minB`"]: #dcev-constants-minb
+[`DCEv` "`constants`"."`minB`"]: #dcev-constantsminb
 
 Parent: [`GDTv`]
 
 Internal data used by Spiral autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`constants`"."`minNodes`"
 
-[`DCEv` "`constants`"."`minNodes`"]: #dcev-constants-minnodes
+[`DCEv` "`constants`"."`minNodes`"]: #dcev-constantsminnodes
 
 Parent: [`GDTv`]
 
 Internal data used by Star, Polygon autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`constants`"."`ppc`"
 
-[`DCEv` "`constants`"."`ppc`"]: #dcev-constants-ppc
+[`DCEv` "`constants`"."`ppc`"]: #dcev-constantsppc
 
 Parent: [`GDTv`]
 
 Internal data used by Spiral autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`contrast_amount`"
 
-[`DCEv` "`contrast_amount`"]: #dcev-contrast-amount
+[`DCEv` "`contrast_amount`"]: #dcev-contrast_amount
 
 Parent: [`EPSv`]
 
@@ -2811,10 +2619,7 @@ The behaviour is quite linear, but has a few discontinuities:
 
 Value range: `-100`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`corner0`"
 
@@ -2824,10 +2629,7 @@ Parent: [`DTAv`]
 
 Internal data used by Rounded Rectangle autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`corner1`"
 
@@ -2837,10 +2639,7 @@ Parent: [`DTAv`]
 
 Internal data used by Rounded Rectangle, Connector Line autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`corner2`"
 
@@ -2850,10 +2649,7 @@ Parent: [`DTAv`]
 
 Internal data used by Rounded Rectangle, Connector Line autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`corner3`"
 
@@ -2863,10 +2659,7 @@ Parent: [`DTAv`]
 
 Internal data used by Rounded Rectangle autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`css`"
 
@@ -2878,10 +2671,7 @@ Values:
 
 - ``: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ctype0`"
 
@@ -2893,10 +2683,7 @@ Values:
 
 - `1`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ctype1`"
 
@@ -2908,10 +2695,7 @@ Values:
 
 - `1`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ctype2`"
 
@@ -2923,10 +2707,7 @@ Values:
 
 - `1`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`ctype3`"
 
@@ -2938,10 +2719,7 @@ Values:
 
 - `1`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`currentValues`"
 
@@ -2949,15 +2727,11 @@ Contains:
 
 Parent: [`DTAv`]
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
-- [`GVRv`]? Dictionary Value Array
+Data Type: [`GVRv`]
 
 ### `DCEv` "`currentValues`"\[\]."`name`"
 
-[`DCEv` "`currentValues`"\[\]."`name`"]: #dcev-currentvalues-name
+[`DCEv` "`currentValues`"\[\]."`name`"]: #dcev-currentvaluesname
 
 Parent: [`GDTv`]
 
@@ -2995,14 +2769,11 @@ Values:
 - `title`: unknown - TODO
 - `value`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`currentValues`"\[\]."`type`"
 
-[`DCEv` "`currentValues`"\[\]."`type`"]: #dcev-currentvalues-type
+[`DCEv` "`currentValues`"\[\]."`type`"]: #dcev-currentvaluestype
 
 Parent: [`GDTv`]
 
@@ -3021,21 +2792,15 @@ Values:
 - `number`: unknown - TODO
 - `text`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`currentValues`"\[\]."`value`"
 
-[`DCEv` "`currentValues`"\[\]."`value`"]: #dcev-currentvalues-value
+[`DCEv` "`currentValues`"\[\]."`value`"]: #dcev-currentvaluesvalue
 
 Parent: [`GDTv`]
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`curvature`"
 
@@ -3045,10 +2810,7 @@ Parent: [`DTAv`]
 
 Observed value range: `6.9999956375149095`..`6.9999956375149095`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`curveRatio`"
 
@@ -3058,10 +2820,7 @@ Parent: [`DTAv`]
 
 Observed value range: `0.3695652173913043`..`0.3695652173913043`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`custData`"
 
@@ -3071,79 +2830,61 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`custData`"."`box`"
 
-[`DCEv` "`custData`"."`box`"]: #dcev-custdata-box
+[`DCEv` "`custData`"."`box`"]: #dcev-custdatabox
 
 Parent: [`GDTv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`custData`"."`head1`"
 
-[`DCEv` "`custData`"."`head1`"]: #dcev-custdata-head1
+[`DCEv` "`custData`"."`head1`"]: #dcev-custdatahead1
 
 Parent: [`GDTv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`custData`"."`head2`"
 
-[`DCEv` "`custData`"."`head2`"]: #dcev-custdata-head2
+[`DCEv` "`custData`"."`head2`"]: #dcev-custdatahead2
 
 Parent: [`GDTv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`custData`"."`none`"
 
-[`DCEv` "`custData`"."`none`"]: #dcev-custdata-none
+[`DCEv` "`custData`"."`none`"]: #dcev-custdatanone
 
 Parent: [`GDTv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`custData`"."`tail`"
 
-[`DCEv` "`custData`"."`tail`"]: #dcev-custdata-tail
+[`DCEv` "`custData`"."`tail`"]: #dcev-custdatatail
 
 Parent: [`GDTv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_high_blue`"
 
-[`DCEv` "`dest_high_blue`"]: #dcev-dest-high-blue
+[`DCEv` "`dest_high_blue`"]: #dcev-dest_high_blue
 
 Parent: [`EPSv`]
 
@@ -3151,14 +2892,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_high_green`"
 
-[`DCEv` "`dest_high_green`"]: #dcev-dest-high-green
+[`DCEv` "`dest_high_green`"]: #dcev-dest_high_green
 
 Parent: [`EPSv`]
 
@@ -3166,14 +2904,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_high_red`"
 
-[`DCEv` "`dest_high_red`"]: #dcev-dest-high-red
+[`DCEv` "`dest_high_red`"]: #dcev-dest_high_red
 
 Parent: [`EPSv`]
 
@@ -3181,14 +2916,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_high_rgb`"
 
-[`DCEv` "`dest_high_rgb`"]: #dcev-dest-high-rgb
+[`DCEv` "`dest_high_rgb`"]: #dcev-dest_high_rgb
 
 Parent: [`EPSv`]
 
@@ -3196,14 +2928,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_low_blue`"
 
-[`DCEv` "`dest_low_blue`"]: #dcev-dest-low-blue
+[`DCEv` "`dest_low_blue`"]: #dcev-dest_low_blue
 
 Parent: [`EPSv`]
 
@@ -3211,14 +2940,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_low_green`"
 
-[`DCEv` "`dest_low_green`"]: #dcev-dest-low-green
+[`DCEv` "`dest_low_green`"]: #dcev-dest_low_green
 
 Parent: [`EPSv`]
 
@@ -3226,14 +2952,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_low_red`"
 
-[`DCEv` "`dest_low_red`"]: #dcev-dest-low-red
+[`DCEv` "`dest_low_red`"]: #dcev-dest_low_red
 
 Parent: [`EPSv`]
 
@@ -3241,14 +2964,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dest_low_rgb`"
 
-[`DCEv` "`dest_low_rgb`"]: #dcev-dest-low-rgb
+[`DCEv` "`dest_low_rgb`"]: #dcev-dest_low_rgb
 
 Parent: [`EPSv`]
 
@@ -3256,10 +2976,7 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`distance`"
 
@@ -3271,10 +2988,7 @@ Used by "Solid Shadow" filter.
 
 Observed value range: `1`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`dropShadow`"
 
@@ -3305,14 +3019,11 @@ Fields:
 11. Colour `RGBColor;<r>;<g>;<b>`
 12. Unknown; always `2$$0.000000;0.000000;1$255.000000;255.000000;1` - maybe colour space related?
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_have_scripting_data`"
 
-[`DCEv` "`external_filter_have_scripting_data`"]: #dcev-external-filter-have-scripting-data
+[`DCEv` "`external_filter_have_scripting_data`"]: #dcev-external_filter_have_scripting_data
 
 Parent: [`EPSv`]
 
@@ -3320,27 +3031,21 @@ Values:
 
 - `true`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__0x436c7220`"
 
-[`DCEv` "`external_filter_key__0x436c7220`"]: #dcev-external-filter-key-0x436c7220
+[`DCEv` "`external_filter_key__0x436c7220`"]: #dcev-external_filter_key__0x436c7220
 
 Parent: [`EPSv`]
 
 Hex in key translates to `Clr `. Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__0x45646720`"
 
-[`DCEv` "`external_filter_key__0x45646720`"]: #dcev-external-filter-key-0x45646720
+[`DCEv` "`external_filter_key__0x45646720`"]: #dcev-external_filter_key__0x45646720
 
 Parent: [`EPSv`]
 
@@ -3350,14 +3055,11 @@ Values:
 
 - `false`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__0x46637320`"
 
-[`DCEv` "`external_filter_key__0x46637320`"]: #dcev-external-filter-key-0x46637320
+[`DCEv` "`external_filter_key__0x46637320`"]: #dcev-external_filter_key__0x46637320
 
 Parent: [`EPSv`]
 
@@ -3365,14 +3067,11 @@ Hex in key translates to `Fcs `.
 
 Observed value range: `-60`..`40`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__0x466c2020`"
 
-[`DCEv` "`external_filter_key__0x466c2020`"]: #dcev-external-filter-key-0x466c2020
+[`DCEv` "`external_filter_key__0x466c2020`"]: #dcev-external_filter_key__0x466c2020
 
 Parent: [`EPSv`]
 
@@ -3383,274 +3082,211 @@ Values:
 - `false`: unknown - TODO
 - `true`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BEvl`"
 
-[`DCEv` "`external_filter_key__BEvl`"]: #dcev-external-filter-key-bevl
+[`DCEv` "`external_filter_key__BEvl`"]: #dcev-external_filter_key__bevl
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMbs`"
 
-[`DCEv` "`external_filter_key__BMbs`"]: #dcev-external-filter-key-bmbs
+[`DCEv` "`external_filter_key__BMbs`"]: #dcev-external_filter_key__bmbs
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMbv`"
 
-[`DCEv` "`external_filter_key__BMbv`"]: #dcev-external-filter-key-bmbv
+[`DCEv` "`external_filter_key__BMbv`"]: #dcev-external_filter_key__bmbv
 
 Parent: [`EPSv`]
 
 Observed value range: `29`..`29`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMde`"
 
-[`DCEv` "`external_filter_key__BMde`"]: #dcev-external-filter-key-bmde
+[`DCEv` "`external_filter_key__BMde`"]: #dcev-external_filter_key__bmde
 
 Parent: [`EPSv`]
 
 Observed value range: `65`..`65`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMdi`"
 
-[`DCEv` "`external_filter_key__BMdi`"]: #dcev-external-filter-key-bmdi
+[`DCEv` "`external_filter_key__BMdi`"]: #dcev-external_filter_key__bmdi
 
 Parent: [`EPSv`]
 
 Observed value range: `336`..`336`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMgd`"
 
-[`DCEv` "`external_filter_key__BMgd`"]: #dcev-external-filter-key-bmgd
+[`DCEv` "`external_filter_key__BMgd`"]: #dcev-external_filter_key__bmgd
 
 Parent: [`EPSv`]
 
 Observed value range: `56`..`56`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMgw`"
 
-[`DCEv` "`external_filter_key__BMgw`"]: #dcev-external-filter-key-bmgw
+[`DCEv` "`external_filter_key__BMgw`"]: #dcev-external_filter_key__bmgw
 
 Parent: [`EPSv`]
 
 Observed value range: `39`..`39`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMmo`"
 
-[`DCEv` "`external_filter_key__BMmo`"]: #dcev-external-filter-key-bmmo
+[`DCEv` "`external_filter_key__BMmo`"]: #dcev-external_filter_key__bmmo
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__BMsm`"
 
-[`DCEv` "`external_filter_key__BMsm`"]: #dcev-external-filter-key-bmsm
+[`DCEv` "`external_filter_key__BMsm`"]: #dcev-external_filter_key__bmsm
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Brgh`"
 
-[`DCEv` "`external_filter_key__Brgh`"]: #dcev-external-filter-key-brgh
+[`DCEv` "`external_filter_key__Brgh`"]: #dcev-external_filter_key__brgh
 
 Parent: [`EPSv`]
 
 Observed value range: `68`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Cntr`"
 
-[`DCEv` "`external_filter_key__Cntr`"]: #dcev-external-filter-key-cntr
+[`DCEv` "`external_filter_key__Cntr`"]: #dcev-external_filter_key__cntr
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`58`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Drct`"
 
-[`DCEv` "`external_filter_key__Drct`"]: #dcev-external-filter-key-drct
+[`DCEv` "`external_filter_key__Drct`"]: #dcev-external_filter_key__drct
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`180`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Drkn`"
 
-[`DCEv` "`external_filter_key__Drkn`"]: #dcev-external-filter-key-drkn
+[`DCEv` "`external_filter_key__Drkn`"]: #dcev-external_filter_key__drkn
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__FLsi`"
 
-[`DCEv` "`external_filter_key__FLsi`"]: #dcev-external-filter-key-flsi
+[`DCEv` "`external_filter_key__FLsi`"]: #dcev-external_filter_key__flsi
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__FRcl`"
 
-[`DCEv` "`external_filter_key__FRcl`"]: #dcev-external-filter-key-frcl
+[`DCEv` "`external_filter_key__FRcl`"]: #dcev-external_filter_key__frcl
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__FlCl`"
 
-[`DCEv` "`external_filter_key__FlCl`"]: #dcev-external-filter-key-flcl
+[`DCEv` "`external_filter_key__FlCl`"]: #dcev-external_filter_key__flcl
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__GLcl`"
 
-[`DCEv` "`external_filter_key__GLcl`"]: #dcev-external-filter-key-glcl
+[`DCEv` "`external_filter_key__GLcl`"]: #dcev-external_filter_key__glcl
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__GRsh`"
 
-[`DCEv` "`external_filter_key__GRsh`"]: #dcev-external-filter-key-grsh
+[`DCEv` "`external_filter_key__GRsh`"]: #dcev-external_filter_key__grsh
 
 Parent: [`EPSv`]
 
 Observed value range: `35`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__INcl`"
 
-[`DCEv` "`external_filter_key__INcl`"]: #dcev-external-filter-key-incl
+[`DCEv` "`external_filter_key__INcl`"]: #dcev-external_filter_key__incl
 
 Parent: [`EPSv`]
 
 Observed value range: `45`..`81.86989773939402`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Lngt`"
 
-[`DCEv` "`external_filter_key__Lngt`"]: #dcev-external-filter-key-lngt
+[`DCEv` "`external_filter_key__Lngt`"]: #dcev-external_filter_key__lngt
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Mask`"
 
-[`DCEv` "`external_filter_key__Mask`"]: #dcev-external-filter-key-mask
+[`DCEv` "`external_filter_key__Mask`"]: #dcev-external_filter_key__mask
 
 Parent: [`EPSv`]
 
@@ -3658,14 +3294,11 @@ Values:
 
 - `true`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__NLnl`"
 
-[`DCEv` "`external_filter_key__NLnl`"]: #dcev-external-filter-key-nlnl
+[`DCEv` "`external_filter_key__NLnl`"]: #dcev-external_filter_key__nlnl
 
 Parent: [`EPSv`]
 
@@ -3674,40 +3307,31 @@ Values:
 - `false`: unknown - TODO
 - `true`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Opct`"
 
-[`DCEv` "`external_filter_key__Opct`"]: #dcev-external-filter-key-opct
+[`DCEv` "`external_filter_key__Opct`"]: #dcev-external_filter_key__opct
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__PSfo`"
 
-[`DCEv` "`external_filter_key__PSfo`"]: #dcev-external-filter-key-psfo
+[`DCEv` "`external_filter_key__PSfo`"]: #dcev-external_filter_key__psfo
 
 Parent: [`EPSv`]
 
 Observed value range: `49`..`49`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__PSmo`"
 
-[`DCEv` "`external_filter_key__PSmo`"]: #dcev-external-filter-key-psmo
+[`DCEv` "`external_filter_key__PSmo`"]: #dcev-external_filter_key__psmo
 
 Parent: [`EPSv`]
 
@@ -3715,40 +3339,31 @@ Values:
 
 - `false`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__PSob`"
 
-[`DCEv` "`external_filter_key__PSob`"]: #dcev-external-filter-key-psob
+[`DCEv` "`external_filter_key__PSob`"]: #dcev-external_filter_key__psob
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__PSpb`"
 
-[`DCEv` "`external_filter_key__PSpb`"]: #dcev-external-filter-key-pspb
+[`DCEv` "`external_filter_key__PSpb`"]: #dcev-external_filter_key__pspb
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__PSrs`"
 
-[`DCEv` "`external_filter_key__PSrs`"]: #dcev-external-filter-key-psrs
+[`DCEv` "`external_filter_key__PSrs`"]: #dcev-external_filter_key__psrs
 
 Parent: [`EPSv`]
 
@@ -3756,352 +3371,271 @@ Values:
 
 - `false`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__REfr`"
 
-[`DCEv` "`external_filter_key__REfr`"]: #dcev-external-filter-key-refr
+[`DCEv` "`external_filter_key__REfr`"]: #dcev-external_filter_key__refr
 
 Parent: [`EPSv`]
 
 Observed value range: `45`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__RPwi`"
 
-[`DCEv` "`external_filter_key__RPwi`"]: #dcev-external-filter-key-rpwi
+[`DCEv` "`external_filter_key__RPwi`"]: #dcev-external_filter_key__rpwi
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__RndS`"
 
-[`DCEv` "`external_filter_key__RndS`"]: #dcev-external-filter-key-rnds
+[`DCEv` "`external_filter_key__RndS`"]: #dcev-external_filter_key__rnds
 
 Parent: [`EPSv`]
 
 Observed value range: `1`..`243`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__RplS`"
 
-[`DCEv` "`external_filter_key__RplS`"]: #dcev-external-filter-key-rpls
+[`DCEv` "`external_filter_key__RplS`"]: #dcev-external_filter_key__rpls
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpa`"
 
-[`DCEv` "`external_filter_key__SHpa`"]: #dcev-external-filter-key-shpa
+[`DCEv` "`external_filter_key__SHpa`"]: #dcev-external_filter_key__shpa
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpb`"
 
-[`DCEv` "`external_filter_key__SHpb`"]: #dcev-external-filter-key-shpb
+[`DCEv` "`external_filter_key__SHpb`"]: #dcev-external_filter_key__shpb
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpc`"
 
-[`DCEv` "`external_filter_key__SHpc`"]: #dcev-external-filter-key-shpc
+[`DCEv` "`external_filter_key__SHpc`"]: #dcev-external_filter_key__shpc
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpd`"
 
-[`DCEv` "`external_filter_key__SHpd`"]: #dcev-external-filter-key-shpd
+[`DCEv` "`external_filter_key__SHpd`"]: #dcev-external_filter_key__shpd
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpe`"
 
-[`DCEv` "`external_filter_key__SHpe`"]: #dcev-external-filter-key-shpe
+[`DCEv` "`external_filter_key__SHpe`"]: #dcev-external_filter_key__shpe
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpf`"
 
-[`DCEv` "`external_filter_key__SHpf`"]: #dcev-external-filter-key-shpf
+[`DCEv` "`external_filter_key__SHpf`"]: #dcev-external_filter_key__shpf
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHpg`"
 
-[`DCEv` "`external_filter_key__SHpg`"]: #dcev-external-filter-key-shpg
+[`DCEv` "`external_filter_key__SHpg`"]: #dcev-external_filter_key__shpg
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__SHph`"
 
-[`DCEv` "`external_filter_key__SHph`"]: #dcev-external-filter-key-shph
+[`DCEv` "`external_filter_key__SHph`"]: #dcev-external_filter_key__shph
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__STre`"
 
-[`DCEv` "`external_filter_key__STre`"]: #dcev-external-filter-key-stre
+[`DCEv` "`external_filter_key__STre`"]: #dcev-external_filter_key__stre
 
 Parent: [`EPSv`]
 
 Observed value range: `100`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Shrp`"
 
-[`DCEv` "`external_filter_key__Shrp`"]: #dcev-external-filter-key-shrp
+[`DCEv` "`external_filter_key__Shrp`"]: #dcev-external_filter_key__shrp
 
 Parent: [`EPSv`]
 
 Observed value range: `25`..`99`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Smth`"
 
-[`DCEv` "`external_filter_key__Smth`"]: #dcev-external-filter-key-smth
+[`DCEv` "`external_filter_key__Smth`"]: #dcev-external_filter_key__smth
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppa`"
 
-[`DCEv` "`external_filter_key__Sppa`"]: #dcev-external-filter-key-sppa
+[`DCEv` "`external_filter_key__Sppa`"]: #dcev-external_filter_key__sppa
 
 Parent: [`EPSv`]
 
 Observed value range: `0.2060783638783466`..`0.2060783638783466`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppb`"
 
-[`DCEv` "`external_filter_key__Sppb`"]: #dcev-external-filter-key-sppb
+[`DCEv` "`external_filter_key__Sppb`"]: #dcev-external_filter_key__sppb
 
 Parent: [`EPSv`]
 
 Observed value range: `0.8093332915198681`..`0.8093332915198681`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppc`"
 
-[`DCEv` "`external_filter_key__Sppc`"]: #dcev-external-filter-key-sppc
+[`DCEv` "`external_filter_key__Sppc`"]: #dcev-external_filter_key__sppc
 
 Parent: [`EPSv`]
 
 Observed value range: `0.1525414702284726`..`0.1525414702284726`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppd`"
 
-[`DCEv` "`external_filter_key__Sppd`"]: #dcev-external-filter-key-sppd
+[`DCEv` "`external_filter_key__Sppd`"]: #dcev-external_filter_key__sppd
 
 Parent: [`EPSv`]
 
 Observed value range: `0.8099199043537173`..`0.8099199043537173`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppe`"
 
-[`DCEv` "`external_filter_key__Sppe`"]: #dcev-external-filter-key-sppe
+[`DCEv` "`external_filter_key__Sppe`"]: #dcev-external_filter_key__sppe
 
 Parent: [`EPSv`]
 
 Observed value range: `0.014812047740113002`..`0.014812047740113002`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppf`"
 
-[`DCEv` "`external_filter_key__Sppf`"]: #dcev-external-filter-key-sppf
+[`DCEv` "`external_filter_key__Sppf`"]: #dcev-external_filter_key__sppf
 
 Parent: [`EPSv`]
 
 Observed value range: `-0.015200676470588231`..`-0.015200676470588231`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Sppg`"
 
-[`DCEv` "`external_filter_key__Sppg`"]: #dcev-external-filter-key-sppg
+[`DCEv` "`external_filter_key__Sppg`"]: #dcev-external_filter_key__sppg
 
 Parent: [`EPSv`]
 
 Observed value range: `0.010748909113519809`..`0.010748909113519809`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Spph`"
 
-[`DCEv` "`external_filter_key__Spph`"]: #dcev-external-filter-key-spph
+[`DCEv` "`external_filter_key__Spph`"]: #dcev-external_filter_key__spph
 
 Parent: [`EPSv`]
 
 Observed value range: `-0.015817225285350095`..`-0.015817225285350095`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TApe`"
 
-[`DCEv` "`external_filter_key__TApe`"]: #dcev-external-filter-key-tape
+[`DCEv` "`external_filter_key__TApe`"]: #dcev-external_filter_key__tape
 
 Parent: [`EPSv`]
 
 Observed value range: `40`..`40`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEbr`"
 
-[`DCEv` "`external_filter_key__TEbr`"]: #dcev-external-filter-key-tebr
+[`DCEv` "`external_filter_key__TEbr`"]: #dcev-external_filter_key__tebr
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEcu`"
 
-[`DCEv` "`external_filter_key__TEcu`"]: #dcev-external-filter-key-tecu
+[`DCEv` "`external_filter_key__TEcu`"]: #dcev-external_filter_key__tecu
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEec`"
 
-[`DCEv` "`external_filter_key__TEec`"]: #dcev-external-filter-key-teec
+[`DCEv` "`external_filter_key__TEec`"]: #dcev-external_filter_key__teec
 
 Parent: [`EPSv`]
 
@@ -4109,218 +3643,167 @@ Values:
 
 - `false`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEgo`"
 
-[`DCEv` "`external_filter_key__TEgo`"]: #dcev-external-filter-key-tego
+[`DCEv` "`external_filter_key__TEgo`"]: #dcev-external_filter_key__tego
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`44`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEgs`"
 
-[`DCEv` "`external_filter_key__TEgs`"]: #dcev-external-filter-key-tegs
+[`DCEv` "`external_filter_key__TEgs`"]: #dcev-external_filter_key__tegs
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`8`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEsc`"
 
-[`DCEv` "`external_filter_key__TEsc`"]: #dcev-external-filter-key-tesc
+[`DCEv` "`external_filter_key__TEsc`"]: #dcev-external_filter_key__tesc
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEss`"
 
-[`DCEv` "`external_filter_key__TEss`"]: #dcev-external-filter-key-tess
+[`DCEv` "`external_filter_key__TEss`"]: #dcev-external_filter_key__tess
 
 Parent: [`EPSv`]
 
 Observed value range: `5`..`15`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEst`"
 
-[`DCEv` "`external_filter_key__TEst`"]: #dcev-external-filter-key-test
+[`DCEv` "`external_filter_key__TEst`"]: #dcev-external_filter_key__test
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`4`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEth`"
 
-[`DCEv` "`external_filter_key__TEth`"]: #dcev-external-filter-key-teth
+[`DCEv` "`external_filter_key__TEth`"]: #dcev-external_filter_key__teth
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TEvs`"
 
-[`DCEv` "`external_filter_key__TEvs`"]: #dcev-external-filter-key-tevs
+[`DCEv` "`external_filter_key__TEvs`"]: #dcev-external_filter_key__tevs
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TIna`"
 
-[`DCEv` "`external_filter_key__TIna`"]: #dcev-external-filter-key-tina
+[`DCEv` "`external_filter_key__TIna`"]: #dcev-external_filter_key__tina
 
 Parent: [`EPSv`]
 
 Observed value range: `40`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TInc`"
 
-[`DCEv` "`external_filter_key__TInc`"]: #dcev-external-filter-key-tinc
+[`DCEv` "`external_filter_key__TInc`"]: #dcev-external_filter_key__tinc
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__TxtF`"
 
-[`DCEv` "`external_filter_key__TxtF`"]: #dcev-external-filter-key-txtf
+[`DCEv` "`external_filter_key__TxtF`"]: #dcev-external_filter_key__txtf
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__WAve`"
 
-[`DCEv` "`external_filter_key__WAve`"]: #dcev-external-filter-key-wave
+[`DCEv` "`external_filter_key__WAve`"]: #dcev-external_filter_key__wave
 
 Parent: [`EPSv`]
 
 Observed value range: `23`..`23`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__Wdth`"
 
-[`DCEv` "`external_filter_key__Wdth`"]: #dcev-external-filter-key-wdth
+[`DCEv` "`external_filter_key__Wdth`"]: #dcev-external_filter_key__wdth
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__blur`"
 
-[`DCEv` "`external_filter_key__blur`"]: #dcev-external-filter-key-blur
+[`DCEv` "`external_filter_key__blur`"]: #dcev-external_filter_key__blur
 
 Parent: [`EPSv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__bvlS`"
 
-[`DCEv` "`external_filter_key__bvlS`"]: #dcev-external-filter-key-bvls
+[`DCEv` "`external_filter_key__bvlS`"]: #dcev-external_filter_key__bvls
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__sdwC`"
 
-[`DCEv` "`external_filter_key__sdwC`"]: #dcev-external-filter-key-sdwc
+[`DCEv` "`external_filter_key__sdwC`"]: #dcev-external_filter_key__sdwc
 
 Parent: [`EPSv`]
 
 Unknown data storage.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`external_filter_key__sdwO`"
 
-[`DCEv` "`external_filter_key__sdwO`"]: #dcev-external-filter-key-sdwo
+[`DCEv` "`external_filter_key__sdwO`"]: #dcev-external_filter_key__sdwo
 
 Parent: [`EPSv`]
 
 Observed value range: `82`..`82`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`flexClassName`"
 
@@ -4332,10 +3815,7 @@ Values:
 
 - `Accordion`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`focalLength`"
 
@@ -4347,14 +3827,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `300`..`300`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`gamma_blue`"
 
-[`DCEv` "`gamma_blue`"]: #dcev-gamma-blue
+[`DCEv` "`gamma_blue`"]: #dcev-gamma_blue
 
 Parent: [`EPSv`]
 
@@ -4362,14 +3839,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0.1`..`10`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`gamma_green`"
 
-[`DCEv` "`gamma_green`"]: #dcev-gamma-green
+[`DCEv` "`gamma_green`"]: #dcev-gamma_green
 
 Parent: [`EPSv`]
 
@@ -4377,14 +3851,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0.1`..`10`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`gamma_red`"
 
-[`DCEv` "`gamma_red`"]: #dcev-gamma-red
+[`DCEv` "`gamma_red`"]: #dcev-gamma_red
 
 Parent: [`EPSv`]
 
@@ -4392,14 +3863,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0.1`..`10`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`gamma_rgb`"
 
-[`DCEv` "`gamma_rgb`"]: #dcev-gamma-rgb
+[`DCEv` "`gamma_rgb`"]: #dcev-gamma_rgb
 
 Parent: [`EPSv`]
 
@@ -4407,14 +3875,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0.1`..`10`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`gaussian_blur_radius`"
 
-[`DCEv` "`gaussian_blur_radius`"]: #dcev-gaussian-blur-radius
+[`DCEv` "`gaussian_blur_radius`"]: #dcev-gaussian_blur_radius
 
 Parent: [`EPSv`]
 
@@ -4422,10 +3887,7 @@ Used by "Gaussian Blur" filter.
 
 Observed value range: `0.1`..`250`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`gradientFill`"
 
@@ -4441,23 +3903,17 @@ This is an "&"-separated string, for example:
 0&0&1&100.000000&90.000000&100.000000&0.000000&0.000000&normal&linear&Two_Color,customStops,4096.000000$2$2,0$50$userStop$RGBColor;0.000000;0.000000;0.000000,4096$50$userStop$RGBColor;255.000000;255.000000;255.000000,100.000000$0$50,100.000000$4096$50
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`green_points`"
 
-[`DCEv` "`green_points`"]: #dcev-green-points
+[`DCEv` "`green_points`"]: #dcev-green_points
 
 Parent: [`EPSv`]
 
 Used by "Curves" filter.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GPLv`] Grab Point List
+Data Type: [`GPLv`]
 
 ### `DCEv` "`height`"
 
@@ -4467,14 +3923,11 @@ Parent: [`DTAv`]
 
 Internal data used by Connector Line autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`hls_colorize`"
 
-[`DCEv` "`hls_colorize`"]: #dcev-hls-colorize
+[`DCEv` "`hls_colorize`"]: #dcev-hls_colorize
 
 Parent: [`EPSv`]
 
@@ -4487,10 +3940,7 @@ Values:
 - `false`: adjust existing pixel hue
 - `true`: replace pixel hue
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`html`"
 
@@ -4500,14 +3950,11 @@ Parent: [`DTAv`]
 
 HTML to use in place of this symbol when exporting as a page.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`hue_amount`"
 
-[`DCEv` "`hue_amount`"]: #dcev-hue-amount
+[`DCEv` "`hue_amount`"]: #dcev-hue_amount
 
 Parent: [`EPSv`]
 
@@ -4515,10 +3962,7 @@ Used by "Hue/Saturation" filter.
 
 Value range: `-180`..`180` (degrees), or `0`..`360` (degrees) if [`DCEv` "`hls_colorize`"] is `true`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`innerGlow`"
 
@@ -4534,10 +3978,7 @@ This is an "&"-separated string, for example:
 0&0&screen&75.000000:0.000000:5.000000:0.000000:0.000000:50.000000&softMatte&RGBColor;255.000000;255.000000;189.996109&nogradient&2$$0.000000;0.000000;1$255.000000;255.000000;1&edgeGlow
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`innerRatio`"
 
@@ -4547,10 +3988,7 @@ Parent: [`DTAv`]
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`innerShadow`"
 
@@ -4566,10 +4004,7 @@ This is an "&"-separated string, for example:
 0&75.000000&0&-135.000000&0.000000&5.000000&5.000000&0.000000&0&0&multiply&RGBColor;0.000000;0.000000;0.000000&2$$0.000000;0.000000;1$255.000000;255.000000;1
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`lastMouse`"
 
@@ -4581,10 +4016,7 @@ Used internally by "3D Box" autoshape.
 
 A mouse coordinate recorded as `{x:0, y:0}`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`lastMouseAngle`"
 
@@ -4596,14 +4028,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `2.677945044588987`..`2.677945044588987`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`lightness_amount`"
 
-[`DCEv` "`lightness_amount`"]: #dcev-lightness-amount
+[`DCEv` "`lightness_amount`"]: #dcev-lightness_amount
 
 Parent: [`EPSv`]
 
@@ -4611,10 +4040,7 @@ Used by "Hue/Saturation" filter.
 
 Value range: `-100`..`100` (percent)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`lineAngle`"
 
@@ -4624,10 +4050,7 @@ Parent: [`DTAv`]
 
 Observed value range: `-0.26884042763972626`..`-0.26884042763972626`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`locX`"
 
@@ -4637,10 +4060,7 @@ Parent: [`DTAv`]
 
 Observed value range: `172`..`172`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`locY`"
 
@@ -4650,10 +4070,7 @@ Parent: [`DTAv`]
 
 Observed value range: `290`..`290`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`locked`"
 
@@ -4663,10 +4080,7 @@ Parent: [`DTAv`]
 
 Internal data used by Rounded Rectangle autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`maxNodes`"
 
@@ -4676,10 +4090,7 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon autoshape (duplicated in [`DCEv` "`constants`"."`maxNodes`"]).
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`minNodes`"
 
@@ -4689,21 +4100,15 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon autoshape (duplicated in [`DCEv` "`constants`"."`minNodes`"]).
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"
 
-[`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"]: #dcev-mkbfile-writeonly-temporaryeffectuiname
+[`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"]: #dcev-mkbfile_writeonly_temporaryeffectuiname
 
 Parent: [`EPSv`]
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`mode`"
 
@@ -4713,14 +4118,11 @@ Parent: [`DTAv`]
 
 Internal data used by Connector Line autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`motion_blur_angle`"
 
-[`DCEv` "`motion_blur_angle`"]: #dcev-motion-blur-angle
+[`DCEv` "`motion_blur_angle`"]: #dcev-motion_blur_angle
 
 Parent: [`EPSv`]
 
@@ -4728,14 +4130,11 @@ Used by "Motion Blur" filter.
 
 Value range: `0`..`360` (degrees)
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`motion_blur_distance`"
 
-[`DCEv` "`motion_blur_distance`"]: #dcev-motion-blur-distance
+[`DCEv` "`motion_blur_distance`"]: #dcev-motion_blur_distance
 
 Parent: [`EPSv`]
 
@@ -4743,10 +4142,7 @@ Used by "Motion Blur" filter.
 
 Observed value range: `1`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`mouse`"
 
@@ -4758,10 +4154,7 @@ Used internally by "3D Box" autoshape.
 
 A mouse coordinate recorded as `{x:0, y:0}`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`name`"
 
@@ -4820,10 +4213,7 @@ Values:
 - `进一步锐化`
 - `锐化`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`nodes`"
 
@@ -4840,10 +4230,7 @@ Also observed non-numeric values:
 - `3; Alt/Opt-drag to split`
 - `5; Alt/Opt-drag to split`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`offset1`"
 
@@ -4853,10 +4240,7 @@ Parent: [`DTAv`]
 
 Internal data used by Connector Line autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`offset2`"
 
@@ -4866,10 +4250,7 @@ Parent: [`DTAv`]
 
 Internal data used by Connector Line autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"
 
@@ -4879,27 +4260,21 @@ Parent: [`DTAv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p0`"
 
-[`DCEv` "`origPoints3D`"."`p0`"]: #dcev-origpoints3d-p0
+[`DCEv` "`origPoints3D`"."`p0`"]: #dcev-origpoints3dp0
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p0`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p0`"."`_x`"]: #dcev-origpoints3d-p0-x
+[`DCEv` "`origPoints3D`"."`p0`"."`_x`"]: #dcev-origpoints3dp0_x
 
 Parent: [`GDTv`]
 
@@ -4907,14 +4282,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p0`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p0`"."`_y`"]: #dcev-origpoints3d-p0-y
+[`DCEv` "`origPoints3D`"."`p0`"."`_y`"]: #dcev-origpoints3dp0_y
 
 Parent: [`GDTv`]
 
@@ -4922,14 +4294,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p0`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p0`"."`_z`"]: #dcev-origpoints3d-p0-z
+[`DCEv` "`origPoints3D`"."`p0`"."`_z`"]: #dcev-origpoints3dp0_z
 
 Parent: [`GDTv`]
 
@@ -4937,27 +4306,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p1`"
 
-[`DCEv` "`origPoints3D`"."`p1`"]: #dcev-origpoints3d-p1
+[`DCEv` "`origPoints3D`"."`p1`"]: #dcev-origpoints3dp1
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p1`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p1`"."`_x`"]: #dcev-origpoints3d-p1-x
+[`DCEv` "`origPoints3D`"."`p1`"."`_x`"]: #dcev-origpoints3dp1_x
 
 Parent: [`GDTv`]
 
@@ -4965,14 +4328,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p1`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p1`"."`_y`"]: #dcev-origpoints3d-p1-y
+[`DCEv` "`origPoints3D`"."`p1`"."`_y`"]: #dcev-origpoints3dp1_y
 
 Parent: [`GDTv`]
 
@@ -4980,14 +4340,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p1`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p1`"."`_z`"]: #dcev-origpoints3d-p1-z
+[`DCEv` "`origPoints3D`"."`p1`"."`_z`"]: #dcev-origpoints3dp1_z
 
 Parent: [`GDTv`]
 
@@ -4995,27 +4352,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p2`"
 
-[`DCEv` "`origPoints3D`"."`p2`"]: #dcev-origpoints3d-p2
+[`DCEv` "`origPoints3D`"."`p2`"]: #dcev-origpoints3dp2
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p2`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p2`"."`_x`"]: #dcev-origpoints3d-p2-x
+[`DCEv` "`origPoints3D`"."`p2`"."`_x`"]: #dcev-origpoints3dp2_x
 
 Parent: [`GDTv`]
 
@@ -5023,14 +4374,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p2`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p2`"."`_y`"]: #dcev-origpoints3d-p2-y
+[`DCEv` "`origPoints3D`"."`p2`"."`_y`"]: #dcev-origpoints3dp2_y
 
 Parent: [`GDTv`]
 
@@ -5038,14 +4386,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p2`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p2`"."`_z`"]: #dcev-origpoints3d-p2-z
+[`DCEv` "`origPoints3D`"."`p2`"."`_z`"]: #dcev-origpoints3dp2_z
 
 Parent: [`GDTv`]
 
@@ -5053,27 +4398,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p3`"
 
-[`DCEv` "`origPoints3D`"."`p3`"]: #dcev-origpoints3d-p3
+[`DCEv` "`origPoints3D`"."`p3`"]: #dcev-origpoints3dp3
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p3`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p3`"."`_x`"]: #dcev-origpoints3d-p3-x
+[`DCEv` "`origPoints3D`"."`p3`"."`_x`"]: #dcev-origpoints3dp3_x
 
 Parent: [`GDTv`]
 
@@ -5081,14 +4420,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p3`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p3`"."`_y`"]: #dcev-origpoints3d-p3-y
+[`DCEv` "`origPoints3D`"."`p3`"."`_y`"]: #dcev-origpoints3dp3_y
 
 Parent: [`GDTv`]
 
@@ -5096,14 +4432,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p3`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p3`"."`_z`"]: #dcev-origpoints3d-p3-z
+[`DCEv` "`origPoints3D`"."`p3`"."`_z`"]: #dcev-origpoints3dp3_z
 
 Parent: [`GDTv`]
 
@@ -5111,27 +4444,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p4`"
 
-[`DCEv` "`origPoints3D`"."`p4`"]: #dcev-origpoints3d-p4
+[`DCEv` "`origPoints3D`"."`p4`"]: #dcev-origpoints3dp4
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p4`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p4`"."`_x`"]: #dcev-origpoints3d-p4-x
+[`DCEv` "`origPoints3D`"."`p4`"."`_x`"]: #dcev-origpoints3dp4_x
 
 Parent: [`GDTv`]
 
@@ -5139,14 +4466,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p4`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p4`"."`_y`"]: #dcev-origpoints3d-p4-y
+[`DCEv` "`origPoints3D`"."`p4`"."`_y`"]: #dcev-origpoints3dp4_y
 
 Parent: [`GDTv`]
 
@@ -5154,14 +4478,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p4`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p4`"."`_z`"]: #dcev-origpoints3d-p4-z
+[`DCEv` "`origPoints3D`"."`p4`"."`_z`"]: #dcev-origpoints3dp4_z
 
 Parent: [`GDTv`]
 
@@ -5169,27 +4490,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p5`"
 
-[`DCEv` "`origPoints3D`"."`p5`"]: #dcev-origpoints3d-p5
+[`DCEv` "`origPoints3D`"."`p5`"]: #dcev-origpoints3dp5
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p5`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p5`"."`_x`"]: #dcev-origpoints3d-p5-x
+[`DCEv` "`origPoints3D`"."`p5`"."`_x`"]: #dcev-origpoints3dp5_x
 
 Parent: [`GDTv`]
 
@@ -5197,14 +4512,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p5`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p5`"."`_y`"]: #dcev-origpoints3d-p5-y
+[`DCEv` "`origPoints3D`"."`p5`"."`_y`"]: #dcev-origpoints3dp5_y
 
 Parent: [`GDTv`]
 
@@ -5212,14 +4524,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p5`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p5`"."`_z`"]: #dcev-origpoints3d-p5-z
+[`DCEv` "`origPoints3D`"."`p5`"."`_z`"]: #dcev-origpoints3dp5_z
 
 Parent: [`GDTv`]
 
@@ -5227,27 +4536,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p6`"
 
-[`DCEv` "`origPoints3D`"."`p6`"]: #dcev-origpoints3d-p6
+[`DCEv` "`origPoints3D`"."`p6`"]: #dcev-origpoints3dp6
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p6`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p6`"."`_x`"]: #dcev-origpoints3d-p6-x
+[`DCEv` "`origPoints3D`"."`p6`"."`_x`"]: #dcev-origpoints3dp6_x
 
 Parent: [`GDTv`]
 
@@ -5255,14 +4558,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p6`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p6`"."`_y`"]: #dcev-origpoints3d-p6-y
+[`DCEv` "`origPoints3D`"."`p6`"."`_y`"]: #dcev-origpoints3dp6_y
 
 Parent: [`GDTv`]
 
@@ -5270,14 +4570,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p6`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p6`"."`_z`"]: #dcev-origpoints3d-p6-z
+[`DCEv` "`origPoints3D`"."`p6`"."`_z`"]: #dcev-origpoints3dp6_z
 
 Parent: [`GDTv`]
 
@@ -5285,27 +4582,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p7`"
 
-[`DCEv` "`origPoints3D`"."`p7`"]: #dcev-origpoints3d-p7
+[`DCEv` "`origPoints3D`"."`p7`"]: #dcev-origpoints3dp7
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`origPoints3D`"."`p7`"."`_x`"
 
-[`DCEv` "`origPoints3D`"."`p7`"."`_x`"]: #dcev-origpoints3d-p7-x
+[`DCEv` "`origPoints3D`"."`p7`"."`_x`"]: #dcev-origpoints3dp7_x
 
 Parent: [`GDTv`]
 
@@ -5313,14 +4604,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p7`"."`_y`"
 
-[`DCEv` "`origPoints3D`"."`p7`"."`_y`"]: #dcev-origpoints3d-p7-y
+[`DCEv` "`origPoints3D`"."`p7`"."`_y`"]: #dcev-origpoints3dp7_y
 
 Parent: [`GDTv`]
 
@@ -5328,14 +4616,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`origPoints3D`"."`p7`"."`_z`"
 
-[`DCEv` "`origPoints3D`"."`p7`"."`_z`"]: #dcev-origpoints3d-p7-z
+[`DCEv` "`origPoints3D`"."`p7`"."`_z`"]: #dcev-origpoints3dp7_z
 
 Parent: [`GDTv`]
 
@@ -5343,10 +4628,7 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`outerGlow`"
 
@@ -5362,10 +4644,7 @@ This is an "&"-separated string, for example:
 0&0&screen&75.000000:0.000000:5.000000:0.000000:0.000000:50.000000&softMatte&RGBColor;255.000000;255.000000;189.996109&nogradient&2$$0.000000;0.000000;1$255.000000;255.000000;1&
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`patternFill`"
 
@@ -5381,10 +4660,7 @@ This is an "&"-separated string, for example:
 0&1&100.000000&100.000000&0.000000&0.000000&normal&Bubbles&b7334da0-122f-11d4-8bb5-e27e45023b5f
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"
 
@@ -5394,27 +4670,21 @@ Parent: [`DTAv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p0`"
 
-[`DCEv` "`points3D`"."`p0`"]: #dcev-points3d-p0
+[`DCEv` "`points3D`"."`p0`"]: #dcev-points3dp0
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p0`"."`_x`"
 
-[`DCEv` "`points3D`"."`p0`"."`_x`"]: #dcev-points3d-p0-x
+[`DCEv` "`points3D`"."`p0`"."`_x`"]: #dcev-points3dp0_x
 
 Parent: [`GDTv`]
 
@@ -5422,14 +4692,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p0`"."`_y`"
 
-[`DCEv` "`points3D`"."`p0`"."`_y`"]: #dcev-points3d-p0-y
+[`DCEv` "`points3D`"."`p0`"."`_y`"]: #dcev-points3dp0_y
 
 Parent: [`GDTv`]
 
@@ -5437,14 +4704,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p0`"."`_z`"
 
-[`DCEv` "`points3D`"."`p0`"."`_z`"]: #dcev-points3d-p0-z
+[`DCEv` "`points3D`"."`p0`"."`_z`"]: #dcev-points3dp0_z
 
 Parent: [`GDTv`]
 
@@ -5452,27 +4716,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p1`"
 
-[`DCEv` "`points3D`"."`p1`"]: #dcev-points3d-p1
+[`DCEv` "`points3D`"."`p1`"]: #dcev-points3dp1
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p1`"."`_x`"
 
-[`DCEv` "`points3D`"."`p1`"."`_x`"]: #dcev-points3d-p1-x
+[`DCEv` "`points3D`"."`p1`"."`_x`"]: #dcev-points3dp1_x
 
 Parent: [`GDTv`]
 
@@ -5480,14 +4738,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p1`"."`_y`"
 
-[`DCEv` "`points3D`"."`p1`"."`_y`"]: #dcev-points3d-p1-y
+[`DCEv` "`points3D`"."`p1`"."`_y`"]: #dcev-points3dp1_y
 
 Parent: [`GDTv`]
 
@@ -5495,14 +4750,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p1`"."`_z`"
 
-[`DCEv` "`points3D`"."`p1`"."`_z`"]: #dcev-points3d-p1-z
+[`DCEv` "`points3D`"."`p1`"."`_z`"]: #dcev-points3dp1_z
 
 Parent: [`GDTv`]
 
@@ -5510,27 +4762,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p2`"
 
-[`DCEv` "`points3D`"."`p2`"]: #dcev-points3d-p2
+[`DCEv` "`points3D`"."`p2`"]: #dcev-points3dp2
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p2`"."`_x`"
 
-[`DCEv` "`points3D`"."`p2`"."`_x`"]: #dcev-points3d-p2-x
+[`DCEv` "`points3D`"."`p2`"."`_x`"]: #dcev-points3dp2_x
 
 Parent: [`GDTv`]
 
@@ -5538,14 +4784,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p2`"."`_y`"
 
-[`DCEv` "`points3D`"."`p2`"."`_y`"]: #dcev-points3d-p2-y
+[`DCEv` "`points3D`"."`p2`"."`_y`"]: #dcev-points3dp2_y
 
 Parent: [`GDTv`]
 
@@ -5553,14 +4796,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p2`"."`_z`"
 
-[`DCEv` "`points3D`"."`p2`"."`_z`"]: #dcev-points3d-p2-z
+[`DCEv` "`points3D`"."`p2`"."`_z`"]: #dcev-points3dp2_z
 
 Parent: [`GDTv`]
 
@@ -5568,27 +4808,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p3`"
 
-[`DCEv` "`points3D`"."`p3`"]: #dcev-points3d-p3
+[`DCEv` "`points3D`"."`p3`"]: #dcev-points3dp3
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p3`"."`_x`"
 
-[`DCEv` "`points3D`"."`p3`"."`_x`"]: #dcev-points3d-p3-x
+[`DCEv` "`points3D`"."`p3`"."`_x`"]: #dcev-points3dp3_x
 
 Parent: [`GDTv`]
 
@@ -5596,14 +4830,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p3`"."`_y`"
 
-[`DCEv` "`points3D`"."`p3`"."`_y`"]: #dcev-points3d-p3-y
+[`DCEv` "`points3D`"."`p3`"."`_y`"]: #dcev-points3dp3_y
 
 Parent: [`GDTv`]
 
@@ -5611,14 +4842,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p3`"."`_z`"
 
-[`DCEv` "`points3D`"."`p3`"."`_z`"]: #dcev-points3d-p3-z
+[`DCEv` "`points3D`"."`p3`"."`_z`"]: #dcev-points3dp3_z
 
 Parent: [`GDTv`]
 
@@ -5626,27 +4854,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p4`"
 
-[`DCEv` "`points3D`"."`p4`"]: #dcev-points3d-p4
+[`DCEv` "`points3D`"."`p4`"]: #dcev-points3dp4
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p4`"."`_x`"
 
-[`DCEv` "`points3D`"."`p4`"."`_x`"]: #dcev-points3d-p4-x
+[`DCEv` "`points3D`"."`p4`"."`_x`"]: #dcev-points3dp4_x
 
 Parent: [`GDTv`]
 
@@ -5654,14 +4876,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p4`"."`_y`"
 
-[`DCEv` "`points3D`"."`p4`"."`_y`"]: #dcev-points3d-p4-y
+[`DCEv` "`points3D`"."`p4`"."`_y`"]: #dcev-points3dp4_y
 
 Parent: [`GDTv`]
 
@@ -5669,14 +4888,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p4`"."`_z`"
 
-[`DCEv` "`points3D`"."`p4`"."`_z`"]: #dcev-points3d-p4-z
+[`DCEv` "`points3D`"."`p4`"."`_z`"]: #dcev-points3dp4_z
 
 Parent: [`GDTv`]
 
@@ -5684,27 +4900,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p5`"
 
-[`DCEv` "`points3D`"."`p5`"]: #dcev-points3d-p5
+[`DCEv` "`points3D`"."`p5`"]: #dcev-points3dp5
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p5`"."`_x`"
 
-[`DCEv` "`points3D`"."`p5`"."`_x`"]: #dcev-points3d-p5-x
+[`DCEv` "`points3D`"."`p5`"."`_x`"]: #dcev-points3dp5_x
 
 Parent: [`GDTv`]
 
@@ -5712,14 +4922,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p5`"."`_y`"
 
-[`DCEv` "`points3D`"."`p5`"."`_y`"]: #dcev-points3d-p5-y
+[`DCEv` "`points3D`"."`p5`"."`_y`"]: #dcev-points3dp5_y
 
 Parent: [`GDTv`]
 
@@ -5727,14 +4934,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p5`"."`_z`"
 
-[`DCEv` "`points3D`"."`p5`"."`_z`"]: #dcev-points3d-p5-z
+[`DCEv` "`points3D`"."`p5`"."`_z`"]: #dcev-points3dp5_z
 
 Parent: [`GDTv`]
 
@@ -5742,27 +4946,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p6`"
 
-[`DCEv` "`points3D`"."`p6`"]: #dcev-points3d-p6
+[`DCEv` "`points3D`"."`p6`"]: #dcev-points3dp6
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p6`"."`_x`"
 
-[`DCEv` "`points3D`"."`p6`"."`_x`"]: #dcev-points3d-p6-x
+[`DCEv` "`points3D`"."`p6`"."`_x`"]: #dcev-points3dp6_x
 
 Parent: [`GDTv`]
 
@@ -5770,14 +4968,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p6`"."`_y`"
 
-[`DCEv` "`points3D`"."`p6`"."`_y`"]: #dcev-points3d-p6-y
+[`DCEv` "`points3D`"."`p6`"."`_y`"]: #dcev-points3dp6_y
 
 Parent: [`GDTv`]
 
@@ -5785,14 +4980,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p6`"."`_z`"
 
-[`DCEv` "`points3D`"."`p6`"."`_z`"]: #dcev-points3d-p6-z
+[`DCEv` "`points3D`"."`p6`"."`_z`"]: #dcev-points3dp6_z
 
 Parent: [`GDTv`]
 
@@ -5800,27 +4992,21 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p7`"
 
-[`DCEv` "`points3D`"."`p7`"]: #dcev-points3d-p7
+[`DCEv` "`points3D`"."`p7`"]: #dcev-points3dp7
 
 Parent: [`GDTv`]
 
 Used internally by "3D Box" autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`points3D`"."`p7`"."`_x`"
 
-[`DCEv` "`points3D`"."`p7`"."`_x`"]: #dcev-points3d-p7-x
+[`DCEv` "`points3D`"."`p7`"."`_x`"]: #dcev-points3dp7_x
 
 Parent: [`GDTv`]
 
@@ -5828,14 +5014,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p7`"."`_y`"
 
-[`DCEv` "`points3D`"."`p7`"."`_y`"]: #dcev-points3d-p7-y
+[`DCEv` "`points3D`"."`p7`"."`_y`"]: #dcev-points3dp7_y
 
 Parent: [`GDTv`]
 
@@ -5843,14 +5026,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `50`..`50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`points3D`"."`p7`"."`_z`"
 
-[`DCEv` "`points3D`"."`p7`"."`_z`"]: #dcev-points3d-p7-z
+[`DCEv` "`points3D`"."`p7`"."`_z`"]: #dcev-points3dp7_z
 
 Parent: [`GDTv`]
 
@@ -5858,10 +5038,7 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-50`..`-50`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`pressMouse`"
 
@@ -5873,10 +5050,7 @@ Used internally by "3D Box" autoshape.
 
 A mouse coordinate recorded as `{x:0, y:0}`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`radial`"
 
@@ -5888,14 +5062,11 @@ Values:
 
 - `1`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`radial_blur_amount`"
 
-[`DCEv` "`radial_blur_amount`"]: #dcev-radial-blur-amount
+[`DCEv` "`radial_blur_amount`"]: #dcev-radial_blur_amount
 
 Parent: [`EPSv`]
 
@@ -5903,14 +5074,11 @@ Used by "Radial Blur" filter.
 
 Observed value range: `1`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`radial_blur_quality`"
 
-[`DCEv` "`radial_blur_quality`"]: #dcev-radial-blur-quality
+[`DCEv` "`radial_blur_quality`"]: #dcev-radial_blur_quality
 
 Parent: [`EPSv`]
 
@@ -5918,10 +5086,7 @@ Used by "Radial Blur" filter.
 
 Observed value range: `1`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`radius`"
 
@@ -5931,10 +5096,7 @@ Parent: [`DTAv`]
 
 Internal data used by Spiral autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`radius0`"
 
@@ -5944,10 +5106,7 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`radius1`"
 
@@ -5957,36 +5116,27 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`red_points`"
 
-[`DCEv` "`red_points`"]: #dcev-red-points
+[`DCEv` "`red_points`"]: #dcev-red_points
 
 Parent: [`EPSv`]
 
 Used by "Curves" filter.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GPLv`] Grab Point List
+Data Type: [`GPLv`]
 
 ### `DCEv` "`rgb_points`"
 
-[`DCEv` "`rgb_points`"]: #dcev-rgb-points
+[`DCEv` "`rgb_points`"]: #dcev-rgb_points
 
 Parent: [`EPSv`]
 
 Used by "Curves" filter.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GPLv`] Grab Point List
+Data Type: [`GPLv`]
 
 ### `DCEv` "`rotation`"
 
@@ -5996,15 +5146,11 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon, 3D Box autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`]? Dictionary Entry String Value
-- [`GDTv`]? Nested Dictionary
+Data Type: [`DCVs`] / [`GDTv`]
 
 ### `DCEv` "`rotation`"."`_x`"
 
-[`DCEv` "`rotation`"."`_x`"]: #dcev-rotation-x
+[`DCEv` "`rotation`"."`_x`"]: #dcev-rotation_x
 
 Parent: [`GDTv`]
 
@@ -6012,14 +5158,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `0.5599999999999999`..`0.5599999999999999`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`rotation`"."`_y`"
 
-[`DCEv` "`rotation`"."`_y`"]: #dcev-rotation-y
+[`DCEv` "`rotation`"."`_y`"]: #dcev-rotation_y
 
 Parent: [`GDTv`]
 
@@ -6027,14 +5170,11 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `-0.44`..`-0.44`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`rotation`"."`_z`"
 
-[`DCEv` "`rotation`"."`_z`"]: #dcev-rotation-z
+[`DCEv` "`rotation`"."`_z`"]: #dcev-rotation_z
 
 Parent: [`GDTv`]
 
@@ -6042,10 +5182,7 @@ Used internally by "3D Box" autoshape.
 
 Observed value range: `0`..`0`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`round0`"
 
@@ -6055,10 +5192,7 @@ Parent: [`DTAv`]
 
 Internal data used by Star autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`round1`"
 
@@ -6068,10 +5202,7 @@ Parent: [`DTAv`]
 
 Internal data used by Star autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`roundness`"
 
@@ -6081,10 +5212,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`satin`"
 
@@ -6100,14 +5228,11 @@ This is an "&"-separated string, for example:
 0&0&1&70.000000&19.000000&23.000000&15.000000&multiply&RGBColor;0.000000;0.000000;0.000000&9$$0.000000;0.000000;1$32.000000;7.000000;1$64.000000;38.000000;1$96.000000;101.000000;1$128.000000;166.000000;1$159.000000;209.000000;1$191.000000;235.000000;1$223.000000;248.000000;1$255.000000;255.000000;1
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`saturation_amount`"
 
-[`DCEv` "`saturation_amount`"]: #dcev-saturation-amount
+[`DCEv` "`saturation_amount`"]: #dcev-saturation_amount
 
 Parent: [`EPSv`]
 
@@ -6115,10 +5240,7 @@ Used by "Hue/Saturation" filter.
 
 Observed value range: `-100`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`shapeName`"
 
@@ -6142,10 +5264,7 @@ Values:
 - `spiral`
 - `star`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`sides`"
 
@@ -6155,14 +5274,11 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`sky_color`"
 
-[`DCEv` "`sky_color`"]: #dcev-sky-color
+[`DCEv` "`sky_color`"]: #dcev-sky_color
 
 Parent: [`EPSv`]
 
@@ -6170,10 +5286,7 @@ Used by "Clouds" filter.
 
 A colour in "#rrggbb" format
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`solidFill`"
 
@@ -6189,14 +5302,11 @@ This is an "&"-separated string, for example:
 0&100.000000&normal&RGBColor;255.000000;0.000000;0.000000
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_high_blue`"
 
-[`DCEv` "`source_high_blue`"]: #dcev-source-high-blue
+[`DCEv` "`source_high_blue`"]: #dcev-source_high_blue
 
 Parent: [`EPSv`]
 
@@ -6204,14 +5314,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `2`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_high_green`"
 
-[`DCEv` "`source_high_green`"]: #dcev-source-high-green
+[`DCEv` "`source_high_green`"]: #dcev-source_high_green
 
 Parent: [`EPSv`]
 
@@ -6219,14 +5326,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `2`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_high_red`"
 
-[`DCEv` "`source_high_red`"]: #dcev-source-high-red
+[`DCEv` "`source_high_red`"]: #dcev-source_high_red
 
 Parent: [`EPSv`]
 
@@ -6234,14 +5338,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_high_rgb`"
 
-[`DCEv` "`source_high_rgb`"]: #dcev-source-high-rgb
+[`DCEv` "`source_high_rgb`"]: #dcev-source_high_rgb
 
 Parent: [`EPSv`]
 
@@ -6249,14 +5350,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `2`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_low_blue`"
 
-[`DCEv` "`source_low_blue`"]: #dcev-source-low-blue
+[`DCEv` "`source_low_blue`"]: #dcev-source_low_blue
 
 Parent: [`EPSv`]
 
@@ -6264,14 +5362,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`253`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_low_green`"
 
-[`DCEv` "`source_low_green`"]: #dcev-source-low-green
+[`DCEv` "`source_low_green`"]: #dcev-source_low_green
 
 Parent: [`EPSv`]
 
@@ -6279,14 +5374,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`253`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_low_red`"
 
-[`DCEv` "`source_low_red`"]: #dcev-source-low-red
+[`DCEv` "`source_low_red`"]: #dcev-source_low_red
 
 Parent: [`EPSv`]
 
@@ -6294,14 +5386,11 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`253`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`source_low_rgb`"
 
-[`DCEv` "`source_low_rgb`"]: #dcev-source-low-rgb
+[`DCEv` "`source_low_rgb`"]: #dcev-source_low_rgb
 
 Parent: [`EPSv`]
 
@@ -6309,10 +5398,7 @@ Used by "Auto Levels", "Levels" filters.
 
 Observed value range: `0`..`253`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`split`"
 
@@ -6322,10 +5408,7 @@ Parent: [`DTAv`]
 
 Internal data used by Polygon autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`stroke`"
 
@@ -6341,10 +5424,7 @@ This is an "&"-separated string, for example:
 0&100.000000&3.000000&normal&RGBColor;255.000000;0.000000;0.000000&outsetFrame&solidColor&
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`style`"
 
@@ -6356,10 +5436,7 @@ Values:
 
 - `0`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`t1`"
 
@@ -6369,10 +5446,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`t2`"
 
@@ -6382,10 +5456,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tags`"
 
@@ -6397,11 +5468,7 @@ Values:
 
 - `[  ]`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
-- [`GVRv`] Dictionary Value Array
+Data Type: [`GVRv`]
 
 ### `DCEv` "`text`"
 
@@ -6461,10 +5528,7 @@ Text to show in Annotation autoshape, in a JSON-like structure (without key quot
 }
 ```
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`thickness`"
 
@@ -6474,10 +5538,7 @@ Parent: [`DTAv`]
 
 Internal data used by Arrow Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"
 
@@ -6487,114 +5548,87 @@ Parent: [`DTAv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`toolTips`"."`angle`"
 
-[`DCEv` "`toolTips`"."`angle`"]: #dcev-tooltips-angle
+[`DCEv` "`toolTips`"."`angle`"]: #dcev-tooltipsangle
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`drag`"
 
-[`DCEv` "`toolTips`"."`drag`"]: #dcev-tooltips-drag
+[`DCEv` "`toolTips`"."`drag`"]: #dcev-tooltipsdrag
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`head`"
 
-[`DCEv` "`toolTips`"."`head`"]: #dcev-tooltips-head
+[`DCEv` "`toolTips`"."`head`"]: #dcev-tooltipshead
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`inch`"
 
-[`DCEv` "`toolTips`"."`inch`"]: #dcev-tooltips-inch
+[`DCEv` "`toolTips`"."`inch`"]: #dcev-tooltipsinch
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`length`"
 
-[`DCEv` "`toolTips`"."`length`"]: #dcev-tooltips-length
+[`DCEv` "`toolTips`"."`length`"]: #dcev-tooltipslength
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`of`"
 
-[`DCEv` "`toolTips`"."`of`"]: #dcev-tooltips-of
+[`DCEv` "`toolTips`"."`of`"]: #dcev-tooltipsof
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`px`"
 
-[`DCEv` "`toolTips`"."`px`"]: #dcev-tooltips-px
+[`DCEv` "`toolTips`"."`px`"]: #dcev-tooltipspx
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`toolTips`"."`resize`"
 
-[`DCEv` "`toolTips`"."`resize`"]: #dcev-tooltips-resize
+[`DCEv` "`toolTips`"."`resize`"]: #dcev-tooltipsresize
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"
 
@@ -6604,192 +5638,147 @@ Parent: [`DTAv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`GDTv`] Nested Dictionary
+Data Type: [`GDTv`]
 
 ### `DCEv` "`tooltips`"."`altopt`"
 
-[`DCEv` "`tooltips`"."`altopt`"]: #dcev-tooltips-altopt
+[`DCEv` "`tooltips`"."`altopt`"]: #dcev-tooltipsaltopt
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`inner`"
 
-[`DCEv` "`tooltips`"."`inner`"]: #dcev-tooltips-inner
+[`DCEv` "`tooltips`"."`inner`"]: #dcev-tooltipsinner
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`openclose`"
 
-[`DCEv` "`tooltips`"."`openclose`"]: #dcev-tooltips-openclose
+[`DCEv` "`tooltips`"."`openclose`"]: #dcev-tooltipsopenclose
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`points`"
 
-[`DCEv` "`tooltips`"."`points`"]: #dcev-tooltips-points
+[`DCEv` "`tooltips`"."`points`"]: #dcev-tooltipspoints
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`radius`"
 
-[`DCEv` "`tooltips`"."`radius`"]: #dcev-tooltips-radius
+[`DCEv` "`tooltips`"."`radius`"]: #dcev-tooltipsradius
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`radius0`"
 
-[`DCEv` "`tooltips`"."`radius0`"]: #dcev-tooltips-radius0
+[`DCEv` "`tooltips`"."`radius0`"]: #dcev-tooltipsradius0
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`radius1`"
 
-[`DCEv` "`tooltips`"."`radius1`"]: #dcev-tooltips-radius1
+[`DCEv` "`tooltips`"."`radius1`"]: #dcev-tooltipsradius1
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`reset`"
 
-[`DCEv` "`tooltips`"."`reset`"]: #dcev-tooltips-reset
+[`DCEv` "`tooltips`"."`reset`"]: #dcev-tooltipsreset
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`roundness1`"
 
-[`DCEv` "`tooltips`"."`roundness1`"]: #dcev-tooltips-roundness1
+[`DCEv` "`tooltips`"."`roundness1`"]: #dcev-tooltipsroundness1
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`roundness2`"
 
-[`DCEv` "`tooltips`"."`roundness2`"]: #dcev-tooltips-roundness2
+[`DCEv` "`tooltips`"."`roundness2`"]: #dcev-tooltipsroundness2
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`scale`"
 
-[`DCEv` "`tooltips`"."`scale`"]: #dcev-tooltips-scale
+[`DCEv` "`tooltips`"."`scale`"]: #dcev-tooltipsscale
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`sections`"
 
-[`DCEv` "`tooltips`"."`sections`"]: #dcev-tooltips-sections
+[`DCEv` "`tooltips`"."`sections`"]: #dcev-tooltipssections
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`sides`"
 
-[`DCEv` "`tooltips`"."`sides`"]: #dcev-tooltips-sides
+[`DCEv` "`tooltips`"."`sides`"]: #dcev-tooltipssides
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`tooltips`"."`spirals`"
 
-[`DCEv` "`tooltips`"."`spirals`"]: #dcev-tooltips-spirals
+[`DCEv` "`tooltips`"."`spirals`"]: #dcev-tooltipsspirals
 
 Parent: [`GDTv`]
 
 Internal data used by autoshapes.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`type`"
 
@@ -6802,14 +5791,11 @@ Values:
 - `Button`: unknown - TODO
 - `TextField`: unknown - TODO
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`unsharp_mask_amount`"
 
-[`DCEv` "`unsharp_mask_amount`"]: #dcev-unsharp-mask-amount
+[`DCEv` "`unsharp_mask_amount`"]: #dcev-unsharp_mask_amount
 
 Parent: [`EPSv`]
 
@@ -6817,14 +5803,11 @@ Used by "Unsharp Mask" filter.
 
 Observed value range: `1`..`500`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`unsharp_mask_radius`"
 
-[`DCEv` "`unsharp_mask_radius`"]: #dcev-unsharp-mask-radius
+[`DCEv` "`unsharp_mask_radius`"]: #dcev-unsharp_mask_radius
 
 Parent: [`EPSv`]
 
@@ -6832,14 +5815,11 @@ Used by "Unsharp Mask" filter.
 
 Observed value range: `0.1`..`250`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`unsharp_mask_threshold`"
 
-[`DCEv` "`unsharp_mask_threshold`"]: #dcev-unsharp-mask-threshold
+[`DCEv` "`unsharp_mask_threshold`"]: #dcev-unsharp_mask_threshold
 
 Parent: [`EPSv`]
 
@@ -6847,10 +5827,7 @@ Used by "Unsharp Mask" filter.
 
 Observed value range: `0`..`255`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`usecolor`"
 
@@ -6865,10 +5842,7 @@ Values:
 - `false`: shadow colour is extension of edge colour
 - `true`: shadow colour is set by [`DCEv` "`color`"]
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`wavelength`"
 
@@ -6878,10 +5852,7 @@ Parent: [`DTAv`]
 
 Observed value range: `33.00001272903228`..`33.00001272903228`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`width`"
 
@@ -6891,10 +5862,7 @@ Parent: [`DTAv`]
 
 Internal data used by Connector Line autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`x1`"
 
@@ -6904,10 +5872,7 @@ Parent: [`DTAv`]
 
 Internal data used by Measure Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`x2`"
 
@@ -6917,10 +5882,7 @@ Parent: [`DTAv`]
 
 Internal data used by Measure Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`y1`"
 
@@ -6930,10 +5892,7 @@ Parent: [`DTAv`]
 
 Internal data used by Measure Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`y2`"
 
@@ -6943,14 +5902,11 @@ Parent: [`DTAv`]
 
 Internal data used by Measure Tool autoshape.
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`zoom_blur_amount`"
 
-[`DCEv` "`zoom_blur_amount`"]: #dcev-zoom-blur-amount
+[`DCEv` "`zoom_blur_amount`"]: #dcev-zoom_blur_amount
 
 Parent: [`EPSv`]
 
@@ -6958,14 +5914,11 @@ Used by "Zoom Blur" filter.
 
 Observed value range: `1`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ### `DCEv` "`zoom_blur_quality`"
 
-[`DCEv` "`zoom_blur_quality`"]: #dcev-zoom-blur-quality
+[`DCEv` "`zoom_blur_quality`"]: #dcev-zoom_blur_quality
 
 Parent: [`EPSv`]
 
@@ -6973,10 +5926,7 @@ Used by "Zoom Blur" filter.
 
 Observed value range: `1`..`100`
 
-Contains:
-
-- [`DCKs`] Dictionary Entry Key
-- [`DCVs`] Dictionary Entry String Value
+Data Type: [`DCVs`]
 
 ## `DCKs` **D**i**c**tionary Entry **K**ey
 
@@ -7565,7 +6515,7 @@ Contains:
 
 ## `EXPv`.`FCLi` Matte **C**o**l**our
 
-[`EXPv`.`FCLi`]: #expv-fcli-matte-colour
+[`EXPv`.`FCLi`]: #expvfcli-matte-colour
 
 Parent: [`EXPv`]
 
@@ -7773,7 +6723,7 @@ Contains:
 
 ## `FGYv` **F**ill **G**radient RGB + Alpha
 
-[`FGYv`]: #fgyv-fill-gradient-rgb-alpha
+[`FGYv`]: #fgyv-fill-gradient-rgb--alpha
 
 Parent: [`FGLv`]
 
@@ -7872,6 +6822,8 @@ Contains:
 
 Parent: [`FNMv`]
 
+Possibly controls GIF disposal method for frame?
+
 Values:
 
 - `0`: unknown - TODO
@@ -7939,7 +6891,7 @@ Contains:
 
 ## `FPLv`.`FETi` **F**ill **E**dge An**t**i-alias
 
-[`FPLv`.`FETi`]: #fplv-feti-fill-edge-anti-alias
+[`FPLv`.`FETi`]: #fplvfeti-fill-edge-anti-alias
 
 Parent: [`FPLv`]
 
@@ -8520,11 +7472,9 @@ Parent: [`MKBv`]
 
 Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
-Observed in all Fireworks CS4 files, not seen in Fireworks 8 files. Always seems to be `false`.
-
 Values:
 
-- `false`: unknown
+- `false`: unknown - TODO
 
 ## `IMDs` **Im**age **D**irectory
 
@@ -8758,11 +7708,13 @@ Contains:
 
 - [`JSSs`]\* JavaScript Substring
 
-## `KRNf`
+## `KRNf` Pair **K**e**rn**ing
 
-[`KRNf`]: #krnf
+[`KRNf`]: #krnf-pair-kerning
 
 Parent: [`TFSv`] / [`TXTv`]
+
+Kerning adjustment for a single pair of characters (TODO: which pair?)
 
 Observed value range: `-1`..`0.14`
 
@@ -9798,9 +8750,9 @@ Parent: [`TXTv`]
 
 Values:
 
-- `0`: left-to-right
-- `1`: top-to-bottom
-- `3`: top-to-bottom (TODO: unknown distinction from `1`)
+- `0`: right-to-left (lines top-to-bottom)
+- `1`: top-to-bottom (lines right-to-left)
+- `3`: top-to-bottom (lines left-to-right)
 
 ## `OSAi` **O**nion **S**kinning **A**fter Frames
 
@@ -10428,11 +9380,13 @@ Parent: [`CDMv`] / [`NGMv`] / [`NGVv`] / [`RCTv`] / [`TXTv`] / [`URLv`]
 
 Distance (pixels) from left of container to right of entity.
 
-## `RKNf` **K**er**n**ing
+## `RKNf` **R**ange **K**er**n**ing
 
-[`RKNf`]: #rknf-kerning
+[`RKNf`]: #rknf-range-kerning
 
 Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
+
+Kerning adjustment to apply to all character distances in the current run.
 
 Observed value range: `-1`..`5`
 
@@ -10961,14 +9915,14 @@ Contains:
 - [`HSCf`]\* Horizontal Scale
 - [`ITLb`]\* Italic
 - [`JSTi`]\* Justification
-- [`KRNf`]\*
+- [`KRNf`]\* Pair Kerning
 - [`LDMi`]\* Leading Mode
 - [`LEDf`]\* Leading (Line Height)
 - [`PINf`]\* Paragraph Indent
 - [`PSAf`]\* Paragraph Space After
 - [`PSBf`]\* Paragraph Space Before
 - [`PTSf`]\* Font Point Size
-- [`RKNf`]\* Kerning
+- [`RKNf`]\* Range Kerning
 - [`TRNs`]\* Text Run
 - [`UNDb`]\* Underline
 
@@ -11105,11 +10059,9 @@ Parent: [`EXPv`]
 
 Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
-Not seen in Fireworks MX files. In Fireworks 8+, this seems to always be `0`
-
 Values:
 
-- `0`: unknown
+- `0`: unknown - TODO
 
 ## `TRMb` Export **Tr**i**m**med Images
 
@@ -11219,7 +10171,7 @@ Contains:
 - [`HSCf`] Horizontal Scale
 - [`ITLb`] Italic
 - [`JSTi`] Justification
-- [`KRNf`]
+- [`KRNf`] Pair Kerning
 - [`LDMi`] Leading Mode
 - [`LEDf`] Leading (Line Height)
 - [`LFTf`] Left
@@ -11228,7 +10180,7 @@ Contains:
 - [`PTSf`] Font Point Size
 - [`PTTi`] Path Templated
 - [`RITf`] Right
-- [`RKNf`] Kerning
+- [`RKNf`] Range Kerning
 - [`RNDi`] Random Seed
 - [`TAAi`] Text Anti-Alias
 - [`TFSv`] Text Formatted String
@@ -11236,7 +10188,7 @@ Contains:
 - [`TOXf`] Texture Offset X
 - [`TOYf`] Texture Offset Y
 - [`UNDb`] Underline
-- [`XFMi`]
+- [`XFMi`] Transform Mode
 - [`AIDi`]?
 - [`BLDi`]? Blend Mode
 - [`BOAf`]? Bounds
@@ -11310,7 +10262,7 @@ Values:
 
 ## `URLv` Image Slice / Hotspot
 
-[`URLv`]: #urlv-image-slice-hotspot
+[`URLv`]: #urlv-image-slice--hotspot
 
 Parent: [`ELMv`] / [`MNFv`]
 
@@ -11406,8 +10358,6 @@ Parent: [`MKBv`] / [`PDCv`]
 
 Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
-Not seen in Fireworks 8 files.
-
 Values:
 
 - `1`: unknown - TODO
@@ -11419,8 +10369,6 @@ Values:
 Parent: [`MKBv`] / [`PDCv`]
 
 Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
-
-Not seen in Fireworks 8 files.
 
 Values:
 
@@ -11474,16 +10422,16 @@ Values:
 - `false`: unknown - TODO
 - `true`: unknown - TODO
 
-## `XFMi`
+## `XFMi` Trans**f**orm **M**ode
 
-[`XFMi`]: #xfmi
+[`XFMi`]: #xfmi-transform-mode
 
 Parent: [`ALSv`] / [`TXTv`]
 
 Values:
 
-- `0`: unknown - TODO
-- `1`: unknown - TODO
+- `0`: vector ?
+- `1`: pixel ?
 
 ## `XFSi` E**x**port **F**ormat **S**election
 
@@ -11518,7 +10466,7 @@ Parent: [`BEHv`] / [`CPTv`] / [`GPTv`] / [`IMGv`] / [`MKBv`] / [`PBTv`] / [`PDCv
 
 Parent: [`EXPv`]
 
-Something to do with the latest export settings (TODO)
+Possibly dither mode: none / error diffusion / 2x2 cells
 
 Values:
 
@@ -11668,6 +10616,8 @@ Parent: [`ZSTv`]
 
 Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
+Possibly a bitmask of which parts of the style to use?
+
 Values:
 
 - `0`: unknown - TODO
@@ -11707,7 +10657,7 @@ Contains:
 - [`PSXf`] Fill Point 1 (S) X
 - [`PSYf`] Fill Point 1 (S) Y
 - [`PTSf`] Font Point Size
-- [`RKNf`] Kerning
+- [`RKNf`] Range Kerning
 - [`TAAi`] Text Anti-Alias
 - [`TIAb`]
 - [`UNDb`] Underline

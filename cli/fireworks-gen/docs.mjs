@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+/*
+ * This script regenerates docs/FireworksNodes.md from an input set of sample
+ * PNG images, which are analysed to identify the possible node structures
+ * and values. It combines this with manually-entered data from:
+ * src/image/png/chunks/private/fireworks/node-info.mjs
+ */
+
 import { Writable } from 'node:stream';
 import { createWriteStream } from 'node:fs';
 import { NODE_INFO } from '../../src/image/png/chunks/private/fireworks/node-info.mjs';
@@ -12,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 const basedir = dirname(fileURLToPath(import.meta.url));
 const includeDebugFilePaths = Boolean(process.env['FILE_PATHS']);
-const { paths, nodes, allSoftware } = await processFiles(process.argv.slice(2));
+const { paths, nodes } = await processFiles(process.argv.slice(2));
 
 const target = createWriteStream(join(basedir, '..', '..', 'docs', 'FireworksNodes.md'));
 target.write([
@@ -27,7 +34,7 @@ target.write([
 	'means 2 or more. No suffix means it has always been observed to appear',
 	'exactly once.',
 ].join('\n') + '\n\n');
-printInfo(target, nodes, allSoftware, paths, includeDebugFilePaths);
+printInfo(target, nodes, paths, includeDebugFilePaths);
 target.write('[`mkBT`]: ./Fireworks.md#mkbt\n');
 target.close();
 
@@ -57,11 +64,10 @@ function byHuman(a, b) {
 /**
  * @param {Writable} target
  * @param {Map<string, Observed>} nodes
- * @param {Set<string>} allSoftware
  * @param {string[]} allFiles
  * @param {boolean} includeTODOFilePaths
  */
-function printInfo(target, nodes, allSoftware, allFiles, includeTODOFilePaths) {
+function printInfo(target, nodes, allFiles, includeTODOFilePaths) {
 	const sortedNodes = [...nodes].sort(byKey);
 	const seenNodes = new Set();
 	let hasDCEv = false;
@@ -91,7 +97,7 @@ function printInfo(target, nodes, allSoftware, allFiles, includeTODOFilePaths) {
 		printHeading(target, id, extraInfo?.name, headingLevel);
 		if (id === 'DCKs' || id === 'DCVs' || id === 'GDTv') {
 			target.write('Parent: [`DCEv`]\n\n'); // avoid useless large list for this node
-		} else if (info.parents.size) {
+		} else if (info.parents.size && !id.startsWith('DCEV.')) {
 			target.write(`Parent: ${[...info.parents].sort().map(idToLink).join(' / ')}\n\n`);
 		}
 		if (!id.startsWith('DCEv.')) {
@@ -156,7 +162,15 @@ function printInfo(target, nodes, allSoftware, allFiles, includeTODOFilePaths) {
 				target.write('\n');
 			}
 		}
-		if (info.children?.size) {
+		if (id.startsWith('DCEv.') && info.children) {
+			const dataTypes = new Set(info.children.keys());
+			dataTypes.delete('DCKs');
+			if (dataTypes.has('GVRv')) {
+				target.write(`Data Type: ${idToLink('GVRv')}\n\n`);
+			} else {
+				target.write(`Data Type: ${[...dataTypes].sort().map((id) => idToLink(id)).join(' / ')}\n\n`);
+			}
+		} else if (info.children?.size) {
 			target.write('Contains:\n\n');
 			printChildren(target, info);
 			target.write('\n');
@@ -182,11 +196,12 @@ function printHeading(target, id, name, level) {
 	if (name) {
 		fullHeading += ` ${name}`;
 	}
+	// match "github-style" heading IDs
 	const headingAnchor = fullHeading.replaceAll('*', '')
-		.replaceAll(/[^a-zA-Z0-9]+/g, ' ')
+		.toLowerCase()
+		.replaceAll(/[^\p{L}\p{N}_\- ]+/gu, '')
 		.trim()
-		.replaceAll(' ', '-')
-		.toLowerCase();
+		.replaceAll(' ', '-');
 	target.write(`${'#'.repeat(level)} ${fullHeading}\n\n`);
 	target.write(`${idToLink(id)}: #${headingAnchor}\n\n`);
 }

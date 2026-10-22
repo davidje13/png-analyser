@@ -178,6 +178,7 @@ RENDERERS.set('PTHv', (globals, /** @type {PTHv} */ pthv) => {
 			'shape-rendering': pthv.pattern.brushPropertyList.isAntiAliased ? undefined : 'crispEdges',
 			'stroke-dasharray': pthv.pattern.brushPropertyList.dashArray.join(' ') || undefined,
 		});
+		// TODO: apply other brush properties (multiple tip, edge feathering, alpha mapping, etc.)
 		if (
 			pthv.pattern.textureBrush && (
 				pthv.pattern.brushPropertyList.textureBlend > 0 ||
