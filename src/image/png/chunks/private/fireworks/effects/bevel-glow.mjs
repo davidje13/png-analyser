@@ -1,6 +1,7 @@
 import { rgba, svgEl } from '../../../../../../display/pretty.mjs';
 import { ierf } from '../math.mjs';
-import { col, float, str } from './readers.mjs';
+import { makeCurveMapping } from './curves.mjs';
+import { asciiHex, col, float, str } from './readers.mjs';
 import { registerEffect } from './registry.mjs';
 
 /**
@@ -174,16 +175,17 @@ function innerBevel(data) {
 			svgEl('feFuncA', { type: 'linear', slope: 512, intercept: -threshold * 511 }),
 		]),
 		svgEl('feGaussianBlur', { stdDeviation: width / GAUSSIAN_TO_LINEAR_SCALE }),
-		svgEl('feComponentTransfer', { result: 'h' }, [
+		svgEl('feComponentTransfer', {}, [
 			svgEl('feFuncA', { type: 'table', tableValues: GAUSSIAN_TO_LINEAR }),
 		]),
 	];
 
 	if (slope.transferInner !== '0 1') {
-		steps.push(svgEl('feComponentTransfer', { result: 'h' }, [
+		steps.push(svgEl('feComponentTransfer', {}, [
 			svgEl('feFuncA', { type: 'table', tableValues: slope.transferInner }),
 		]));
 	}
+	steps[steps.length - 1].setAttribute('result', 'h');
 
 	if (lightAngleAdjust) {
 		steps.push(
@@ -281,16 +283,17 @@ function outerBevel(data) {
 		svgEl('feComponentTransfer', { result: 'c' }, [
 			svgEl('feFuncA', { type: 'linear', slope: 128, intercept: -3 }),
 		]),
-		svgEl('feComponentTransfer', { in: 'b', result: 'h' }, [
+		svgEl('feComponentTransfer', { in: 'b' }, [
 			svgEl('feFuncA', { type: 'table', tableValues: GAUSSIAN_TO_LINEAR }),
 		]),
 	];
 
 	if (slope.transferOuter !== '0 1') {
-		steps.push(svgEl('feComponentTransfer', { result: 'h' }, [
+		steps.push(svgEl('feComponentTransfer', {}, [
 			svgEl('feFuncA', { type: 'table', tableValues: slope.transferOuter }),
 		]));
 	}
+	steps[steps.length - 1].setAttribute('result', 'h');
 
 	if (lightAngleAdjust) {
 		steps.push(
@@ -388,16 +391,17 @@ function emboss(data, depth) {
 		svgEl('feComponentTransfer', { result: 'c' }, [
 			svgEl('feFuncA', { type: 'linear', slope: 128, intercept: -3 }),
 		]),
-		svgEl('feComponentTransfer', { in: 'b', result: 'h' }, [
+		svgEl('feComponentTransfer', { in: 'b' }, [
 			svgEl('feFuncA', { type: 'table', tableValues: GAUSSIAN_TO_LINEAR }),
 		]),
 	];
 
 	if (slope.transferOuter !== '0 1') {
-		steps.push(svgEl('feComponentTransfer', { result: 'h' }, [
+		steps.push(svgEl('feComponentTransfer', {}, [
 			svgEl('feFuncA', { type: 'table', tableValues: slope.transferOuter }),
 		]));
 	}
+	steps[steps.length - 1].setAttribute('result', 'h');
 
 	if (lightAngleAdjust) {
 		steps.push(
@@ -497,7 +501,7 @@ function glow({
 			svgEl('feFuncA', { type: 'linear', slope: 512, intercept: -threshold * 511 }),
 		]),
 		svgEl('feGaussianBlur', { stdDeviation: (Math.abs(distance) + width) / GAUSSIAN_TO_LINEAR_SCALE }),
-		svgEl('feComponentTransfer', { result: 'h' }, [
+		svgEl('feComponentTransfer', {}, [
 			svgEl('feFuncA', { type: 'table', tableValues: GAUSSIAN_TO_LINEAR }),
 		]),
 		svgEl('feComponentTransfer', {}, [
@@ -597,6 +601,93 @@ registerEffect('{2ba87123-8220-11d3-baad0000861f4d01}', {
 registerEffect('{d810e821-f86b-11d0-656341346564694e}', {
 	name: 'Bevel Boss',
 	apply: (globals, contents, data) => {
-		return contents; // TODO
+		const azimuth = -(float(data['external_filter_key__Drct']) ?? 0);
+		const elevation = float(data['external_filter_key__INcl']) ?? 0;
+		const widthRaw = asciiHex(data['external_filter_key__Wdth'])?.[0]; // format: "12.34 pixels"
+		const widthMatch = /^([\d.]+) pixels?$/.exec(widthRaw ?? '');
+		let width = 0;
+		if (widthMatch) {
+			width = Number.parseFloat(widthMatch[1]);
+		} else if (widthRaw) {
+			console.warn(`Unknown bevel-boss width format: ${widthRaw}`);
+		}
+		const brightness = (float(data['external_filter_key__Brgh']) ?? 0) * 0.01; // 1 = normal
+		const contrast = (float(data['external_filter_key__Cntr']) ?? 0) * 0.01; // 0 = normal?
+		const darkness = (float(data['external_filter_key__Drkn']) ?? 0) * 0.01;
+		const specularExponent = float(data['external_filter_key__Shrp']) ?? 0;
+		const smoothing = (float(data['external_filter_key__Smth']) ?? 0) * 0.1;
+		const bevelRaw = asciiHex(data['external_filter_key__BEvl'])?.[0]; // format: "Bevel: 4/0.000 1.000 0/0.300 0.900 0/0.900 0.300 0/1.000 0.000 0"
+		const bevel = bevelRaw?.split('/').slice(1).map((v) => {
+			const [s = '0', t = '0'] = v.split(' ');
+			return { x: (1 - Number.parseFloat(s) * 0.5) * 255, y: Number.parseFloat(t) * 255 };
+		}).reverse();
+		//const fl = data['external_filter_key__0x466c2020'] === 'true';
+		//const bvls = asciiHex(data['external_filter_key__bvlS']); // [Beti, beT0]
+		const shadowColour = asciiHex(data['external_filter_key__sdwC'])?.[0]; // format: "RGB: 0.0% 0.0% 0.0% (0 0 0)"
+		const specularColour = asciiHex(data['external_filter_key__0x436c7220'])?.[0]; // format: "RGB: 100.0% 100.0% 100.0% (255 255 255)"
+		const height = width / 4;
+
+		/** @type {SVGElement[]} */ const steps = [
+			svgEl('feComponentTransfer', { in: 'SourceAlpha' }, [
+				svgEl('feFuncA', { type: 'linear', slope: 512, intercept: -511 }),
+			]),
+			svgEl('feGaussianBlur', { stdDeviation: width / GAUSSIAN_TO_LINEAR_SCALE }),
+			svgEl('feComponentTransfer', {}, [
+				svgEl('feFuncA', { type: 'table', tableValues: GAUSSIAN_TO_LINEAR }),
+			]),
+		];
+
+		if (bevel) {
+			steps.push(svgEl('feComponentTransfer', {}, [
+				// TODO: what is the correct interpolation for the bevel curve?
+				svgEl('feFuncA', { type: 'table', tableValues: makeCurveMapping(bevel).join(' ') }),
+			]));
+		}
+		steps[steps.length - 1].setAttribute('result', 'h');
+
+		steps.push(svgEl('feSpecularLighting', {
+			surfaceScale: height,
+			kernelUnitLength: 1,
+			specularConstant: 1,
+			specularExponent,
+		}, [svgEl('feDistantLight', { azimuth, elevation })]));
+		if (smoothing) {
+			steps.push(svgEl('feGaussianBlur', { stdDeviation: smoothing * 0.5 }));
+		}
+		steps.push(svgEl('feComponentTransfer', {}, [
+			svgEl('feFuncA', { type: 'linear', slope: brightness * 2 }),
+		]));
+		steps[steps.length - 1].setAttribute('result', 's');
+
+		steps.push(svgEl('feDiffuseLighting', {
+			surfaceScale: height,
+			kernelUnitLength: 1,
+			diffuseConstant: 1,
+			in: 'h',
+		}, [svgEl('feDistantLight', { azimuth, elevation })]));
+		if (smoothing) {
+			steps.push(
+				svgEl('feGaussianBlur', { stdDeviation: smoothing, result: 'b' }),
+				// edgeMode is not supported for feGaussianBlur in most browsers, so patch it in:
+				svgEl('feFlood', { 'flood-color': '#808080' }),
+				svgEl('feComposite', { operator: 'over', in: 'b' }),
+			);
+		}
+		steps.push(
+			svgEl('feComposite', { operator: 'arithmetic', in: 'SourceGraphic', k1: contrast + 1, k2: -contrast * 0.75 }),
+			svgEl('feComposite', { operator: 'atop', in: 's' }),
+		);
+
+		const filterID = globals.addDef(svgEl('filter', {
+			// ideally this filter is 1 pixel larger than the shape in all directions
+			// but edgeMode is not supported for feGaussianBlur in most browsers
+			x: '-1%',
+			y: '-1%',
+			width: '102%',
+			height: '102%',
+			'data-type': 'bevel-boss',
+		}, steps));
+		contents.setAttribute('filter', `url(#${encodeURIComponent(filterID)})`);
+		return contents;
 	},
 });

@@ -231,7 +231,7 @@ RENDERERS.set('TXTv', (globals, /** @type {TXTv} */ txtv) => {
 		hold.setAttribute('stroke-width', String(txtv.pattern.brushPropertyList.diameter / approxScale));
 	}
 	/** @type {SVGElement} */ let target = hold;
-	if (txtv.flow === 2 && txtv.path) {
+	if ((txtv.flow === 2 || txtv.flow === undefined) && txtv.path) {
 		target = svgEl('textPath', {
 			href: '#' + globals.addDef(svgEl('path', {
 				d: txtv.path.path.bezierPoints.map(contourToSVG).join(''),

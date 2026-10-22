@@ -1,11 +1,10 @@
 import { svgEl } from '../../../../../../display/pretty.mjs';
 import { lcm } from '../math.mjs';
 import { GPLv } from '../nodes/GPLv.mjs';
-import { GPTv } from '../nodes/GPTv.mjs';
 import { registerEffect } from './registry.mjs';
 
-/** @param {ReadonlyArray<GPTv>} points */
-function makeCurveMapping(points) {
+/** @param {ReadonlyArray<{ readonly x: number, readonly y: number }>} points */
+export function makeCurveMapping(points) {
 	const N = points.length;
 	if (N < 2) {
 		return [0, 1];

@@ -4,6 +4,28 @@ export const str = (v) => typeof v === 'string' ? v : undefined;
 /** @param {import('./registry.mjs').CustomData | undefined} v */
 export const float = (v) => typeof v === 'string' ? Number.parseFloat(v) : undefined;
 
+/** @param {import('./registry.mjs').CustomData | undefined} v */
+export const asciiHex = (v) => {
+	const raw = str(v);
+	if (!raw) {
+		return undefined;
+	}
+	return raw.split(' ').map((v) => {
+		if (v === '0') {
+			return null;
+		}
+		if (v.length & 1 || /[^0-9a-f]/.test(v)) {
+			console.warn('unexpected ascii hex format string');
+			return v;
+		}
+		let r = '';
+		for (let p = 0; p < v.length; p += 2) {
+			r += String.fromCharCode(Number.parseInt(v.substring(p, p + 2), 16));
+		}
+		return r;
+	});
+};
+
 /**
  * @param {import('./registry.mjs').CustomData | undefined} c
  * @param {import('./registry.mjs').CustomData | undefined=} alpha

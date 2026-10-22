@@ -3039,7 +3039,9 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Hex in key translates to `Clr `. Unknown data storage.
+Used by bevel-boss filter.
+
+Hex in key translates to `Clr `. Space-separated hex-encoded ASCII text chunks, terminated by a `0`. The first (only) chunk contains a string of the form `RGB: 100.0% 100.0% 100.0% (255 255 255)`, denoting the specular colour to apply.
 
 Data Type: [`DCVs`]
 
@@ -3075,7 +3077,9 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Hex in key translates to `Fl  `.
+Used by bevel-boss filter.
+
+Hex in key translates to `Fl  `. Unknown purpose.
 
 Values:
 
@@ -3090,7 +3094,9 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Unknown data storage.
+Used by bevel-boss filter.
+
+Space-separated hex-encoded ASCII text chunks, terminated by a `0`. The first (only) chunk contains a string of the form `Bevel: 4/0.000 1.000 0/0.300 0.900 0/0.900 0.300 0/1.000 0.000 0`, denoting the shape of the bevel profile (each `/`-separated entry has space-separated input distance and output height, followed by an unknown flag). This shape is smoothed (unknown interpolation) before being applied.
 
 Data Type: [`DCVs`]
 
@@ -3180,6 +3186,10 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
+Used by bevel-boss filter.
+
+Possibly "brightness".
+
 Observed value range: `68`..`100`
 
 Data Type: [`DCVs`]
@@ -3189,6 +3199,10 @@ Data Type: [`DCVs`]
 [`DCEv` "`external_filter_key__Cntr`"]: #dcev-external_filter_key__cntr
 
 Parent: [`EPSv`]
+
+Used by bevel-boss filter.
+
+Possibly "contrast".
 
 Observed value range: `0`..`58`
 
@@ -3200,6 +3214,10 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
+Used by bevel-boss filter.
+
+Light direction.
+
 Observed value range: `0`..`180`
 
 Data Type: [`DCVs`]
@@ -3209,6 +3227,10 @@ Data Type: [`DCVs`]
 [`DCEv` "`external_filter_key__Drkn`"]: #dcev-external_filter_key__drkn
 
 Parent: [`EPSv`]
+
+Used by bevel-boss filter.
+
+Possibly "darkness".
 
 Observed value range: `0`..`0`
 
@@ -3270,7 +3292,11 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Observed value range: `45`..`81.86989773939402`
+Used by bevel-boss filter.
+
+Light inclination.
+
+Value range: `-90` (behind)..`90` (above)
 
 Data Type: [`DCVs`]
 
@@ -3509,6 +3535,10 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
+Used by bevel-boss filter.
+
+Possibly "sharpness", may relate to specular highlight exponent.
+
 Observed value range: `25`..`99`
 
 Data Type: [`DCVs`]
@@ -3518,6 +3548,10 @@ Data Type: [`DCVs`]
 [`DCEv` "`external_filter_key__Smth`"]: #dcev-external_filter_key__smth
 
 Parent: [`EPSv`]
+
+Used by bevel-boss filter.
+
+Possibly "smoothing".
 
 Observed value range: `0`..`100`
 
@@ -3761,7 +3795,9 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Unknown data storage.
+Used by bevel-boss filter.
+
+Space-separated hex-encoded ASCII text chunks, terminated by a `0`. The first (only) chunk contains a string of the form `12.34 pixels`, denoting the width of the bevel to apply.
 
 Data Type: [`DCVs`]
 
@@ -3781,7 +3817,9 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Unknown data storage.
+Used by bevel-boss filter.
+
+Space-separated hex-encoded ASCII text chunks. Unknown purpose.
 
 Data Type: [`DCVs`]
 
@@ -3791,7 +3829,9 @@ Data Type: [`DCVs`]
 
 Parent: [`EPSv`]
 
-Unknown data storage.
+Used by bevel-boss filter.
+
+Space-separated hex-encoded ASCII text chunks, terminated by a `0`. The first (only) chunk contains a string of the form `RGB: 100.0% 100.0% 100.0% (255 255 255)`, denoting the shadow colour to apply.
 
 Data Type: [`DCVs`]
 
@@ -8750,8 +8790,9 @@ Parent: [`TXTv`]
 
 Values:
 
-- `0`: right-to-left (lines top-to-bottom)
+- `0`: left-to-right (lines top-to-bottom)
 - `1`: top-to-bottom (lines right-to-left)
+- `2`: right-to-left (lines top-to-bottom)
 - `3`: top-to-bottom (lines left-to-right)
 
 ## `OSAi` **O**nion **S**kinning **A**fter Frames
@@ -9934,12 +9975,14 @@ Parent: [`TXTv`]
 
 Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
+Type of path following to use. In older versions this is not present, and 2 (follow path) is implied by the presence of [`TAPv`]
+
 Values:
 
 - `0`: normal
 - `1`: fit to width (defined in [`BOAf`])
-- `2`: follow path
-- `3`: fit inside shape
+- `2`: follow path (defined in [`TAPv`])
+- `3`: fit inside shape (defined in [`TAPv`])
 
 ## `TIAb`
 
