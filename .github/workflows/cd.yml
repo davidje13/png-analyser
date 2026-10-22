@@ -27,7 +27,6 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - name: Build static files
-        id: build
         run: npm install && npm run build
       - name: Upload pages content
         uses: actions/upload-pages-artifact@v5
