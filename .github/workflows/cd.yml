@@ -31,7 +31,7 @@ jobs:
       - name: Upload pages content
         uses: actions/upload-pages-artifact@v5
         with:
-          path: build
+          path: build/static
 
   deploy:
     runs-on: ubuntu-latest
