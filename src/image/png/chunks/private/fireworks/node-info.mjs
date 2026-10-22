@@ -891,7 +891,7 @@
 	['EFXs', { name: '**E**xport **F**ile Filter.', noValueDetails: true }],
 	['ELMv', { name: '**El**e**m**ents', description: 'A list of individual elements to render within a layer or group, ordered from front to back.' }],
 	['ENCi', { name: 'HTML **Enc**oding', values: new Map([[0, 'ASCII'], [1, 'UTF-8']]) }],
-	['EOFb', { name: '**E**ven-**O**dd **F**ill Rule', values: new Map([[true, 'even-odd fill rule'], [false, 'nonzero fill rule']]) }],
+	['EOFb', { name: '**E**ven-**O**dd **F**ill Rule', values: new Map([[true, 'even-odd fill rule (default)'], [false, 'nonzero fill rule']]) }],
 	['EPSv', { name: '**E**ffect **P**ropertie**s**', description: 'Defines an effect (such as a drop-shadow). See [`DCEv` "`EffectMoaID`"] for the type of effect applied.' }],
 	['EXPv', { name: '**Exp**ort Options' }],
 	['FABi', { description: 'A **signed** 32-bit number, relating to Bottom.', range: false }],

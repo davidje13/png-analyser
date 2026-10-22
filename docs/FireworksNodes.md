@@ -6290,7 +6290,7 @@ Observed in versions: Macromedia Fireworks MX 2005 - Adobe Fireworks CS6
 Values:
 
 - `false`: nonzero fill rule
-- `true`: even-odd fill rule
+- `true`: even-odd fill rule (default)
 
 ## `EPSv` **E**ffect **P**ropertie**s**
 

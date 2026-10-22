@@ -7,7 +7,7 @@ import { PRIv } from './PRIv.mjs';
 export class PTHv extends BaseElement {
 	fillOnTop = this.optional('FOTb') ?? false;
 	brushPlacement = this.optional('BRPi') ?? 1;
-	evenOddFillRule = this.optional('EOFb') ?? false;
+	evenOddFillRule = this.optional('EOFb') ?? true;
 
 	bezierPoints = this.required('PBLv', PBLv);
 	//segmentedPoints = this.required('PCLv', PCLv);
