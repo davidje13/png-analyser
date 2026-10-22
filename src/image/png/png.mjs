@@ -37,6 +37,17 @@ export async function readPNG(data) {
   return result;
 }
 
+/**
+ * @template {import('./chunk.mjs').Chunk} C
+ * @param {PNGResult} png
+ * @param {string} name
+ * @param {(chunk: C) => boolean} predicate
+ * @return {C | undefined}
+ */
+export function findChunk(png, name, predicate = () => true) {
+  return /** @type {C | undefined} */ (png.chunks.find((c) => c.name === name && predicate(/** @type {C} */ (c))));
+}
+
 //const npot = (v) => 1 << (32 - Math.clz32(v - 1));
 //const deflateOptions = {
 //  chunkSize: Math.max(256, Math.min(32768, npot(imageData.length))),

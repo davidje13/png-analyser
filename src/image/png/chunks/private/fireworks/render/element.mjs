@@ -14,6 +14,7 @@ import { rasterToDataURL } from './image.mjs';
 import { contourToSVG } from './path.mjs';
 import { makeTextureMask } from './texture.mjs';
 import { LYLv } from '../nodes/LYLv.mjs';
+import { CSGv } from '../nodes/CSGv.mjs';
 
 /** @typedef {import('./globals.mjs').ImageGlobals} ImageGlobals */
 
@@ -308,36 +309,42 @@ RENDERERS.set('TXTv', (globals, /** @type {TXTv} */ txtv) => {
 	}
 	return hold;
 });
-RENDERERS.set('GRPv', (globals, /** @type {GRPv} */ grpv) => {
-	if (grpv.type === 0) {
+/**
+ * @param {ImageGlobals} globals
+ * @param {GRPv | CSGv} grp
+ */
+function renderGroup(globals, grp) {
+	if (grp.type === 0) {
 		return svgEl('g', {
-			'data-type': grpv.smartShape ? 'smart-shape' : 'group',
-		}, renderElements(globals, grpv.elements));
+			'data-type': grp.smartShape ? 'smart-shape' : 'group',
+		}, renderElements(globals, grp.elements));
 	}
 	/** @type {string} */ let maskID;
-	if (grpv.type === 1) {
+	if (grp.type === 1) {
 		// fireworks uses black for opaque and white for transparent,
 		// so we must invert the mask to match SVG's behaviour
 		maskID = globals.addDef(svgEl('mask', {}, [
 			svgEl('g', {
 				filter: `url(#${encodeURIComponent(invertFilter(globals))})`,
-			}, renderElements(globals, grpv.elements.slice(0, 1))),
+			}, renderElements(globals, grp.elements.slice(0, 1))),
 		]));
 	} else {
 		maskID = globals.addDef(svgEl('mask', {
 			'mask-type': 'alpha',
-		}, renderElements(globals, grpv.elements.slice(0, 1))));
+		}, renderElements(globals, grp.elements.slice(0, 1))));
 	}
 	const masked = svgEl('g', {
 		mask: `url(#${encodeURIComponent(maskID)})`,
 		'data-type': 'masked',
-	}, renderElements(globals, grpv.elements.slice(1)));
-	if (grpv.showMask) {
-		return [...renderElements(globals, grpv.elements.slice(0, 1)), masked];
+	}, renderElements(globals, grp.elements.slice(1)));
+	if (grp.showMask) {
+		return [...renderElements(globals, grp.elements.slice(0, 1)), masked];
 	} else {
 		return [masked];
 	}
-});
+}
+RENDERERS.set('GRPv', renderGroup);
+RENDERERS.set('CSGv', renderGroup);
 RENDERERS.set('LSLv', (globals, /** @type {LSLv} */ lslv) => {
 	if (lslv.visibleInFrame(globals.frame)) {
 		return svgEl('g', {

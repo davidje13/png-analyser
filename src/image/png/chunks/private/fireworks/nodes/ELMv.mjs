@@ -6,6 +6,7 @@ import { LSLv } from './LSLv.mjs';
 import { PTHv } from './PTHv.mjs';
 import { TXTv } from './TXTv.mjs';
 import { URLv } from './URLv.mjs';
+import { CSGv } from './CSGv.mjs';
 
 /** Elements */
 export class ELMv extends MultiList(() => ({
@@ -13,6 +14,7 @@ export class ELMv extends MultiList(() => ({
 	PTHv,
 	TXTv,
 	GRPv,
+	CSGv,
 	LSLv,
 	URLv,
 	ALSv,

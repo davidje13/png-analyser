@@ -23,6 +23,21 @@ An example Fireworks PNG contains the following chunks:
 
 Chunks marked with a **\*** are private.
 
+The "Software" `tEXt` chunk has been observed to have the following values:
+
+- `Macromedia Fireworks 4.0` (v4)
+- `Macromedia Fireworks MX` (v6)
+- `Macromedia Fireworks MX 2004` (v7)
+- `Macromedia Fireworks MX 2005` (used in library images, presumably an early name for 8)
+- `Macromedia Fireworks 8` (v8)
+- `Adobe Fireworks` (used in library images, presumably an early name for CS3)
+- `Adobe Fireworks 9` (used in library images, presumably an early name for CS3)
+- `Adobe Fireworks CS3` (v9)
+- `Adobe Fireworks CS4` (v10)
+- `Adobe Fireworks CS5` (v11)
+- `Adobe Fireworks CS5.1` (v11.1)
+- `Adobe Fireworks CS6` (v12)
+
 The standard chunks are
 [well-documented elsewhere](https://www.w3.org/TR/png/#4Concepts.FormatTypes).
 The only custom part is the XML content of the `XML:com.adobe.xmp` `iTXt`
@@ -250,8 +265,7 @@ with a variety of byte layouts (`RGBA`, `ABGR`, `ARGB`).
 
 [FireworksNodes.md](./FireworksNodes.md) attempts to document the various node
 types, and is based on observations from a large number of real Fireworks
-documents created by Macromedia Fireworks 8 and Adobe Fireworks CS4 (and a
-small selection from 4, MX, and CS3). The long names and descriptions are
+documents created by various versions. The long names and descriptions are
 guessed / inferred, and may be incorrect / misleading. The value ranges are
 based on observations and UI limits and may be incomplete.
 
@@ -313,10 +327,11 @@ See the [full node rundown](./FireworksNodes.md) for much more detail.
 [`BPLv`.`BCMi`]: ./FireworksNodes.md#bplvbcmi-brush-tip-colouring-mode
 [`BEHv`.`BCMi`]: ./FireworksNodes.md#behvbcmi-background-colour-hover
 
-## Other sources of information
+## Other sources of information and sample files
 
 - <http://fileformats.archiveteam.org/wiki/Fireworks_PNG>
 - [PRONOM sample files](https://github.com/digital-preservation/PRONOM_Research/tree/main/Submissions/Adobe%20Fireworks/Samples)
+- [Search for sample Fireworks PNGs on discmaster.textfiles.com](https://discmaster.textfiles.com/search?q=&qfields=name&mode=quick&extension=.png&visual=&auditory=&family=image&format=png&sizeMin=&sizeMax=&durationMin=&durationMax=&widthMin=&heightMin=&widthMax=&heightMax=&tsMin=&tsMax=&addedAfter=&detection=Fireworks+PNG+bitmap&nsfw=1&nsfwOnly=0&animated=&unsupported=&sortBy=ts&sortOrderDesc=desc&limit=100&outputAs=html)
 
 Credit to [this StackOverflow answer](https://stackoverflow.com/a/51683285) for
 spotting that the private chunks are mostly zlib-compressed data.

@@ -25,7 +25,9 @@ Contains:
 
 [`A2Ts`]: #a2ts-anchor-link-alt-text
 
-Parent: [`URLv`]
+Parent: [`ALSv`] / [`MSTv`] / [`URLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 ## `AACb` Export GIF **A**nimation **C**rop
 
@@ -49,6 +51,8 @@ Only include diffs between frames when exporting as animated GIF.
 
 Parent: [`ALSv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Final opacity for animation-type symbol. Defaults to 1000.
 
 Value range: `0` (transparent) .. `1000` (opaque)
@@ -58,6 +62,8 @@ Value range: `0` (transparent) .. `1000` (opaque)
 [`AGMb`]: #agmb
 
 Parent: [`PTHv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 Seen this set to `false` in one file, but it's usually `true`; seems to have no impact on rendering.
 
@@ -72,17 +78,24 @@ Values:
 
 Parent: [`TXTv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 Set on text in some symbols, unknown meaning
 
 Values:
 
 - `1`: unknown - TODO
+- `2`: unknown - TODO
+- `3`: unknown - TODO
+- `4`: unknown - TODO
 
 ## `ALNi`
 
 [`ALNi`]: #alni
 
 Parent: [`ALSv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Appears to be some sort of randomly-generated ID
 
@@ -92,40 +105,54 @@ Appears to be some sort of randomly-generated ID
 
 Parent: [`ELMv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 References a [`MSTv`] symbol definition with a matching [`MSNi`] ID.
 
 Contains:
 
-- [`MSNi`] Symbol Unique Number
-- [`MTXv`] Matrix
-- [`LCKb`] Lock
-- [`XFMi`]
-- [`OBNs`]? Object Name
-- [`DTAv`] Data
 - [`ANNi`] Animation Number of Frames
 - [`ANXf`] Animation X Shift
 - [`ANYf`] Animation Y Shift
 - [`ASCf`] Animation Scaling
-- [`ATMv`]? Symbol Transform Matrix
+- [`MSNi`] Symbol Unique Number
+- [`MTXv`] Matrix
+- [`XFMi`]
+- [`A2Ts`]? Anchor Link Alt Text
+- [`AEOi`]? Animation End Opacity
 - [`ALNi`]?
-- [`FILs`]? Label
-- [`IMGv`]? Image
 - [`ANRi`]? Animation Rotation
 - [`ASOi`]? Animation Start Opacity
-- [`AEOi`]? Animation End Opacity
+- [`ATMv`]? Symbol Transform Matrix
+- [`BEVv`]? Behaviour List
+- [`BLDi`]? Blend Mode
+- [`BUTs`]?
+- [`DTAv`]? Data
+- [`DVLb`]?
+- [`EFLv`]? Effect List
+- [`FILs`]? Label
+- [`IMGv`]? Image
+- [`INMs`]? Internal Name
+- [`LCKb`]? Lock
+- [`OBNs`]? Object Name
+- [`VISb`]? Visible
 - [`WPVs`]? Widget Parameter Values
 
 ## `ALTs` **A**nchor **L**ink **T**arget
 
 [`ALTs`]: #alts-anchor-link-target
 
-Parent: [`URLv`]
+Parent: [`MSTv`] / [`URLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 ## `ANNi` **An**imation **N**umber of Frames
 
 [`ANNi`]: #anni-animation-number-of-frames
 
 Parent: [`ALSv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Number of frames of animation to generate for the animation-type symbol (this generates a smooth transition using [`ANRi`], [`ASCf`], [`ASOi`], [`AEOi`], [`ANXf`], and [`ANYf`]).
 
@@ -137,6 +164,8 @@ Value range: `1`..inf
 
 Parent: [`ALSv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Number of degrees of clockwise rotation to apply to an animation-type symbol. Uses a **signed** 32-bit value. Negative numbers are counter-clockwise.
 
 Value range: `-360`..`360` (degrees)
@@ -147,6 +176,8 @@ Value range: `-360`..`360` (degrees)
 
 Parent: [`ALSv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 Amount of x translation (pixels) to apply to an animation-type symbol.
 
 ## `ANYf` **An**imation **Y** Shift
@@ -154,6 +185,8 @@ Amount of x translation (pixels) to apply to an animation-type symbol.
 [`ANYf`]: #anyf-animation-y-shift
 
 Parent: [`ALSv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Amount of y translation (pixels) to apply to an animation-type symbol.
 
@@ -185,6 +218,8 @@ Values:
 
 Parent: [`ALSv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 Scaling to apply to an animation-type symbol
 
 Value range: `0`..`250` (percent)
@@ -194,6 +229,8 @@ Value range: `0`..`250` (percent)
 [`ASOi`]: #asoi-animation-start-opacity
 
 Parent: [`ALSv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Initial opacity for animation-type symbol.
 
@@ -232,6 +269,8 @@ Apply kerning based on character shape.
 
 Parent: [`ALSv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS5.1
+
 Unclear what this matrix is for; it only includes translation, not rotation/scale/skew. Possibly a legacy value? Prefer using [`MTXv`] for the transformation.
 
 Contains:
@@ -252,8 +291,11 @@ Contains:
 
 Parent: [`MSTv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 Values:
 
+- `false`: unknown - TODO
 - `true`: unknown - TODO
 
 ## `BANi` **B**rush **An**gle
@@ -282,8 +324,8 @@ These sub-points are spaced equally along the bezier curve (TODO: by distance or
 
 Contains:
 
-- [`VELf`]? Velocity
 - [`PRSf`]? Pressure
+- [`VELf`]? Velocity
 
 ## `BBKi` **B**rush **B**lac**k**ness
 
@@ -333,6 +375,8 @@ Value range: `0`..inf (pixels)
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Values:
 
 - `0`: mouse over
@@ -361,6 +405,8 @@ Values:
 
 Parent: [`BEVv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Used for popup menus, rollover effects, etc.
 
 - For setting status text, the text to set is in [`UNMs`].
@@ -374,50 +420,50 @@ Used for popup menus, rollover effects, etc.
 
 Contains:
 
-- [`BETi`] Behaviour Type
 - [`BEEi`] Behaviour Trigger Event
-- [`ROLi`]? Roll Behaviour
-- [`MSNi`]? Symbol Unique Number
-- [`FRCi`]? Frame Count
-- [`PREb`]? Preload
-- [`CHKb`]? Checked ?
-- [`FRTi`]? Over While Down state number
-- [`RMOb`]? Revert on Mouse Out
-- [`UNMs`]? User-facing Name
-- [`CDTs`]?
-- [`XLCf`]? X Location
-- [`YLCf`]? Y Location
-- [`TRNs`]? Text Run
-- [`BEHv`.`FCLi`]? Menu Item Text Colour
-- [`BEHv`.`FETi`]?
-- [`JSTi`]? Justification
-- [`VERi`]?
-- [`TMOi`]? Menu Delay
-- [`XSLf`]?
-- [`YSLf`]?
-- [`RELb`]?
-- [`CSPi`]? Menu Item Cell Spacing
-- [`CPDi`]? Menu Item Cell Padding
-- [`OPQb`]?
-- [`HICi`]? Highlight Colour
-- [`CSHi`]? Colour Shadow
-- [`BOCi`]? Border Colour
-- [`BOSi`]? Border Size
-- [`OVWb`]? Override Width
-- [`OVHb`]? Override Height
-- [`MITi`]? Menu Indent Text
-- [`MIVb`]? Menu Items Vertical
-- [`MIDi`]? Text Colour Hover
-- [`MIWi`]? Menu Item Width
-- [`MIHi`]? Menu Item Height
-- [`HIMb`]?
-- [`BOLb`]? Bold
-- [`ITLb`]? Italic
-- [`FONs`]? Font Family
-- [`PTSf`]? Font Point Size
+- [`BETi`] Behaviour Type
 - [`ATEb`]? Auto-Enlarge
 - [`BEHv`.`BCLi`]? Background Colour
 - [`BEHv`.`BCMi`]? Background Colour Hover
+- [`BEHv`.`FCLi`]? Menu Item Text Colour
+- [`BEHv`.`FETi`]?
+- [`BOCi`]? Border Colour
+- [`BOLb`]? Bold
+- [`BOSi`]? Border Size
+- [`CDTs`]?
+- [`CHKb`]? Checked ?
+- [`CPDi`]? Menu Item Cell Padding
+- [`CSHi`]? Colour Shadow
+- [`CSPi`]? Menu Item Cell Spacing
+- [`FONs`]? Font Family
+- [`FRCi`]? Frame Count
+- [`FRTi`]? Over While Down state number
+- [`HICi`]? Highlight Colour
+- [`HIMb`]?
+- [`ITLb`]? Italic
+- [`JSTi`]? Justification
+- [`MIDi`]? Text Colour Hover
+- [`MIHi`]? Menu Item Height
+- [`MITi`]? Menu Indent Text
+- [`MIVb`]? Menu Items Vertical
+- [`MIWi`]? Menu Item Width
+- [`MSNi`]? Symbol Unique Number
+- [`OPQb`]?
+- [`OVHb`]? Override Height
+- [`OVWb`]? Override Width
+- [`PREb`]? Preload
+- [`PTSf`]? Font Point Size
+- [`RELb`]?
+- [`RMOb`]? Revert on Mouse Out
+- [`ROLi`]? Roll Behaviour
+- [`TMOi`]? Menu Delay
+- [`TRNs`]? Text Run
+- [`UNMs`]? User-facing Name
+- [`VERi`]?
+- [`XLCf`]? X Location
+- [`XSLf`]?
+- [`YLCf`]? Y Location
+- [`YSLf`]?
 - [`ZSTv`]\* Saved Style
 
 ## `BEHv`.`BCLi` **B**ackground **C**o**l**our
@@ -425,6 +471,8 @@ Contains:
 [`BEHv`.`BCLi`]: #behv-bcli-background-colour
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 ARGB format colour.
 
@@ -436,6 +484,8 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 A BGRA colour for the background of highlighted menu items.
 
 Value range: `0x00000000`..`0xffffffff`
@@ -445,6 +495,8 @@ Value range: `0x00000000`..`0xffffffff`
 [`BEHv`.`FCLi`]: #behv-fcli-menu-item-text-colour
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 ARGB (?) format colour for the text of highlighted menu items.
 
@@ -456,15 +508,19 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`BEHv`]
 
-Values:
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
-- `4294967295`: unknown - TODO
+An ARGB (?) format colour, unknown purpose.
+
+Value range: `0x00000000`..`0xffffffff`
 
 ## `BETi` **Be**haviour **T**ype
 
 [`BETi`]: #beti-behaviour-type
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Values:
 
@@ -482,11 +538,13 @@ Values:
 
 [`BEVv`]: #bevv-behaviour-list
 
-Parent: [`URLv`]
+Parent: [`ALSv`] / [`MSTv`] / [`URLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Contains:
 
-- [`BEHv`]+ Behaviour
+- [`BEHv`]\* Behaviour
 
 ## `BFBi` **Br**ush **F**eed**b**ack
 
@@ -538,7 +596,9 @@ Values:
 
 [`BLDi`]: #bldi-blend-mode
 
-Parent: [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`]
+Parent: [`ALSv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Values:
 
@@ -594,11 +654,7 @@ Values:
 
 Parent: [`TFSv`] / [`TXTv`]
 
-Values:
-
-- `-10`: subscript
-- `0`: normal
-- `10`: superscript
+Vertical shift to apply to text. Typically uses -10 for subscript and +10 for superscript (0 for normal), but can be any value
 
 ## `BMMi` **B**rush **M**ax Count
 
@@ -634,6 +690,8 @@ Value range: `1`..`5`
 
 Parent: [`TXTv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 Width to fit text to, if [`TFTi`] is `1`.
 
 ## `BOCi` **Bo**rder **C**olour
@@ -642,11 +700,11 @@ Width to fit text to, if [`TFTi`] is `1`.
 
 Parent: [`BEHv`]
 
-An ARGB colour for the popup menu border.
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
-Values:
+An ARGB format colour for the popup menu border.
 
-- `4283782485`: unknown - TODO
+Value range: `0x00000000`..`0xffffffff`
 
 ## `BOLb` **Bol**d
 
@@ -664,6 +722,8 @@ Values:
 [`BOSi`]: #bosi-border-size
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Size (in pixels) of the popup menu border.
 
@@ -683,80 +743,80 @@ Parent: [`PATv`] / [`PLLv`]
 
 Contains:
 
-- [`CATs`] Category
-- [`INMs`] Internal Name
-- [`RDOb`] Read-Only
 - [`BANi`] Brush Angle
 - [`BASi`] Brush Aspect
+- [`BBKi`] Brush Blackness
+- [`BBLi`] Brush Bleed
+- [`BCNi`] Brush Concentration
 - [`BDIi`] Brush Diameter
+- [`BEFi`] Brush Edge Function
+- [`BFBi`] Brush Feedback
+- [`BFRi`] Brush Flow Rate
+- [`BIAb`] Brush Is Anti-Aliased
 - [`BMMi`] Brush Max Count
 - [`BMSi`] Brush Min Size
+- [`BNTi`] Brush Number of Tips
+- [`BPLv`.`BCMi`] Brush Tip Colouring Mode
+- [`BRTi`] Brush Type
 - [`BSEi`] Brush Soft Edges
 - [`BSFi`] Brush Soft Edges Function
 - [`BSHi`] Brush Shape
-- [`BBLi`] Brush Bleed
-- [`BBKi`] Brush Blackness
-- [`BCNi`] Brush Concentration
-- [`BEFi`] Brush Edge Function
-- [`BRTi`] Brush Type
-- [`BFBi`] Brush Feedback
-- [`BFRi`] Brush Flow Rate
-- [`BNTi`] Brush Number of Tips
+- [`BSMi`] Brush Tip Spacing Mode
 - [`BSPi`] Brush Spacing
 - [`BTBi`] Brush Texture Blend
 - [`BTEi`] Brush Texture Edge
 - [`BTSi`] Brush Tip Spacing
-- [`BSMi`] Brush Tip Spacing Mode
-- [`BPLv`.`BCMi`] Brush Tip Colouring Mode
-- [`BIAb`] Brush Is Anti-Aliased
-- [`NDIi`]? Number of Dashes
-- [`DO1i`]? Dash On 1
-- [`DO2i`]? Dash On 2
-- [`DO3i`]? Dash On 3
+- [`CATs`] Category Name
+- [`INMs`] Internal Name
+- [`RDOb`] Read-Only
 - [`DF1i`]? Dash Off 1
 - [`DF2i`]? Dash Off 2
 - [`DF3i`]? Dash Off 3
-- [`SPZi`]? Sensitivity to Pressure on Size
-- [`SSZi`]? Sensitivity to Speed on Size
-- [`SPOi`]? Sensitivity to Pressure on Opacity
-- [`SSOi`]? Sensitivity to Speed on Opacity
+- [`DO1i`]? Dash On 1
+- [`DO2i`]? Dash On 2
+- [`DO3i`]? Dash On 3
+- [`NDIi`]? Number of Dashes
+- [`SHAi`]? Sensitivity to Horizontal on Angle
+- [`SHBi`]? Sensitivity to Horizontal on Blackness
+- [`SHHi`]? Sensitivity to Horizontal on Hue
+- [`SHLi`]? Sensitivity to Horizontal on Lightness
+- [`SHOi`]? Sensitivity to Horizontal on Opacity
+- [`SHRi`]? Sensitivity to Horizontal on Scatter
+- [`SHSi`]? Sensitivity to Horizontal on Saturation
+- [`SHZi`]? Sensitivity to Horizontal on Size
+- [`SPAi`]? Sensitivity to Pressure on Angle
 - [`SPBi`]? Sensitivity to Pressure on Blackness
-- [`SSBi`]? Sensitivity to Speed on Blackness
-- [`SRZi`]? Sensitivity to Random on Size
+- [`SPHi`]? Sensitivity to Pressure on Hue
+- [`SPLi`]? Sensitivity to Pressure on Lightness
+- [`SPOi`]? Sensitivity to Pressure on Opacity
+- [`SPRi`]? Sensitivity to Pressure on Scatter
+- [`SPSi`]? Sensitivity to Pressure on Saturation
+- [`SPZi`]? Sensitivity to Pressure on Size
+- [`SRAi`]? Sensitivity to Random on Angle
 - [`SRBi`]? Sensitivity to Random on Blackness
 - [`SRHi`]? Sensitivity to Random on Hue
-- [`SRAi`]? Sensitivity to Random on Angle
-- [`SRSi`]? Sensitivity to Random on Saturation
-- [`SRRi`]? Sensitivity to Random on Scatter
-- [`SROi`]? Sensitivity to Random on Opacity
-- [`SPRi`]? Sensitivity to Pressure on Scatter
-- [`SSRi`]? Sensitivity to Speed on Scatter
-- [`SPHi`]? Sensitivity to Pressure on Hue
-- [`SSHi`]? Sensitivity to Speed on Hue
-- [`UNMs`]? User-facing Name
-- [`SSAi`]? Sensitivity to Speed on Angle
-- [`SHZi`]? Sensitivity to Horizontal on Size
-- [`SVZi`]? Sensitivity to Vertical on Size
-- [`SPAi`]? Sensitivity to Pressure on Angle
-- [`SHAi`]? Sensitivity to Horizontal on Angle
-- [`SVAi`]? Sensitivity to Vertical on Angle
-- [`SHOi`]? Sensitivity to Horizontal on Opacity
-- [`SVOi`]? Sensitivity to Vertical on Opacity
-- [`SHRi`]? Sensitivity to Horizontal on Scatter
-- [`SVRi`]? Sensitivity to Vertical on Scatter
-- [`SHHi`]? Sensitivity to Horizontal on Hue
-- [`SVHi`]? Sensitivity to Vertical on Hue
-- [`SPLi`]? Sensitivity to Pressure on Lightness
-- [`SSLi`]? Sensitivity to Speed on Lightness
-- [`SHLi`]? Sensitivity to Horizontal on Lightness
-- [`SVLi`]? Sensitivity to Vertical on Lightness
 - [`SRLi`]? Sensitivity to Random on Lightness
-- [`SPSi`]? Sensitivity to Pressure on Saturation
+- [`SROi`]? Sensitivity to Random on Opacity
+- [`SRRi`]? Sensitivity to Random on Scatter
+- [`SRSi`]? Sensitivity to Random on Saturation
+- [`SRZi`]? Sensitivity to Random on Size
+- [`SSAi`]? Sensitivity to Speed on Angle
+- [`SSBi`]? Sensitivity to Speed on Blackness
+- [`SSHi`]? Sensitivity to Speed on Hue
+- [`SSLi`]? Sensitivity to Speed on Lightness
+- [`SSOi`]? Sensitivity to Speed on Opacity
+- [`SSRi`]? Sensitivity to Speed on Scatter
 - [`SSSi`]? Sensitivity to Speed on Saturation
-- [`SHSi`]? Sensitivity to Horizontal on Saturation
-- [`SVSi`]? Sensitivity to Vertical on Saturation
-- [`SHBi`]? Sensitivity to Horizontal on Blackness
+- [`SSZi`]? Sensitivity to Speed on Size
+- [`SVAi`]? Sensitivity to Vertical on Angle
 - [`SVBi`]? Sensitivity to Vertical on Blackness
+- [`SVHi`]? Sensitivity to Vertical on Hue
+- [`SVLi`]? Sensitivity to Vertical on Lightness
+- [`SVOi`]? Sensitivity to Vertical on Opacity
+- [`SVRi`]? Sensitivity to Vertical on Scatter
+- [`SVSi`]? Sensitivity to Vertical on Saturation
+- [`SVZi`]? Sensitivity to Vertical on Size
+- [`UNMs`]? User-facing Name
 
 ## `BPLv`.`BCMi` **B**rush Tip **C**olouring **M**ode
 
@@ -885,6 +945,14 @@ Distance from centre of tips to outermost tips, as a fraction of the brush size
 
 Value range: `0`..inf (percent)
 
+## `BUTs`
+
+[`BUTs`]: #buts
+
+Parent: [`ALSv`]
+
+Observed in versions: Macromedia Fireworks MX - Macromedia Fireworks MX 2004
+
 ## `BZCi` **B**e**z**ier Sub-Points **C**ount
 
 [`BZCi`]: #bzci-bezier-sub-points-count
@@ -901,75 +969,22 @@ Parent: [`PBTv`]
 
 Contains:
 
-- [`BZCi`] Bezier Sub-Points Count
 - [`BAZv`]+ Bezier Sub-Point
+- [`BZCi`] Bezier Sub-Points Count
 
-## `CATs` **Cat**egory
+## `CATs` **Cat**egory Name
 
-[`CATs`]: #cats-category
+[`CATs`]: #cats-category-name
 
 Parent: [`BPLv`] / [`EFLv`] / [`FGLv`] / [`FPLv`]
-
-Values:
-
-- ` Eye Candy 4000 LE`
-- `Adjust Color`
-- `Alien Skin Splat LE`
-- `Artistic`
-- `Blur`
-- `Brush Strokes`
-- `Clouds`
-- `Distort`
-- `Noise`
-- `Other`
-- `Render`
-- `Shadow and Glow`
-- `Sharpen`
-- `Sketch`
-- `SpecialFill`
-- `Stylize`
-- `Texture`
-- `UNUSED`
-- `Untitled`
-- `bc_Air Brush`
-- `bc_Basic`
-- `bc_Calligraphy`
-- `bc_Charcoal`
-- `bc_Crayon`
-- `bc_Dashed`
-- `bc_Felt Tip`
-- `bc_Oil`
-- `bc_Pencil`
-- `bc_Random`
-- `bc_Unnatural`
-- `bc_Watercolor`
-- `cc_GradientColors`
-- `ec_DropShadow`
-- `ec_EmbossBevel`
-- `ec_Glow`
-- `ec_InnerBevel`
-- `ec_OuterBevel`
-- `fc_Bars`
-- `fc_Circular`
-- `fc_Conical`
-- `fc_ContourGrad`
-- `fc_Elliptical`
-- `fc_Folds`
-- `fc_Linear`
-- `fc_Pattern`
-- `fc_Pinch`
-- `fc_Rectangular`
-- `fc_Ripple`
-- `fc_Satin`
-- `fc_Solid`
-- `fc_Waves`
-- `fc_WebDither`
 
 ## `CBAi` **C**ell **B**ackground (Slice) **A**ttachment
 
 [`CBAi`]: #cbai-cell-background-slice-attachment
 
 Parent: [`EXPv`] / [`URLv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 Values:
 
@@ -985,6 +1000,8 @@ Values:
 [`CBHi`]: #cbhi-cell-background-slice-horizontal-position
 
 Parent: [`URLv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS5
 
 Values:
 
@@ -1003,6 +1020,8 @@ Values:
 
 Parent: [`EXPv`] / [`URLv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 Values:
 
 - `0`: no-repeat
@@ -1019,6 +1038,8 @@ Values:
 
 Parent: [`URLv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS5
+
 Appears to be `true` if [`TSLi`] is `2` (i.e. slice is "background").
 
 ## `CBUs` **C**ell **B**ackground **U**RL
@@ -1027,6 +1048,8 @@ Appears to be `true` if [`TSLi`] is `2` (i.e. slice is "background").
 
 Parent: [`EXPv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 URL (starting `file://`) of a background image to use when exporting as HTML, or a blank string.
 
 ## `CBVi` **C**ell **B**ackground (Slice) **V**ertical Position
@@ -1034,6 +1057,8 @@ URL (starting `file://`) of a background image to use when exporting as HTML, or
 [`CBVi`]: #cbvi-cell-background-slice-vertical-position
 
 Parent: [`URLv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS5
 
 Values:
 
@@ -1054,6 +1079,8 @@ Values:
 
 Parent: [`EXPv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 Values:
 
 - `0`: left
@@ -1066,18 +1093,22 @@ Values:
 
 Parent: [`EXPv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 Contains:
 
-- [`LFTf`] Left
-- [`TOPf`] Top
-- [`RITf`] Right
 - [`BOTf`] Bottom
+- [`LFTf`] Left
+- [`RITf`] Right
+- [`TOPf`] Top
 
 ## `CDTs`
 
 [`CDTs`]: #cdts
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 A timestamp in `yyyyMMddHHmmss` format.
 
@@ -1089,8 +1120,8 @@ Parent: [`CLLv`]
 
 Contains:
 
-- [`LCKb`] Lock
 - [`ELMv`] Elements
+- [`LCKb`] Lock
 - [`VISb`]? Visible
 
 ## `CFTs` **F**ont **T**ypeface
@@ -1099,32 +1130,17 @@ Contains:
 
 Parent: [`TXTv`] / [`ZSTv`]
 
-Values:
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
-- `Arial`
-- `Arial-Black`
-- `ArialMT`
-- `Chalkboard-Bold`
-- `ChaparralPro-Bold`
-- `Cochin`
-- `CourierNewPSMT`
-- `Geneva`
-- `Helvetica`
-- `HelveticaNeue`
-- `Lucida Grande`
-- `MinionPro-Regular`
-- `Myriad Pro`
-- `Myriad Pro Bold`
-- `OCRAStd`
-- `RosewoodStd-Regular`
-- `TektonPro-BoldCond`
-- `Verdana`
+e.g. `Arial-Black`, `HelveticaNeue-Light`
 
 ## `CHKb` **Ch**ec**k**ed ?
 
 [`CHKb`]: #chkb-checked
 
 Parent: [`BEHv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Used by Set Nav Bar behaviour.
 
@@ -1136,6 +1152,8 @@ Used by Set Nav Bar behaviour.
 
 Parent: [`TAPv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Offset (in pixels) along path to begin text.
 
 ## `CHVi` **C**ell **H**orizontal **V**alue
@@ -1144,6 +1162,8 @@ Offset (in pixels) along path to begin text.
 
 Parent: [`URLv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS5
+
 Used if [`CBHi`] is `3`. Otherwise this is always set to `0xffffffff`
 
 ## `CLLb` **C**o**l**our **L**ocked
@@ -1151,6 +1171,8 @@ Used if [`CBHi`] is `3`. Otherwise this is always set to `0xffffffff`
 [`CLLb`]: #cllb-colour-locked
 
 Parent: [`PALv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 ## `CLLv` Animation **C**e**l**l **L**ist
 
@@ -1168,6 +1190,8 @@ Contains:
 
 Parent: [`PALv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Values:
 
 - `false`: colour is defined by [`FCLi`]
@@ -1178,6 +1202,8 @@ Values:
 [`CLPi`]: #clpi-export-scale-propotion
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Used to calculate [`XSZi`] and [`YSZi`] if [`CNSb`] is `true` and [`CLSb`] is `true`.
 
@@ -1201,6 +1227,8 @@ Values:
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 Values:
 
 - `false`: [`XSZi`] and [`YSZi`] are specified by the user directly. Export aspect ratio is not preserved.
@@ -1212,11 +1240,15 @@ Values:
 
 Parent: [`PALv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 ## `CNSb` Export **S**cale
 
 [`CNSb`]: #cnsb-export-scale
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Note: this value is never `false`; `false` is implied by its absence.
 
@@ -1230,11 +1262,15 @@ Values:
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 ## `CPSv` **C**ontrol **P**oint**s**
 
 [`CPSv`]: #cpsv-control-points
 
 Parent: [`ISSv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
 
 Contains:
 
@@ -1246,15 +1282,27 @@ Contains:
 
 Parent: [`CPSv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
+
 Contains:
 
-- [`XLCf`] X Location
-- [`YLCf`] Y Location
 - [`CTYi`] Control Point Type
-- [`OBNs`]? Object Name
 - [`TTDb`] Tooltip Tracks Drag
 - [`VISb`] Visible
+- [`XLCf`] X Location
+- [`YLCf`] Y Location
+- [`OBNs`]? Object Name
 - [`TTPs`]? Tooltip
+
+## `CRSv`
+
+[`CRSv`]: #crsv
+
+Parent: [`ISSv`]
+
+Observed in version: Macromedia Fireworks MX 2004
+
+No observed child nodes.
 
 ## `CRVb` Is **C**u**rv**e
 
@@ -1267,23 +1315,51 @@ Values:
 - `false`: line is straight (points are forced to be colinear)
 - `true`: line is a curve
 
+## `CSGv` **CS**6 **G**roup
+
+[`CSGv`]: #csgv-cs6-group
+
+Parent: [`ELMv`]
+
+Observed in version: Adobe Fireworks CS6
+
+Seems to be an alternative to [`GRPv`] introduced in CS6. Unclear what the difference is.
+
+Contains:
+
+- [`DTAv`] Data
+- [`ELMv`] Elements
+- [`GRTi`] Group Type
+- [`LCKb`] Lock
+- [`PTHv`] Path
+- [`EFLv`]? Effect List
+- [`IMGv`]? Image
+- [`OBNs`]? Object Name
+- [`VISb`]? Visible
+
 ## `CSHi` **C**olour **Sh**adow
 
 [`CSHi`]: #cshi-colour-shadow
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 An ARGB colour for the popup menu border shadow.
 
 Values:
 
 - `4283782485`: unknown - TODO
+- `4284900915`: unknown - TODO
+- `4294967295`: unknown - TODO
 
 ## `CSMb` HTML **CS**S **M**enus
 
 [`CSMb`]: #csmb-html-css-menus
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX 2005 - Adobe Fireworks CS6
 
 "Use CSS for Popup Menus".
 
@@ -1293,11 +1369,15 @@ Parent: [`EXPv`]
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 ## `CTYi` **C**ontrol Point **Ty**pe
 
 [`CTYi`]: #ctyi-control-point-type
 
 Parent: [`CPTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
 
 Grab handle config controlled by `type` in JavaScript. Appears to control the appearance of the handle.
 
@@ -1313,6 +1393,8 @@ Values:
 
 Parent: [`URLv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS5
+
 Used if [`CBVi`] is `3`. Otherwise this is always set to `0xffffffff`
 
 ## `CXBb`
@@ -1321,17 +1403,17 @@ Used if [`CBVi`] is `3`. Otherwise this is always set to `0xffffffff`
 
 Parent: [`EXPv`]
 
-Observed in all Fireworks CS4 files, not seen in Fireworks 8 files. Always seems to be `false`.
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 Values:
 
-- `false`: unknown
+- `false`: unknown - TODO
 
 ## `DCEv` **D**i**c**tionary **E**ntry
 
 [`DCEv`]: #dcev-dictionary-entry
 
-A key-value pair with multiple possible value types. Contains a [`DCKs`] and exactly one other child node with type [`DCVs`], [`GPLv`], or [`GDTv`].
+A key-value pair with multiple possible value types. Contains a [`DCKs`] and one other child node with type [`DCVs`], [`GPLv`], [`GDTv`], or [`GVRv`] (note: `GVRv` may have a sibling `DCVs` which represents the same data but flattened).
 
 The observed entities broken down by key are:
 
@@ -1343,7 +1425,7 @@ Parent: [`EPSv`]
 
 Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
 
-Observed value range: `0`..`50`
+Observed value range: `0`..`65`
 
 Contains:
 
@@ -1394,7 +1476,7 @@ Parent: [`EPSv`]
 
 Used by "Glow", "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters.
 
-Observed value range: `0`..`35`
+Observed value range: `0`..`133`
 
 Contains:
 
@@ -1429,6 +1511,7 @@ Values:
 - `19`: negation
 - `21`: hue
 - `22`: saturation
+- `29`: unknown - TODO
 - `30`: average
 - `31`: green
 - `32`: red
@@ -1579,52 +1662,343 @@ Values:
 - `{d1c33142-2ad8-4215-a39fc5d934c8fc0c}`: Radial Blur
 - `{d2541291-70d6-11d1-8c8000a024cdc039}`: Invert
 - `{d2e7769c-6349-11d8-b0e9000a9595f34e}`: Difference Clouds
+- `{d810e821-f86b-11d0-43464c4443664973}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650474246504742}`: unknown - TODO
+- `{d810e821-f86b-11d0-46504b5946504b59}`: unknown - TODO
+- `{d810e821-f86b-11d0-46504c5546504c55}`: unknown - TODO
+- `{d810e821-f86b-11d0-46504c7146504c71}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650524246505242}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650524746505247}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650616546506165}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650616646506166}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650676846506768}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650676c4650676c}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650696e4650696e}`: unknown - TODO
+- `{d810e821-f86b-11d0-46506d6c46506d6c}`: unknown - TODO
+- `{d810e821-f86b-11d0-46506d7146506d71}`: unknown - TODO
+- `{d810e821-f86b-11d0-46506d7a46506d7a}`: unknown - TODO
+- `{d810e821-f86b-11d0-46506f6e46506f6e}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650736946507369}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650737746507377}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650744c4650744c}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650746b4650746b}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650746e4650746e}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650747746507477}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650767446507674}`: unknown - TODO
+- `{d810e821-f86b-11d0-4650785346507853}`: unknown - TODO
+- `{d810e821-f86b-11d0-465a6550465a6550}`: unknown - TODO
+- `{d810e821-f86b-11d0-4661676846616768}`: unknown - TODO
+- `{d810e821-f86b-11d0-4664323546643235}`: unknown - TODO
+- `{d810e821-f86b-11d0-4664353046643530}`: unknown - TODO
+- `{d810e821-f86b-11d0-46676c6946676c69}`: unknown - TODO
+- `{d810e821-f86b-11d0-4668736c4668736c}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747241636345}`: Accented Edges (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472416e6753}`: Angled Strokes (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472426f6b68}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c74724273526c}`: Bas Relief (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747243686c43}`: Chalk && Charcoal (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747243687263}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c74724368726d}`: Chrome (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472436c6473}`: Clouds (obsolete? - seen but unused in Fireworks Common Library symbol)
+- `{d810e821-f86b-11d0-466c7472436c7248}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472436c7250}`: Colored Pencil (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472436e7443}`: Conté Crayon (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c74724372716c}`: Craquelure (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747243727368}`: Crosshatch (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747243727374}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747243742020}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747244667243}`: Difference Clouds (obsolete? - seen but unused in Fireworks Common Library symbol)
 - `{d810e821-f86b-11d0-466c747244667347}`: Diffuse Glow (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472446e7472}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747244726b53}`: Dark Strokes (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747244727942}`: Dry Brush (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c74724473706c}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747245787472}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472466c6d47}`: Film Grain (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747246727363}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747247456663}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472476c7320}`: Glass (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472476c7745}`: Glowing Edges (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747247726150}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747247726e20}`: Grain (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472486c6653}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472496e6b4f}`: Ink Outlines (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c74724c676845}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74724c6e7346}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74724c766c46}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74724d736354}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74724d7a746e}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c74724e476c77}`: Neon Glow (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c74724e545343}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c74724e745072}`: Note Paper (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c74724f636e52}`: Ocean Ripple (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747250687463}`: Photocopy (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472506c7220}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472506c7357}`: Plastic Wrap (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472506c7374}`: Plaster (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472506c744b}`: Palette Knife (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472506e6368}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472506e7444}`: Paint Daubs (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472506e746c}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747250737445}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747250746368}`: Patchwork (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747252646c42}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747252676850}`: Rough Pastels (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747252706c65}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c74725274636c}`: Reticulation (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747253687220}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472536c727a}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c7472536d6453}`: Smudge Stick (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472536d6965}`: Sumi-e (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c7472536d7242}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747253706872}`: Spherize (obsolete? - seen but unused in Fireworks Common Library symbol)
 - `{d810e821-f86b-11d0-466c747253706e67}`: Sponge (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747253707253}`: Sprayed Strokes (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747253707420}`: Spatter (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747253746d70}`: Stamp (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c747253746e47}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747254645420}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472546c7320}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472546d4d74}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747254726e45}`: Torn Edges (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c74725477726c}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747254787446}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c74725478747a}`: Texturizer (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c7472556e6472}`: Underpainting (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c74725672746e}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747257615270}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747257617665}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472576e6420}`: unknown - TODO
 - `{d810e821-f86b-11d0-466c747257747250}`: Water Paper (obsolete / plugin? - seen in Fireworks MX file)
 - `{d810e821-f86b-11d0-466c747257747263}`: Watercolor (obsolete / plugin? - seen in Fireworks MX file)
+- `{d810e821-f86b-11d0-466c74725a675a67}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472626c7273}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74726561734f}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472666c6d32}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472676c6162}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472676f6f6c}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747267726164}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747268797074}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74726c656e73}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74726c676874}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74726d667572}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74726d6b536d}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74726f454447}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747270726f6a}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74727079726d}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747272616477}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747272647368}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747272656163}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747273637472}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747273687270}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c7472736d6f6b}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c74727370687a}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747273757266}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747274757262}`: unknown - TODO
+- `{d810e821-f86b-11d0-466c747274787472}`: unknown - TODO
+- `{d810e821-f86b-11d0-4670747246707472}`: unknown - TODO
+- `{d810e821-f86b-11d0-4672676246726762}`: unknown - TODO
+- `{d810e821-f86b-11d0-46736c6146736c61}`: unknown - TODO
+- `{d810e821-f86b-11d0-46736c6246736c62}`: unknown - TODO
+- `{d810e821-f86b-11d0-46736f6c46736f6c}`: unknown - TODO
+- `{d810e821-f86b-11d0-4673776146737761}`: unknown - TODO
+- `{d810e821-f86b-11d0-494d4673696d6653}`: unknown - TODO
+- `{d810e821-f86b-11d0-506c7033506c7033}`: unknown - TODO
+- `{d810e821-f86b-11d0-5244477464746852}`: unknown - TODO
+- `{d810e821-f86b-11d0-6166533261664532}`: unknown - TODO
+- `{d810e821-f86b-11d0-6166533361664533}`: unknown - TODO
+- `{d810e821-f86b-11d0-6166533461664534}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443161533231}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443161533332}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443161533530}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443161533931}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443161537630}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443161537830}`: unknown - TODO
+- `{d810e821-f86b-11d0-616e443261533530}`: unknown - TODO
+- `{d810e821-f86b-11d0-61764a5050615032}`: unknown - TODO
+- `{d810e821-f86b-11d0-6265794562657945}`: unknown - TODO
+- `{d810e821-f86b-11d0-6469473064694731}`: unknown - TODO
+- `{d810e821-f86b-11d0-6469473264694733}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165636257}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165636655}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165636d41}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165636d45}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165637253}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335416563734c}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165637357}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335416563744e}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354165637745}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335416563774f}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335426563634f}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265636452}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265636649}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265636943}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265637249}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265637255}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265637344}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335426563734d}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265637351}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354265637744}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335436563624c}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335436563624d}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365636256}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365636352}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365636558}`: unknown - TODO
+- `{d810e821-f86b-11d0-656335436563674c}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365636753}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365636d54}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365637348}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563354365637354}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563624c}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563624d}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636256}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636257}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563634f}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636352}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636452}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636558}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636649}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636655}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563674c}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636753}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636943}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636d41}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636d45}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365636d54}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637249}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637253}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637255}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637344}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637348}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563734c}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563734d}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637351}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637354}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637357}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563744e}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637744}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563367365637745}`: unknown - TODO
+- `{d810e821-f86b-11d0-656336736563774f}`: unknown - TODO
+- `{d810e821-f86b-11d0-656341346564614e}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646348}`: unknown - TODO
+- `{d810e821-f86b-11d0-656341346564634f}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646355}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646452}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646453}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646649}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646655}`: unknown - TODO
+- `{d810e821-f86b-11d0-656341346564674c}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646752}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465646853}`: unknown - TODO
 - `{d810e821-f86b-11d0-656341346564694e}`: Bevel Boss (Eye Candy 4000 LE plugin?)
+- `{d810e821-f86b-11d0-6563413465646a49}`: unknown - TODO
 - `{d810e821-f86b-11d0-6563413465646d41}`: Marble (Eye Candy 4000 LE plugin?)
+- `{d810e821-f86b-11d0-6563413465646d45}`: unknown - TODO
 - `{d810e821-f86b-11d0-6563413465646d54}`: Motion Trail (Eye Candy 4000 LE plugin?)
+- `{d810e821-f86b-11d0-656341346564734d}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465647351}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465647354}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465647357}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465647744}`: unknown - TODO
+- `{d810e821-f86b-11d0-6563413465647745}`: unknown - TODO
+- `{d810e821-f86b-11d0-656341346564774f}`: unknown - TODO
+- `{d810e821-f86b-11d0-6572413265726a52}`: unknown - TODO
+- `{d810e821-f86b-11d0-6572413278787352}`: unknown - TODO
+- `{d810e821-f86b-11d0-657241327878744c}`: unknown - TODO
+- `{d810e821-f86b-11d0-657241327878744d}`: unknown - TODO
+- `{d810e821-f86b-11d0-657943336563614e}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636341}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636348}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636355}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636453}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636649}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636655}`: unknown - TODO
+- `{d810e821-f86b-11d0-657943336563674c}`: unknown - TODO
+- `{d810e821-f86b-11d0-657943336563674f}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636853}`: unknown - TODO
+- `{d810e821-f86b-11d0-657943336563694e}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636a49}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636d54}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365636f55}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365637053}`: unknown - TODO
+- `{d810e821-f86b-11d0-657943336563734d}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365637351}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365637354}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365637357}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365637744}`: unknown - TODO
+- `{d810e821-f86b-11d0-6579433365637745}`: unknown - TODO
+- `{d810e821-f86b-11d0-6669315366736257}`: unknown - TODO
+- `{d810e821-f86b-11d0-6669315366736346}`: unknown - TODO
+- `{d810e821-f86b-11d0-6670425066704250}`: unknown - TODO
+- `{d810e821-f86b-11d0-6962367869623678}`: unknown - TODO
+- `{d810e821-f86b-11d0-6962387869623878}`: unknown - TODO
+- `{d810e821-f86b-11d0-6966494269664942}`: unknown - TODO
+- `{d810e821-f86b-11d0-696e5434696e5434}`: unknown - TODO
+- `{d810e821-f86b-11d0-6a7265306a726530}`: unknown - TODO
+- `{d810e821-f86b-11d0-6a7265326a726532}`: unknown - TODO
+- `{d810e821-f86b-11d0-6a7265376a726537}`: unknown - TODO
+- `{d810e821-f86b-11d0-6a7265396a726539}`: unknown - TODO
+- `{d810e821-f86b-11d0-6a7265646a726564}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c61453161717541}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c6145316368724f}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c614531636d6554}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c614531636f7454}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c61453164726f50}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c61453167654c31}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c61453169634531}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c6145316d657441}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c614531706c6153}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c614531736d6f4b}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c614531736e6f57}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c72453133646d41}`: unknown - TODO
+- `{d810e821-f86b-11d0-6c72453233647348}`: unknown - TODO
+- `{d810e821-f86b-11d0-6e69706c6e69706c}`: unknown - TODO
+- `{d810e821-f86b-11d0-6e7a4e4a6e7a4e4a}`: unknown - TODO
+- `{d810e821-f86b-11d0-7068546c62457665}`: unknown - TODO
+- `{d810e821-f86b-11d0-73644b3173644b31}`: unknown - TODO
+- `{d810e821-f86b-11d0-73644b32504c5032}`: unknown - TODO
+- `{d810e821-f86b-11d0-73644b3264697353}`: unknown - TODO
+- `{d810e821-f86b-11d0-73644b3967726944}`: unknown - TODO
+- `{d810e821-f86b-11d0-73644b42636c724d}`: unknown - TODO
+- `{d810e821-f86b-11d0-73646b3173646b31}`: unknown - TODO
+- `{d810e821-f86b-11d0-7371473173676246}`: unknown - TODO
+- `{d810e821-f86b-11d0-737147317367624f}`: unknown - TODO
 - `{d810e821-f86b-11d0-7371473173676544}`: Edges (Alien Skin Splat LE plugin?)
+- `{d810e821-f86b-11d0-7371473173676546}`: unknown - TODO
+- `{d810e821-f86b-11d0-7371473173677041}`: unknown - TODO
+- `{d810e821-f86b-11d0-7371473173677458}`: unknown - TODO
+- `{d810e821-f86b-11d0-7666733576667335}`: unknown - TODO
+- `{d810e821-f86b-11d0-7769673577696735}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e636245}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e63634c}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e63634f}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e636352}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e636449}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e63644f}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e63654c}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e63664c}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e636c49}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e636f52}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e637055}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e637252}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e637341}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e63734d}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e637354}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e316e637456}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278786252}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e327878634c}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e327878634f}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278786352}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278786357}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e327878654c}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278786558}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e327878664c}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278786c49}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278786d4f}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278787050}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278787055}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278787354}`: unknown - TODO
+- `{d810e821-f86b-11d0-78654e3278787456}`: unknown - TODO
 - `{dd54adc0-a279-11d3-b92a000502f3fdbe}`: Color Fill
 - `{e4c0f4bc-c0a3-4cb3-b3513822027e4d9f}`: Add Noise
 - `{f1cfce41-718e-11d1-8c8200a024cdc039}`: Blur
@@ -1856,7 +2230,7 @@ Parent: [`EPSv`]
 
 Used by "Inner Bevel", "Inset Emboss", "Outer Bevel", "Raised Emboss" filters. Set by "Glow" but ignored.
 
-Observed value range: `33`..`200`
+Observed value range: `1`..`1299`
 
 Contains:
 
@@ -1946,7 +2320,7 @@ Parent: [`EPSv`]
 
 Used by "Drop Shadow", "Inner Shadow" filters.
 
-Observed value range: `0`..`60`
+Observed value range: `0`..`62`
 
 Contains:
 
@@ -2295,15 +2669,6 @@ Contains:
 
 Parent: [`EPSv`]
 
-Values:
-
-- `Adjust Color`
-- `Blur`
-- `Noise`
-- `Other`
-- `Shadow and Glow`
-- `Sharpen`
-
 Contains:
 
 - [`DCKs`] Dictionary Entry Key
@@ -2518,6 +2883,66 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`ctype0`"
+
+[`DCEv` "`ctype0`"]: #dcev-ctype0
+
+Parent: [`DTAv`]
+
+Values:
+
+- `1`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`ctype1`"
+
+[`DCEv` "`ctype1`"]: #dcev-ctype1
+
+Parent: [`DTAv`]
+
+Values:
+
+- `1`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`ctype2`"
+
+[`DCEv` "`ctype2`"]: #dcev-ctype2
+
+Parent: [`DTAv`]
+
+Values:
+
+- `1`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`ctype3`"
+
+[`DCEv` "`ctype3`"]: #dcev-ctype3
+
+Parent: [`DTAv`]
+
+Values:
+
+- `1`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`currentValues`"
 
 [`DCEv` "`currentValues`"]: #dcev-currentvalues
@@ -2527,8 +2952,8 @@ Parent: [`DTAv`]
 Contains:
 
 - [`DCKs`] Dictionary Entry Key
-- [`GVRv`] Dictionary Value Array
 - [`DCVs`] Dictionary Entry String Value
+- [`GVRv`]? Dictionary Value Array
 
 ### `DCEv` "`currentValues`"\[\]."`name`"
 
@@ -2547,12 +2972,15 @@ Values:
 - `Show Close`: unknown - TODO
 - `Show content`: unknown - TODO
 - `State`: unknown - TODO
+- `State (Down)`: unknown - TODO
 - `State (Left)`: unknown - TODO
 - `State (Right)`: unknown - TODO
 - `State (Thumb)`: unknown - TODO
 - `State (Track)`: unknown - TODO
+- `State (Up)`: unknown - TODO
 - `Thumb State`: unknown - TODO
 - `Thumb Type`: unknown - TODO
+- `borderColor`: unknown - TODO
 - `buttonType`: unknown - TODO
 - `color`: unknown - TODO
 - `disabledColor`: unknown - TODO
@@ -2882,6 +3310,1018 @@ Contains:
 - [`DCKs`] Dictionary Entry Key
 - [`DCVs`] Dictionary Entry String Value
 
+### `DCEv` "`external_filter_have_scripting_data`"
+
+[`DCEv` "`external_filter_have_scripting_data`"]: #dcev-external-filter-have-scripting-data
+
+Parent: [`EPSv`]
+
+Values:
+
+- `true`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__0x436c7220`"
+
+[`DCEv` "`external_filter_key__0x436c7220`"]: #dcev-external-filter-key-0x436c7220
+
+Parent: [`EPSv`]
+
+Hex in key translates to `Clr `. Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__0x45646720`"
+
+[`DCEv` "`external_filter_key__0x45646720`"]: #dcev-external-filter-key-0x45646720
+
+Parent: [`EPSv`]
+
+Hex in key translates to `Edg `.
+
+Values:
+
+- `false`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__0x46637320`"
+
+[`DCEv` "`external_filter_key__0x46637320`"]: #dcev-external-filter-key-0x46637320
+
+Parent: [`EPSv`]
+
+Hex in key translates to `Fcs `.
+
+Observed value range: `-60`..`40`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__0x466c2020`"
+
+[`DCEv` "`external_filter_key__0x466c2020`"]: #dcev-external-filter-key-0x466c2020
+
+Parent: [`EPSv`]
+
+Hex in key translates to `Fl  `.
+
+Values:
+
+- `false`: unknown - TODO
+- `true`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BEvl`"
+
+[`DCEv` "`external_filter_key__BEvl`"]: #dcev-external-filter-key-bevl
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMbs`"
+
+[`DCEv` "`external_filter_key__BMbs`"]: #dcev-external-filter-key-bmbs
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMbv`"
+
+[`DCEv` "`external_filter_key__BMbv`"]: #dcev-external-filter-key-bmbv
+
+Parent: [`EPSv`]
+
+Observed value range: `29`..`29`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMde`"
+
+[`DCEv` "`external_filter_key__BMde`"]: #dcev-external-filter-key-bmde
+
+Parent: [`EPSv`]
+
+Observed value range: `65`..`65`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMdi`"
+
+[`DCEv` "`external_filter_key__BMdi`"]: #dcev-external-filter-key-bmdi
+
+Parent: [`EPSv`]
+
+Observed value range: `336`..`336`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMgd`"
+
+[`DCEv` "`external_filter_key__BMgd`"]: #dcev-external-filter-key-bmgd
+
+Parent: [`EPSv`]
+
+Observed value range: `56`..`56`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMgw`"
+
+[`DCEv` "`external_filter_key__BMgw`"]: #dcev-external-filter-key-bmgw
+
+Parent: [`EPSv`]
+
+Observed value range: `39`..`39`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMmo`"
+
+[`DCEv` "`external_filter_key__BMmo`"]: #dcev-external-filter-key-bmmo
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__BMsm`"
+
+[`DCEv` "`external_filter_key__BMsm`"]: #dcev-external-filter-key-bmsm
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Brgh`"
+
+[`DCEv` "`external_filter_key__Brgh`"]: #dcev-external-filter-key-brgh
+
+Parent: [`EPSv`]
+
+Observed value range: `68`..`100`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Cntr`"
+
+[`DCEv` "`external_filter_key__Cntr`"]: #dcev-external-filter-key-cntr
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`58`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Drct`"
+
+[`DCEv` "`external_filter_key__Drct`"]: #dcev-external-filter-key-drct
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`180`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Drkn`"
+
+[`DCEv` "`external_filter_key__Drkn`"]: #dcev-external-filter-key-drkn
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__FLsi`"
+
+[`DCEv` "`external_filter_key__FLsi`"]: #dcev-external-filter-key-flsi
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__FRcl`"
+
+[`DCEv` "`external_filter_key__FRcl`"]: #dcev-external-filter-key-frcl
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__FlCl`"
+
+[`DCEv` "`external_filter_key__FlCl`"]: #dcev-external-filter-key-flcl
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__GLcl`"
+
+[`DCEv` "`external_filter_key__GLcl`"]: #dcev-external-filter-key-glcl
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__GRsh`"
+
+[`DCEv` "`external_filter_key__GRsh`"]: #dcev-external-filter-key-grsh
+
+Parent: [`EPSv`]
+
+Observed value range: `35`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__INcl`"
+
+[`DCEv` "`external_filter_key__INcl`"]: #dcev-external-filter-key-incl
+
+Parent: [`EPSv`]
+
+Observed value range: `45`..`81.86989773939402`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Lngt`"
+
+[`DCEv` "`external_filter_key__Lngt`"]: #dcev-external-filter-key-lngt
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Mask`"
+
+[`DCEv` "`external_filter_key__Mask`"]: #dcev-external-filter-key-mask
+
+Parent: [`EPSv`]
+
+Values:
+
+- `true`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__NLnl`"
+
+[`DCEv` "`external_filter_key__NLnl`"]: #dcev-external-filter-key-nlnl
+
+Parent: [`EPSv`]
+
+Values:
+
+- `false`: unknown - TODO
+- `true`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Opct`"
+
+[`DCEv` "`external_filter_key__Opct`"]: #dcev-external-filter-key-opct
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`100`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__PSfo`"
+
+[`DCEv` "`external_filter_key__PSfo`"]: #dcev-external-filter-key-psfo
+
+Parent: [`EPSv`]
+
+Observed value range: `49`..`49`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__PSmo`"
+
+[`DCEv` "`external_filter_key__PSmo`"]: #dcev-external-filter-key-psmo
+
+Parent: [`EPSv`]
+
+Values:
+
+- `false`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__PSob`"
+
+[`DCEv` "`external_filter_key__PSob`"]: #dcev-external-filter-key-psob
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__PSpb`"
+
+[`DCEv` "`external_filter_key__PSpb`"]: #dcev-external-filter-key-pspb
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__PSrs`"
+
+[`DCEv` "`external_filter_key__PSrs`"]: #dcev-external-filter-key-psrs
+
+Parent: [`EPSv`]
+
+Values:
+
+- `false`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__REfr`"
+
+[`DCEv` "`external_filter_key__REfr`"]: #dcev-external-filter-key-refr
+
+Parent: [`EPSv`]
+
+Observed value range: `45`..`50`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__RPwi`"
+
+[`DCEv` "`external_filter_key__RPwi`"]: #dcev-external-filter-key-rpwi
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__RndS`"
+
+[`DCEv` "`external_filter_key__RndS`"]: #dcev-external-filter-key-rnds
+
+Parent: [`EPSv`]
+
+Observed value range: `1`..`243`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__RplS`"
+
+[`DCEv` "`external_filter_key__RplS`"]: #dcev-external-filter-key-rpls
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpa`"
+
+[`DCEv` "`external_filter_key__SHpa`"]: #dcev-external-filter-key-shpa
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpb`"
+
+[`DCEv` "`external_filter_key__SHpb`"]: #dcev-external-filter-key-shpb
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpc`"
+
+[`DCEv` "`external_filter_key__SHpc`"]: #dcev-external-filter-key-shpc
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpd`"
+
+[`DCEv` "`external_filter_key__SHpd`"]: #dcev-external-filter-key-shpd
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpe`"
+
+[`DCEv` "`external_filter_key__SHpe`"]: #dcev-external-filter-key-shpe
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpf`"
+
+[`DCEv` "`external_filter_key__SHpf`"]: #dcev-external-filter-key-shpf
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHpg`"
+
+[`DCEv` "`external_filter_key__SHpg`"]: #dcev-external-filter-key-shpg
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__SHph`"
+
+[`DCEv` "`external_filter_key__SHph`"]: #dcev-external-filter-key-shph
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__STre`"
+
+[`DCEv` "`external_filter_key__STre`"]: #dcev-external-filter-key-stre
+
+Parent: [`EPSv`]
+
+Observed value range: `100`..`100`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Shrp`"
+
+[`DCEv` "`external_filter_key__Shrp`"]: #dcev-external-filter-key-shrp
+
+Parent: [`EPSv`]
+
+Observed value range: `25`..`99`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Smth`"
+
+[`DCEv` "`external_filter_key__Smth`"]: #dcev-external-filter-key-smth
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`100`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppa`"
+
+[`DCEv` "`external_filter_key__Sppa`"]: #dcev-external-filter-key-sppa
+
+Parent: [`EPSv`]
+
+Observed value range: `0.2060783638783466`..`0.2060783638783466`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppb`"
+
+[`DCEv` "`external_filter_key__Sppb`"]: #dcev-external-filter-key-sppb
+
+Parent: [`EPSv`]
+
+Observed value range: `0.8093332915198681`..`0.8093332915198681`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppc`"
+
+[`DCEv` "`external_filter_key__Sppc`"]: #dcev-external-filter-key-sppc
+
+Parent: [`EPSv`]
+
+Observed value range: `0.1525414702284726`..`0.1525414702284726`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppd`"
+
+[`DCEv` "`external_filter_key__Sppd`"]: #dcev-external-filter-key-sppd
+
+Parent: [`EPSv`]
+
+Observed value range: `0.8099199043537173`..`0.8099199043537173`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppe`"
+
+[`DCEv` "`external_filter_key__Sppe`"]: #dcev-external-filter-key-sppe
+
+Parent: [`EPSv`]
+
+Observed value range: `0.014812047740113002`..`0.014812047740113002`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppf`"
+
+[`DCEv` "`external_filter_key__Sppf`"]: #dcev-external-filter-key-sppf
+
+Parent: [`EPSv`]
+
+Observed value range: `-0.015200676470588231`..`-0.015200676470588231`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Sppg`"
+
+[`DCEv` "`external_filter_key__Sppg`"]: #dcev-external-filter-key-sppg
+
+Parent: [`EPSv`]
+
+Observed value range: `0.010748909113519809`..`0.010748909113519809`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Spph`"
+
+[`DCEv` "`external_filter_key__Spph`"]: #dcev-external-filter-key-spph
+
+Parent: [`EPSv`]
+
+Observed value range: `-0.015817225285350095`..`-0.015817225285350095`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TApe`"
+
+[`DCEv` "`external_filter_key__TApe`"]: #dcev-external-filter-key-tape
+
+Parent: [`EPSv`]
+
+Observed value range: `40`..`40`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEbr`"
+
+[`DCEv` "`external_filter_key__TEbr`"]: #dcev-external-filter-key-tebr
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEcu`"
+
+[`DCEv` "`external_filter_key__TEcu`"]: #dcev-external-filter-key-tecu
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEec`"
+
+[`DCEv` "`external_filter_key__TEec`"]: #dcev-external-filter-key-teec
+
+Parent: [`EPSv`]
+
+Values:
+
+- `false`: unknown - TODO
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEgo`"
+
+[`DCEv` "`external_filter_key__TEgo`"]: #dcev-external-filter-key-tego
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`44`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEgs`"
+
+[`DCEv` "`external_filter_key__TEgs`"]: #dcev-external-filter-key-tegs
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`8`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEsc`"
+
+[`DCEv` "`external_filter_key__TEsc`"]: #dcev-external-filter-key-tesc
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEss`"
+
+[`DCEv` "`external_filter_key__TEss`"]: #dcev-external-filter-key-tess
+
+Parent: [`EPSv`]
+
+Observed value range: `5`..`15`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEst`"
+
+[`DCEv` "`external_filter_key__TEst`"]: #dcev-external-filter-key-test
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`4`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEth`"
+
+[`DCEv` "`external_filter_key__TEth`"]: #dcev-external-filter-key-teth
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TEvs`"
+
+[`DCEv` "`external_filter_key__TEvs`"]: #dcev-external-filter-key-tevs
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TIna`"
+
+[`DCEv` "`external_filter_key__TIna`"]: #dcev-external-filter-key-tina
+
+Parent: [`EPSv`]
+
+Observed value range: `40`..`100`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TInc`"
+
+[`DCEv` "`external_filter_key__TInc`"]: #dcev-external-filter-key-tinc
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__TxtF`"
+
+[`DCEv` "`external_filter_key__TxtF`"]: #dcev-external-filter-key-txtf
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__WAve`"
+
+[`DCEv` "`external_filter_key__WAve`"]: #dcev-external-filter-key-wave
+
+Parent: [`EPSv`]
+
+Observed value range: `23`..`23`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__Wdth`"
+
+[`DCEv` "`external_filter_key__Wdth`"]: #dcev-external-filter-key-wdth
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__blur`"
+
+[`DCEv` "`external_filter_key__blur`"]: #dcev-external-filter-key-blur
+
+Parent: [`EPSv`]
+
+Observed value range: `0`..`0`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__bvlS`"
+
+[`DCEv` "`external_filter_key__bvlS`"]: #dcev-external-filter-key-bvls
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__sdwC`"
+
+[`DCEv` "`external_filter_key__sdwC`"]: #dcev-external-filter-key-sdwc
+
+Parent: [`EPSv`]
+
+Unknown data storage.
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
+### `DCEv` "`external_filter_key__sdwO`"
+
+[`DCEv` "`external_filter_key__sdwO`"]: #dcev-external-filter-key-sdwo
+
+Parent: [`EPSv`]
+
+Observed value range: `82`..`82`
+
+Contains:
+
+- [`DCKs`] Dictionary Entry Key
+- [`DCVs`] Dictionary Entry String Value
+
 ### `DCEv` "`flexClassName`"
 
 [`DCEv` "`flexClassName`"]: #dcev-flexclassname
@@ -3042,6 +4482,7 @@ Used by "Hue/Saturation" filter.
 
 Values:
 
+- `0`: adjust existing pixel hue
 - `1`: replace pixel hue
 - `false`: adjust existing pixel hue
 - `true`: replace pixel hue
@@ -3259,85 +4700,6 @@ Contains:
 
 Parent: [`EPSv`]
 
-Values:
-
-- `Accented Edges...`
-- `Add Noise...`
-- `Angled Strokes...`
-- `Auto Levels`
-- `Bas Relief...`
-- `Bevel Boss...`
-- `Blur`
-- `Blur More`
-- `Brightness/Contrast...`
-- `Chalk && Charcoal...`
-- `Chrome...`
-- `Clouds`
-- `Color Fill`
-- `Colored Pencil...`
-- `Conté Crayon...`
-- `Convert to Alpha`
-- `Craquelure...`
-- `Crosshatch...`
-- `Curves...`
-- `Dark Strokes...`
-- `Difference Clouds`
-- `Diffuse Glow...`
-- `Drop Shadow`
-- `Dry Brush...`
-- `Edges...`
-- `Film Grain...`
-- `Find Edges`
-- `Gaussian Blur...`
-- `Glass...`
-- `Glow`
-- `Glowing Edges...`
-- `Grain...`
-- `Hue/Saturation...`
-- `Ink Outlines...`
-- `Inner Bevel`
-- `Inner Glow`
-- `Inner Shadow`
-- `Inset Emboss`
-- `Invert`
-- `Levels...`
-- `Marble...`
-- `Motion Blur...`
-- `Motion Trail...`
-- `Neon Glow...`
-- `Note Paper...`
-- `Ocean Ripple...`
-- `Outer Bevel`
-- `Paint Daubs...`
-- `Palette Knife...`
-- `Patchwork...`
-- `Photocopy...`
-- `Photoshop Live Effects`
-- `PhotoshopEffects...`
-- `Plaster...`
-- `Plastic Wrap...`
-- `Radial Blur...`
-- `Raised Emboss`
-- `Reticulation...`
-- `Rough Pastels...`
-- `Sharpen`
-- `Sharpen More`
-- `Smudge Stick...`
-- `Solid Shadow...`
-- `Spatter...`
-- `Spherize...`
-- `Sponge...`
-- `Sprayed Strokes...`
-- `Stamp...`
-- `Sumi-e...`
-- `Texturizer...`
-- `Torn Edges...`
-- `Underpainting...`
-- `Unsharp Mask...`
-- `Water Paper...`
-- `Watercolor...`
-- `Zoom Blur...`
-
 Contains:
 
 - [`DCKs`] Dictionary Entry Key
@@ -3411,23 +4773,52 @@ Values:
 
 - `Add Noise...`
 - `Auto Levels`
+- `Bevel Boss...`
 - `Blur`
 - `Blur More`
 - `Brightness/Contrast...`
+- `Brushed Metal...`
+- `Chrome...`
 - `Convert to Alpha`
+- `Corona...`
 - `Curves...`
 - `Find Edges`
 - `Gaussian Blur...`
+- `Gaussian rozmazání...`
+- `Glass...`
 - `Hue/Saturation...`
 - `Invert`
+- `Jas/Kontrast...`
 - `Levels...`
+- `Luminosité/Contraste...`
 - `Motion Blur...`
+- `Motion Trail...`
+- `Niveles...`
+- `Odstín/Sytost...`
+- `Perspective Shadow...`
+- `Převrátit-invertovat`
 - `Radial Blur...`
+- `Sfocatura Gaussian...`
 - `Sharpen`
 - `Sharpen More`
 - `Solid Shadow...`
+- `Television...`
 - `Unsharp Mask...`
 - `Zoom Blur...`
+- `ぼかし`
+- `ぼかし（ガウス)...`
+- `カーブ...`
+- `ノイズの追加...`
+- `レベル補正...`
+- `曲线...`
+- `查找边缘`
+- `模糊`
+- `自动色阶`
+- `色相 / 彩度...`
+- `色相 ・ 彩度...`
+- `色相/饱和度...`
+- `进一步锐化`
+- `锐化`
 
 Contains:
 
@@ -3446,6 +4837,7 @@ Observed value range: `5`..`25`
 
 Also observed non-numeric values:
 
+- `3; Alt/Opt-drag to split`
 - `5; Alt/Opt-drag to split`
 
 Contains:
@@ -4607,8 +5999,8 @@ Internal data used by Polygon, 3D Box autoshape.
 Contains:
 
 - [`DCKs`] Dictionary Entry Key
-- [`GDTv`]? Nested Dictionary
 - [`DCVs`]? Dictionary Entry String Value
+- [`GDTv`]? Nested Dictionary
 
 ### `DCEv` "`rotation`"."`_x`"
 
@@ -5008,8 +6400,8 @@ Values:
 Contains:
 
 - [`DCKs`] Dictionary Entry Key
-- [`GVRv`] Dictionary Value Array
 - [`DCVs`] Dictionary Entry String Value
+- [`GVRv`] Dictionary Value Array
 
 ### `DCEv` "`text`"
 
@@ -5590,7 +6982,7 @@ Contains:
 
 [`DCKs`]: #dcks-dictionary-entry-key
 
-Parent: [`DCEv` "`AngleSoftness`"] / [`DCEv` "`BevelContrast`"] / [`DCEv` "`BevelType`"] / [`DCEv` "`BevelWidth`"] / [`DCEv` "`Blendmode`"] / [`DCEv` "`ButtonState`"] / [`DCEv` "`Color`"] / [`DCEv` "`Dict`"] / [`DCEv` "`DownBlendColor`"] / [`DCEv` "`EdgeThreshold`"] / [`DCEv` "`EffectIsVisible`"] / [`DCEv` "`EffectMoaID`"] / [`DCEv` "`EmbossFaceColor`"] / [`DCEv` "`Frame2_SS_MarginID`"] / [`DCEv` "`Frame2_SS_OverhangID`"] / [`DCEv` "`Frame2_SS_WidthID`"] / [`DCEv` "`Frame3_SS_MarginID`"] / [`DCEv` "`Frame3_SS_OverhangID`"] / [`DCEv` "`Frame3_SS_WidthID`"] / [`DCEv` "`Frame_SS_FillPattern`"] / [`DCEv` "`Frame_SS_WidthID`"] / [`DCEv` "`GlowStartDistance`"] / [`DCEv` "`GlowWidth`"] / [`DCEv` "`HiliteColor`"] / [`DCEv` "`HitBlendColor`"] / [`DCEv` "`LightAngle`"] / [`DCEv` "`LightDistance`"] / [`DCEv` "`MB_filter_preview_tile_size`"] / [`DCEv` "`MaskSoftness`"] / [`DCEv` "`Opacity`"] / [`DCEv` "`OuterBevelColor`"] / [`DCEv` "`ShadowAngle`"] / [`DCEv` "`ShadowBlur`"] / [`DCEv` "`ShadowColor`"] / [`DCEv` "`ShadowDistance`"] / [`DCEv` "`ShadowType`"] / [`DCEv` "`ShowObject`"] / [`DCEv` "`SlopeMultiplier`"] / [`DCEv` "`SlopeType`"] / [`DCEv` "`add_noise_amount`"] / [`DCEv` "`add_noise_use_color`"] / [`DCEv` "`alrtmsg`"] / [`DCEv` "`alrtmsg`"."`maxmsg`"] / [`DCEv` "`alrtmsg`"."`minmsg`"] / [`DCEv` "`angle`"] / [`DCEv` "`arrowLength`"] / [`DCEv` "`arrowTip`"] / [`DCEv` "`arrowWidth`"] / [`DCEv` "`atMin`"] / [`DCEv` "`awMin`"] / [`DCEv` "`bevelEmboss`"] / [`DCEv` "`blue_points`"] / [`DCEv` "`brightness_amount`"] / [`DCEv` "`c2y`"] / [`DCEv` "`category`"] / [`DCEv` "`clockwise`"] / [`DCEv` "`cloud_color`"] / [`DCEv` "`color`"] / [`DCEv` "`constants`"] / [`DCEv` "`constants`"."`maxB`"] / [`DCEv` "`constants`"."`maxNodes`"] / [`DCEv` "`constants`"."`minB`"] / [`DCEv` "`constants`"."`minNodes`"] / [`DCEv` "`constants`"."`ppc`"] / [`DCEv` "`contrast_amount`"] / [`DCEv` "`corner0`"] / [`DCEv` "`corner1`"] / [`DCEv` "`corner2`"] / [`DCEv` "`corner3`"] / [`DCEv` "`css`"] / [`DCEv` "`currentValues`"] / [`DCEv` "`currentValues`"\[\]."`name`"] / [`DCEv` "`currentValues`"\[\]."`type`"] / [`DCEv` "`currentValues`"\[\]."`value`"] / [`DCEv` "`curvature`"] / [`DCEv` "`curveRatio`"] / [`DCEv` "`custData`"] / [`DCEv` "`custData`"."`box`"] / [`DCEv` "`custData`"."`head1`"] / [`DCEv` "`custData`"."`head2`"] / [`DCEv` "`custData`"."`none`"] / [`DCEv` "`custData`"."`tail`"] / [`DCEv` "`dest_high_blue`"] / [`DCEv` "`dest_high_green`"] / [`DCEv` "`dest_high_red`"] / [`DCEv` "`dest_high_rgb`"] / [`DCEv` "`dest_low_blue`"] / [`DCEv` "`dest_low_green`"] / [`DCEv` "`dest_low_red`"] / [`DCEv` "`dest_low_rgb`"] / [`DCEv` "`distance`"] / [`DCEv` "`dropShadow`"] / [`DCEv` "`flexClassName`"] / [`DCEv` "`focalLength`"] / [`DCEv` "`gamma_blue`"] / [`DCEv` "`gamma_green`"] / [`DCEv` "`gamma_red`"] / [`DCEv` "`gamma_rgb`"] / [`DCEv` "`gaussian_blur_radius`"] / [`DCEv` "`gradientFill`"] / [`DCEv` "`green_points`"] / [`DCEv` "`height`"] / [`DCEv` "`hls_colorize`"] / [`DCEv` "`html`"] / [`DCEv` "`hue_amount`"] / [`DCEv` "`innerGlow`"] / [`DCEv` "`innerRatio`"] / [`DCEv` "`innerShadow`"] / [`DCEv` "`lastMouse`"] / [`DCEv` "`lastMouseAngle`"] / [`DCEv` "`lightness_amount`"] / [`DCEv` "`lineAngle`"] / [`DCEv` "`locX`"] / [`DCEv` "`locY`"] / [`DCEv` "`locked`"] / [`DCEv` "`maxNodes`"] / [`DCEv` "`minNodes`"] / [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"] / [`DCEv` "`mode`"] / [`DCEv` "`motion_blur_angle`"] / [`DCEv` "`motion_blur_distance`"] / [`DCEv` "`mouse`"] / [`DCEv` "`name`"] / [`DCEv` "`nodes`"] / [`DCEv` "`offset1`"] / [`DCEv` "`offset2`"] / [`DCEv` "`origPoints3D`"] / [`DCEv` "`origPoints3D`"."`p0`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p1`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p2`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p3`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p4`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p5`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p6`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p7`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_z`"] / [`DCEv` "`outerGlow`"] / [`DCEv` "`patternFill`"] / [`DCEv` "`points3D`"] / [`DCEv` "`points3D`"."`p0`"] / [`DCEv` "`points3D`"."`p0`"."`_x`"] / [`DCEv` "`points3D`"."`p0`"."`_y`"] / [`DCEv` "`points3D`"."`p0`"."`_z`"] / [`DCEv` "`points3D`"."`p1`"] / [`DCEv` "`points3D`"."`p1`"."`_x`"] / [`DCEv` "`points3D`"."`p1`"."`_y`"] / [`DCEv` "`points3D`"."`p1`"."`_z`"] / [`DCEv` "`points3D`"."`p2`"] / [`DCEv` "`points3D`"."`p2`"."`_x`"] / [`DCEv` "`points3D`"."`p2`"."`_y`"] / [`DCEv` "`points3D`"."`p2`"."`_z`"] / [`DCEv` "`points3D`"."`p3`"] / [`DCEv` "`points3D`"."`p3`"."`_x`"] / [`DCEv` "`points3D`"."`p3`"."`_y`"] / [`DCEv` "`points3D`"."`p3`"."`_z`"] / [`DCEv` "`points3D`"."`p4`"] / [`DCEv` "`points3D`"."`p4`"."`_x`"] / [`DCEv` "`points3D`"."`p4`"."`_y`"] / [`DCEv` "`points3D`"."`p4`"."`_z`"] / [`DCEv` "`points3D`"."`p5`"] / [`DCEv` "`points3D`"."`p5`"."`_x`"] / [`DCEv` "`points3D`"."`p5`"."`_y`"] / [`DCEv` "`points3D`"."`p5`"."`_z`"] / [`DCEv` "`points3D`"."`p6`"] / [`DCEv` "`points3D`"."`p6`"."`_x`"] / [`DCEv` "`points3D`"."`p6`"."`_y`"] / [`DCEv` "`points3D`"."`p6`"."`_z`"] / [`DCEv` "`points3D`"."`p7`"] / [`DCEv` "`points3D`"."`p7`"."`_x`"] / [`DCEv` "`points3D`"."`p7`"."`_y`"] / [`DCEv` "`points3D`"."`p7`"."`_z`"] / [`DCEv` "`pressMouse`"] / [`DCEv` "`radial`"] / [`DCEv` "`radial_blur_amount`"] / [`DCEv` "`radial_blur_quality`"] / [`DCEv` "`radius`"] / [`DCEv` "`radius0`"] / [`DCEv` "`radius1`"] / [`DCEv` "`red_points`"] / [`DCEv` "`rgb_points`"] / [`DCEv` "`rotation`"] / [`DCEv` "`rotation`"."`_x`"] / [`DCEv` "`rotation`"."`_y`"] / [`DCEv` "`rotation`"."`_z`"] / [`DCEv` "`round0`"] / [`DCEv` "`round1`"] / [`DCEv` "`roundness`"] / [`DCEv` "`satin`"] / [`DCEv` "`saturation_amount`"] / [`DCEv` "`shapeName`"] / [`DCEv` "`sides`"] / [`DCEv` "`sky_color`"] / [`DCEv` "`solidFill`"] / [`DCEv` "`source_high_blue`"] / [`DCEv` "`source_high_green`"] / [`DCEv` "`source_high_red`"] / [`DCEv` "`source_high_rgb`"] / [`DCEv` "`source_low_blue`"] / [`DCEv` "`source_low_green`"] / [`DCEv` "`source_low_red`"] / [`DCEv` "`source_low_rgb`"] / [`DCEv` "`split`"] / [`DCEv` "`stroke`"] / [`DCEv` "`style`"] / [`DCEv` "`t1`"] / [`DCEv` "`t2`"] / [`DCEv` "`tags`"] / [`DCEv` "`text`"] / [`DCEv` "`thickness`"] / [`DCEv` "`toolTips`"] / [`DCEv` "`toolTips`"."`angle`"] / [`DCEv` "`toolTips`"."`drag`"] / [`DCEv` "`toolTips`"."`head`"] / [`DCEv` "`toolTips`"."`inch`"] / [`DCEv` "`toolTips`"."`length`"] / [`DCEv` "`toolTips`"."`of`"] / [`DCEv` "`toolTips`"."`px`"] / [`DCEv` "`toolTips`"."`resize`"] / [`DCEv` "`tooltips`"] / [`DCEv` "`tooltips`"."`altopt`"] / [`DCEv` "`tooltips`"."`inner`"] / [`DCEv` "`tooltips`"."`openclose`"] / [`DCEv` "`tooltips`"."`points`"] / [`DCEv` "`tooltips`"."`radius`"] / [`DCEv` "`tooltips`"."`radius0`"] / [`DCEv` "`tooltips`"."`radius1`"] / [`DCEv` "`tooltips`"."`reset`"] / [`DCEv` "`tooltips`"."`roundness1`"] / [`DCEv` "`tooltips`"."`roundness2`"] / [`DCEv` "`tooltips`"."`scale`"] / [`DCEv` "`tooltips`"."`sections`"] / [`DCEv` "`tooltips`"."`sides`"] / [`DCEv` "`tooltips`"."`spirals`"] / [`DCEv` "`type`"] / [`DCEv` "`unsharp_mask_amount`"] / [`DCEv` "`unsharp_mask_radius`"] / [`DCEv` "`unsharp_mask_threshold`"] / [`DCEv` "`usecolor`"] / [`DCEv` "`wavelength`"] / [`DCEv` "`width`"] / [`DCEv` "`x1`"] / [`DCEv` "`x2`"] / [`DCEv` "`y1`"] / [`DCEv` "`y2`"] / [`DCEv` "`zoom_blur_amount`"] / [`DCEv` "`zoom_blur_quality`"]
+Parent: [`DCEv`]
 
 The key name for a key-value pair.
 
@@ -5598,7 +6990,7 @@ The key name for a key-value pair.
 
 [`DCVs`]: #dcvs-dictionary-entry-string-value
 
-Parent: [`DCEv` "`AngleSoftness`"] / [`DCEv` "`BevelContrast`"] / [`DCEv` "`BevelType`"] / [`DCEv` "`BevelWidth`"] / [`DCEv` "`Blendmode`"] / [`DCEv` "`ButtonState`"] / [`DCEv` "`Color`"] / [`DCEv` "`Dict`"] / [`DCEv` "`DownBlendColor`"] / [`DCEv` "`EdgeThreshold`"] / [`DCEv` "`EffectIsVisible`"] / [`DCEv` "`EffectMoaID`"] / [`DCEv` "`EmbossFaceColor`"] / [`DCEv` "`Frame2_SS_MarginID`"] / [`DCEv` "`Frame2_SS_OverhangID`"] / [`DCEv` "`Frame2_SS_WidthID`"] / [`DCEv` "`Frame3_SS_MarginID`"] / [`DCEv` "`Frame3_SS_OverhangID`"] / [`DCEv` "`Frame3_SS_WidthID`"] / [`DCEv` "`Frame_SS_FillPattern`"] / [`DCEv` "`Frame_SS_WidthID`"] / [`DCEv` "`GlowStartDistance`"] / [`DCEv` "`GlowWidth`"] / [`DCEv` "`HiliteColor`"] / [`DCEv` "`HitBlendColor`"] / [`DCEv` "`LightAngle`"] / [`DCEv` "`LightDistance`"] / [`DCEv` "`MB_filter_preview_tile_size`"] / [`DCEv` "`MaskSoftness`"] / [`DCEv` "`Opacity`"] / [`DCEv` "`OuterBevelColor`"] / [`DCEv` "`ShadowAngle`"] / [`DCEv` "`ShadowBlur`"] / [`DCEv` "`ShadowColor`"] / [`DCEv` "`ShadowDistance`"] / [`DCEv` "`ShadowType`"] / [`DCEv` "`ShowObject`"] / [`DCEv` "`SlopeMultiplier`"] / [`DCEv` "`SlopeType`"] / [`DCEv` "`add_noise_amount`"] / [`DCEv` "`add_noise_use_color`"] / [`DCEv` "`alrtmsg`"."`maxmsg`"] / [`DCEv` "`alrtmsg`"."`minmsg`"] / [`DCEv` "`angle`"] / [`DCEv` "`arrowLength`"] / [`DCEv` "`arrowTip`"] / [`DCEv` "`arrowWidth`"] / [`DCEv` "`atMin`"] / [`DCEv` "`awMin`"] / [`DCEv` "`bevelEmboss`"] / [`DCEv` "`brightness_amount`"] / [`DCEv` "`c2y`"] / [`DCEv` "`category`"] / [`DCEv` "`clockwise`"] / [`DCEv` "`cloud_color`"] / [`DCEv` "`color`"] / [`DCEv` "`constants`"."`maxB`"] / [`DCEv` "`constants`"."`maxNodes`"] / [`DCEv` "`constants`"."`minB`"] / [`DCEv` "`constants`"."`minNodes`"] / [`DCEv` "`constants`"."`ppc`"] / [`DCEv` "`contrast_amount`"] / [`DCEv` "`corner0`"] / [`DCEv` "`corner1`"] / [`DCEv` "`corner2`"] / [`DCEv` "`corner3`"] / [`DCEv` "`css`"] / [`DCEv` "`currentValues`"] / [`DCEv` "`currentValues`"\[\]."`name`"] / [`DCEv` "`currentValues`"\[\]."`type`"] / [`DCEv` "`currentValues`"\[\]."`value`"] / [`DCEv` "`curvature`"] / [`DCEv` "`curveRatio`"] / [`DCEv` "`custData`"."`box`"] / [`DCEv` "`custData`"."`head1`"] / [`DCEv` "`custData`"."`head2`"] / [`DCEv` "`custData`"."`none`"] / [`DCEv` "`custData`"."`tail`"] / [`DCEv` "`dest_high_blue`"] / [`DCEv` "`dest_high_green`"] / [`DCEv` "`dest_high_red`"] / [`DCEv` "`dest_high_rgb`"] / [`DCEv` "`dest_low_blue`"] / [`DCEv` "`dest_low_green`"] / [`DCEv` "`dest_low_red`"] / [`DCEv` "`dest_low_rgb`"] / [`DCEv` "`distance`"] / [`DCEv` "`dropShadow`"] / [`DCEv` "`flexClassName`"] / [`DCEv` "`focalLength`"] / [`DCEv` "`gamma_blue`"] / [`DCEv` "`gamma_green`"] / [`DCEv` "`gamma_red`"] / [`DCEv` "`gamma_rgb`"] / [`DCEv` "`gaussian_blur_radius`"] / [`DCEv` "`gradientFill`"] / [`DCEv` "`height`"] / [`DCEv` "`hls_colorize`"] / [`DCEv` "`html`"] / [`DCEv` "`hue_amount`"] / [`DCEv` "`innerGlow`"] / [`DCEv` "`innerRatio`"] / [`DCEv` "`innerShadow`"] / [`DCEv` "`lastMouse`"] / [`DCEv` "`lastMouseAngle`"] / [`DCEv` "`lightness_amount`"] / [`DCEv` "`lineAngle`"] / [`DCEv` "`locX`"] / [`DCEv` "`locY`"] / [`DCEv` "`locked`"] / [`DCEv` "`maxNodes`"] / [`DCEv` "`minNodes`"] / [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"] / [`DCEv` "`mode`"] / [`DCEv` "`motion_blur_angle`"] / [`DCEv` "`motion_blur_distance`"] / [`DCEv` "`mouse`"] / [`DCEv` "`name`"] / [`DCEv` "`nodes`"] / [`DCEv` "`offset1`"] / [`DCEv` "`offset2`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p0`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p1`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p2`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p3`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p4`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p5`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p6`"."`_z`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_x`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_y`"] / [`DCEv` "`origPoints3D`"."`p7`"."`_z`"] / [`DCEv` "`outerGlow`"] / [`DCEv` "`patternFill`"] / [`DCEv` "`points3D`"."`p0`"."`_x`"] / [`DCEv` "`points3D`"."`p0`"."`_y`"] / [`DCEv` "`points3D`"."`p0`"."`_z`"] / [`DCEv` "`points3D`"."`p1`"."`_x`"] / [`DCEv` "`points3D`"."`p1`"."`_y`"] / [`DCEv` "`points3D`"."`p1`"."`_z`"] / [`DCEv` "`points3D`"."`p2`"."`_x`"] / [`DCEv` "`points3D`"."`p2`"."`_y`"] / [`DCEv` "`points3D`"."`p2`"."`_z`"] / [`DCEv` "`points3D`"."`p3`"."`_x`"] / [`DCEv` "`points3D`"."`p3`"."`_y`"] / [`DCEv` "`points3D`"."`p3`"."`_z`"] / [`DCEv` "`points3D`"."`p4`"."`_x`"] / [`DCEv` "`points3D`"."`p4`"."`_y`"] / [`DCEv` "`points3D`"."`p4`"."`_z`"] / [`DCEv` "`points3D`"."`p5`"."`_x`"] / [`DCEv` "`points3D`"."`p5`"."`_y`"] / [`DCEv` "`points3D`"."`p5`"."`_z`"] / [`DCEv` "`points3D`"."`p6`"."`_x`"] / [`DCEv` "`points3D`"."`p6`"."`_y`"] / [`DCEv` "`points3D`"."`p6`"."`_z`"] / [`DCEv` "`points3D`"."`p7`"."`_x`"] / [`DCEv` "`points3D`"."`p7`"."`_y`"] / [`DCEv` "`points3D`"."`p7`"."`_z`"] / [`DCEv` "`pressMouse`"] / [`DCEv` "`radial`"] / [`DCEv` "`radial_blur_amount`"] / [`DCEv` "`radial_blur_quality`"] / [`DCEv` "`radius`"] / [`DCEv` "`radius0`"] / [`DCEv` "`radius1`"] / [`DCEv` "`rotation`"] / [`DCEv` "`rotation`"."`_x`"] / [`DCEv` "`rotation`"."`_y`"] / [`DCEv` "`rotation`"."`_z`"] / [`DCEv` "`round0`"] / [`DCEv` "`round1`"] / [`DCEv` "`roundness`"] / [`DCEv` "`satin`"] / [`DCEv` "`saturation_amount`"] / [`DCEv` "`shapeName`"] / [`DCEv` "`sides`"] / [`DCEv` "`sky_color`"] / [`DCEv` "`solidFill`"] / [`DCEv` "`source_high_blue`"] / [`DCEv` "`source_high_green`"] / [`DCEv` "`source_high_red`"] / [`DCEv` "`source_high_rgb`"] / [`DCEv` "`source_low_blue`"] / [`DCEv` "`source_low_green`"] / [`DCEv` "`source_low_red`"] / [`DCEv` "`source_low_rgb`"] / [`DCEv` "`split`"] / [`DCEv` "`stroke`"] / [`DCEv` "`style`"] / [`DCEv` "`t1`"] / [`DCEv` "`t2`"] / [`DCEv` "`tags`"] / [`DCEv` "`text`"] / [`DCEv` "`thickness`"] / [`DCEv` "`toolTips`"."`angle`"] / [`DCEv` "`toolTips`"."`drag`"] / [`DCEv` "`toolTips`"."`head`"] / [`DCEv` "`toolTips`"."`inch`"] / [`DCEv` "`toolTips`"."`length`"] / [`DCEv` "`toolTips`"."`of`"] / [`DCEv` "`toolTips`"."`px`"] / [`DCEv` "`toolTips`"."`resize`"] / [`DCEv` "`tooltips`"."`altopt`"] / [`DCEv` "`tooltips`"."`inner`"] / [`DCEv` "`tooltips`"."`openclose`"] / [`DCEv` "`tooltips`"."`points`"] / [`DCEv` "`tooltips`"."`radius`"] / [`DCEv` "`tooltips`"."`radius0`"] / [`DCEv` "`tooltips`"."`radius1`"] / [`DCEv` "`tooltips`"."`reset`"] / [`DCEv` "`tooltips`"."`roundness1`"] / [`DCEv` "`tooltips`"."`roundness2`"] / [`DCEv` "`tooltips`"."`scale`"] / [`DCEv` "`tooltips`"."`sections`"] / [`DCEv` "`tooltips`"."`sides`"] / [`DCEv` "`tooltips`"."`spirals`"] / [`DCEv` "`type`"] / [`DCEv` "`unsharp_mask_amount`"] / [`DCEv` "`unsharp_mask_radius`"] / [`DCEv` "`unsharp_mask_threshold`"] / [`DCEv` "`usecolor`"] / [`DCEv` "`wavelength`"] / [`DCEv` "`width`"] / [`DCEv` "`x1`"] / [`DCEv` "`x2`"] / [`DCEv` "`y1`"] / [`DCEv` "`y2`"] / [`DCEv` "`zoom_blur_amount`"] / [`DCEv` "`zoom_blur_quality`"]
+Parent: [`DCEv`]
 
 A string value for a key-value pair.
 
@@ -5608,6 +7000,8 @@ A string value for a key-value pair.
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
 ## `DF2i` **D**ash O**f**f **2**
@@ -5616,6 +7010,8 @@ Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
 ## `DF3i` **D**ash O**f**f **3**
@@ -5623,6 +7019,8 @@ Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 [`DF3i`]: #df3i-dash-off-3
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
@@ -5643,6 +7041,8 @@ Values:
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
 ## `DO2i` **D**ash **O**n **2**
@@ -5651,6 +7051,8 @@ Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
 ## `DO3i` **D**ash **O**n **3**
@@ -5658,6 +7060,8 @@ Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 [`DO3i`]: #do3i-dash-on-3
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Observed value range: `0x00000000`..`0x000003e8` (`0`..`1000`)
 
@@ -5676,85 +7080,91 @@ Values:
 
 [`DTAv`]: #dtav-data
 
-Parent: [`ALSv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`URLv`]
+Parent: [`ALSv`] / [`CSGv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`URLv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Stores arbitrary, possibly nested, data for JavaScript scripts, as set on `smartShape.elem.customData`.
 
 Contains:
 
-- [`DCEv` "`height`"]?
-- [`DCEv` "`curvature`"]?
-- [`DCEv` "`lineAngle`"]?
-- [`DCEv` "`wavelength`"]?
-- [`DCEv` "`style`"]?
-- [`DCEv` "`radial`"]?
-- [`DCEv` "`innerRatio`"]?
-- [`DCEv` "`curveRatio`"]?
-- [`DCEv` "`Frame3_SS_WidthID`"]?
-- [`DCEv` "`Frame3_SS_OverhangID`"]?
-- [`DCEv` "`Frame3_SS_MarginID`"]?
-- [`DCEv` "`Frame2_SS_WidthID`"]?
-- [`DCEv` "`Frame2_SS_OverhangID`"]?
 - [`DCEv` "`Frame2_SS_MarginID`"]?
+- [`DCEv` "`Frame2_SS_OverhangID`"]?
+- [`DCEv` "`Frame2_SS_WidthID`"]?
+- [`DCEv` "`Frame3_SS_MarginID`"]?
+- [`DCEv` "`Frame3_SS_OverhangID`"]?
+- [`DCEv` "`Frame3_SS_WidthID`"]?
 - [`DCEv` "`Frame_SS_FillPattern`"]?
 - [`DCEv` "`Frame_SS_WidthID`"]?
-- [`DCEv` "`text`"]?
-- [`DCEv` "`width`"]?
-- [`DCEv` "`locX`"]?
-- [`DCEv` "`locY`"]?
-- [`DCEv` "`mouse`"]?
-- [`DCEv` "`points3D`"]?
-- [`DCEv` "`origPoints3D`"]?
-- [`DCEv` "`rotation`"]?
-- [`DCEv` "`focalLength`"]?
-- [`DCEv` "`lastMouse`"]?
-- [`DCEv` "`pressMouse`"]?
-- [`DCEv` "`lastMouseAngle`"]?
-- [`DCEv` "`corner1`"]?
-- [`DCEv` "`locked`"]?
-- [`DCEv` "`shapeName`"]?
-- [`DCEv` "`corner3`"]?
-- [`DCEv` "`corner0`"]?
-- [`DCEv` "`corner2`"]?
-- [`DCEv` "`currentValues`"]?
-- [`DCEv` "`css`"]?
-- [`DCEv` "`html`"]?
-- [`DCEv` "`tags`"]?
-- [`DCEv` "`type`"]?
-- [`DCEv` "`flexClassName`"]?
 - [`DCEv` "`alrtmsg`"]?
-- [`DCEv` "`round0`"]?
-- [`DCEv` "`round1`"]?
-- [`DCEv` "`constants`"]?
-- [`DCEv` "`tooltips`"]?
-- [`DCEv` "`radius0`"]?
-- [`DCEv` "`nodes`"]?
-- [`DCEv` "`radius1`"]?
-- [`DCEv` "`radius`"]?
+- [`DCEv` "`arrowLength`"]?
+- [`DCEv` "`arrowTip`"]?
+- [`DCEv` "`arrowWidth`"]?
+- [`DCEv` "`atMin`"]?
+- [`DCEv` "`awMin`"]?
 - [`DCEv` "`c2y`"]?
 - [`DCEv` "`clockwise`"]?
-- [`DCEv` "`split`"]?
-- [`DCEv` "`sides`"]?
+- [`DCEv` "`constants`"]?
+- [`DCEv` "`corner0`"]?
+- [`DCEv` "`corner1`"]?
+- [`DCEv` "`corner2`"]?
+- [`DCEv` "`corner3`"]?
+- [`DCEv` "`css`"]?
+- [`DCEv` "`ctype0`"]?
+- [`DCEv` "`ctype1`"]?
+- [`DCEv` "`ctype2`"]?
+- [`DCEv` "`ctype3`"]?
+- [`DCEv` "`currentValues`"]?
+- [`DCEv` "`curvature`"]?
+- [`DCEv` "`curveRatio`"]?
+- [`DCEv` "`custData`"]?
+- [`DCEv` "`flexClassName`"]?
+- [`DCEv` "`focalLength`"]?
+- [`DCEv` "`height`"]?
+- [`DCEv` "`html`"]?
+- [`DCEv` "`innerRatio`"]?
+- [`DCEv` "`lastMouse`"]?
+- [`DCEv` "`lastMouseAngle`"]?
+- [`DCEv` "`lineAngle`"]?
+- [`DCEv` "`locX`"]?
+- [`DCEv` "`locY`"]?
+- [`DCEv` "`locked`"]?
 - [`DCEv` "`maxNodes`"]?
 - [`DCEv` "`minNodes`"]?
-- [`DCEv` "`y2`"]?
-- [`DCEv` "`x2`"]?
-- [`DCEv` "`y1`"]?
-- [`DCEv` "`x1`"]?
-- [`DCEv` "`toolTips`"]?
-- [`DCEv` "`thickness`"]?
-- [`DCEv` "`roundness`"]?
 - [`DCEv` "`mode`"]?
+- [`DCEv` "`mouse`"]?
+- [`DCEv` "`nodes`"]?
 - [`DCEv` "`offset1`"]?
 - [`DCEv` "`offset2`"]?
-- [`DCEv` "`t2`"]?
+- [`DCEv` "`origPoints3D`"]?
+- [`DCEv` "`points3D`"]?
+- [`DCEv` "`pressMouse`"]?
+- [`DCEv` "`radial`"]?
+- [`DCEv` "`radius`"]?
+- [`DCEv` "`radius0`"]?
+- [`DCEv` "`radius1`"]?
+- [`DCEv` "`rotation`"]?
+- [`DCEv` "`round0`"]?
+- [`DCEv` "`round1`"]?
+- [`DCEv` "`roundness`"]?
+- [`DCEv` "`shapeName`"]?
+- [`DCEv` "`sides`"]?
+- [`DCEv` "`split`"]?
+- [`DCEv` "`style`"]?
 - [`DCEv` "`t1`"]?
-- [`DCEv` "`custData`"]?
-- [`DCEv` "`arrowTip`"]?
-- [`DCEv` "`atMin`"]?
-- [`DCEv` "`arrowWidth`"]?
-- [`DCEv` "`arrowLength`"]?
-- [`DCEv` "`awMin`"]?
+- [`DCEv` "`t2`"]?
+- [`DCEv` "`tags`"]?
+- [`DCEv` "`text`"]?
+- [`DCEv` "`thickness`"]?
+- [`DCEv` "`toolTips`"]?
+- [`DCEv` "`tooltips`"]?
+- [`DCEv` "`type`"]?
+- [`DCEv` "`wavelength`"]?
+- [`DCEv` "`width`"]?
+- [`DCEv` "`x1`"]?
+- [`DCEv` "`x2`"]?
+- [`DCEv` "`y1`"]?
+- [`DCEv` "`y2`"]?
 
 ## `DURi` **Dur**ation
 
@@ -5768,17 +7178,22 @@ Observed value range: `0x00000000`..`0x00000000` (`0`..`0`)
 
 [`DVLb`]: #dvlb
 
-Parent: [`MSTv`]
+Parent: [`ALSv`] / [`MSTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Values:
 
 - `false`: unknown - TODO
+- `true`: unknown - TODO
 
 ## `ECSi` HTML **E**xternal **CS**S
 
 [`ECSi`]: #ecsi-html-external-css
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX 2005 - Adobe Fireworks CS6
 
 Values:
 
@@ -5809,13 +7224,14 @@ Contains:
 
 [`EFLv`]: #eflv-effect-list
 
-Parent: [`EFDv`] / [`GRPv`] / [`IMGv`] / [`PRIv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
+Parent: [`ALSv`] / [`CSGv`] / [`EFDv`] / [`GRPv`] / [`IMGv`] / [`PRIv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
 
 Contains:
 
-- [`CATs`] Category
+- [`CATs`] Category Name
 - [`INMs`] Internal Name
 - [`EPSv`]\* Effect Properties
+- [`UNMs`]? User-facing Name
 
 ## `EFXs` **E**xport **F**ile Filter.
 
@@ -5831,27 +7247,32 @@ Values:
 - `*.jpg`
 - `*.pdf`
 - `*.png`
+- `*.psd`
+- `*.swf`
 - `*.tif;*.tiff`
 - `.htm`
+- `.html`
+- `.lbi`
 - `.mxml`
 
 ## `ELMv` **El**e**m**ents
 
 [`ELMv`]: #elmv-elements
 
-Parent: [`CELv`] / [`GRPv`]
+Parent: [`CELv`] / [`CSGv`] / [`GRPv`]
 
 A list of individual elements to render within a layer or group, ordered from front to back.
 
 Contains:
 
+- [`ALSv`]\* Symbol Instance
+- [`CSGv`]\* CS6 Group
+- [`GRPv`]\* Group
 - [`IMGv`]\* Image
+- [`LSLv`]\* Layer Sub-Layer
 - [`PTHv`]\* Path
 - [`TXTv`]\* Text
-- [`GRPv`]\* Group
 - [`URLv`]\* Image Slice / Hotspot
-- [`LSLv`]\* Layer Sub-Layer
-- [`ALSv`]\* Symbol Instance
 
 ## `ENCi` HTML **Enc**oding
 
@@ -5859,16 +7280,22 @@ Contains:
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Values:
 
 - `0`: ASCII
 - `1`: UTF-8
+- `2`: unknown - TODO
+- `7`: unknown - TODO
 
 ## `EOFb` **E**ven-**O**dd **F**ill Rule
 
 [`EOFb`]: #eofb-even-odd-fill-rule
 
 Parent: [`PTHv`]
+
+Observed in versions: Macromedia Fireworks MX 2005 - Adobe Fireworks CS6
 
 Values:
 
@@ -5885,98 +7312,174 @@ Defines an effect (such as a drop-shadow). See [`DCEv` "`EffectMoaID`"] for the 
 
 Contains:
 
-- [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"]
-- [`DCEv` "`EffectIsVisible`"]?
 - [`DCEv` "`EffectMoaID`"]
+- [`DCEv` "`mkbFile_WriteOnly_TemporaryEffectUiName`"]
+- [`DCEv` "`AngleSoftness`"]?
+- [`DCEv` "`BevelContrast`"]?
 - [`DCEv` "`BevelType`"]?
 - [`DCEv` "`BevelWidth`"]?
-- [`DCEv` "`BevelContrast`"]?
-- [`DCEv` "`EdgeThreshold`"]?
-- [`DCEv` "`AngleSoftness`"]?
-- [`DCEv` "`MaskSoftness`"]?
-- [`DCEv` "`LightDistance`"]?
-- [`DCEv` "`LightAngle`"]?
-- [`DCEv` "`SlopeType`"]?
-- [`DCEv` "`SlopeMultiplier`"]?
-- [`DCEv` "`OuterBevelColor`"]?
-- [`DCEv` "`DownBlendColor`"]?
-- [`DCEv` "`HitBlendColor`"]?
-- [`DCEv` "`HiliteColor`"]?
-- [`DCEv` "`ShadowColor`"]?
-- [`DCEv` "`EmbossFaceColor`"]?
-- [`DCEv` "`ShowObject`"]?
+- [`DCEv` "`Blendmode`"]?
 - [`DCEv` "`ButtonState`"]?
+- [`DCEv` "`Color`"]?
+- [`DCEv` "`Dict`"]?
+- [`DCEv` "`DownBlendColor`"]?
+- [`DCEv` "`EdgeThreshold`"]?
+- [`DCEv` "`EffectIsVisible`"]?
+- [`DCEv` "`EmbossFaceColor`"]?
 - [`DCEv` "`GlowStartDistance`"]?
 - [`DCEv` "`GlowWidth`"]?
-- [`DCEv` "`ShadowType`"]?
-- [`DCEv` "`ShadowBlur`"]?
-- [`DCEv` "`ShadowDistance`"]?
-- [`DCEv` "`ShadowAngle`"]?
+- [`DCEv` "`HiliteColor`"]?
+- [`DCEv` "`HitBlendColor`"]?
+- [`DCEv` "`LightAngle`"]?
+- [`DCEv` "`LightDistance`"]?
 - [`DCEv` "`MB_filter_preview_tile_size`"]?
-- [`DCEv` "`angle`"]?
-- [`DCEv` "`distance`"]?
-- [`DCEv` "`color`"]?
-- [`DCEv` "`brightness_amount`"]?
-- [`DCEv` "`contrast_amount`"]?
-- [`DCEv` "`source_low_rgb`"]?
-- [`DCEv` "`source_high_rgb`"]?
-- [`DCEv` "`dest_low_rgb`"]?
-- [`DCEv` "`dest_high_rgb`"]?
-- [`DCEv` "`gamma_rgb`"]?
-- [`DCEv` "`source_low_red`"]?
-- [`DCEv` "`source_high_red`"]?
-- [`DCEv` "`dest_low_red`"]?
-- [`DCEv` "`dest_high_red`"]?
-- [`DCEv` "`gamma_red`"]?
-- [`DCEv` "`source_low_green`"]?
-- [`DCEv` "`source_high_green`"]?
-- [`DCEv` "`dest_low_green`"]?
-- [`DCEv` "`dest_high_green`"]?
-- [`DCEv` "`gamma_green`"]?
-- [`DCEv` "`source_low_blue`"]?
-- [`DCEv` "`source_high_blue`"]?
-- [`DCEv` "`dest_low_blue`"]?
-- [`DCEv` "`dest_high_blue`"]?
-- [`DCEv` "`gamma_blue`"]?
-- [`DCEv` "`hue_amount`"]?
-- [`DCEv` "`saturation_amount`"]?
-- [`DCEv` "`lightness_amount`"]?
-- [`DCEv` "`hls_colorize`"]?
-- [`DCEv` "`rgb_points`"]?
-- [`DCEv` "`red_points`"]?
-- [`DCEv` "`green_points`"]?
-- [`DCEv` "`blue_points`"]?
-- [`DCEv` "`Color`"]?
+- [`DCEv` "`MaskSoftness`"]?
 - [`DCEv` "`Opacity`"]?
-- [`DCEv` "`Blendmode`"]?
-- [`DCEv` "`radial_blur_amount`"]?
-- [`DCEv` "`radial_blur_quality`"]?
-- [`DCEv` "`gaussian_blur_radius`"]?
-- [`DCEv` "`motion_blur_angle`"]?
-- [`DCEv` "`motion_blur_distance`"]?
-- [`DCEv` "`zoom_blur_amount`"]?
-- [`DCEv` "`zoom_blur_quality`"]?
-- [`DCEv` "`unsharp_mask_radius`"]?
-- [`DCEv` "`unsharp_mask_amount`"]?
-- [`DCEv` "`unsharp_mask_threshold`"]?
+- [`DCEv` "`OuterBevelColor`"]?
+- [`DCEv` "`ShadowAngle`"]?
+- [`DCEv` "`ShadowBlur`"]?
+- [`DCEv` "`ShadowColor`"]?
+- [`DCEv` "`ShadowDistance`"]?
+- [`DCEv` "`ShadowType`"]?
+- [`DCEv` "`ShowObject`"]?
+- [`DCEv` "`SlopeMultiplier`"]?
+- [`DCEv` "`SlopeType`"]?
 - [`DCEv` "`add_noise_amount`"]?
 - [`DCEv` "`add_noise_use_color`"]?
-- [`DCEv` "`cloud_color`"]?
-- [`DCEv` "`sky_color`"]?
-- [`DCEv` "`Dict`"]?
-- [`DCEv` "`name`"]?
-- [`DCEv` "`category`"]?
-- [`DCEv` "`usecolor`"]?
-- [`DCEv` "`satin`"]?
-- [`DCEv` "`dropShadow`"]?
-- [`DCEv` "`innerShadow`"]?
-- [`DCEv` "`outerGlow`"]?
-- [`DCEv` "`innerGlow`"]?
-- [`DCEv` "`solidFill`"]?
-- [`DCEv` "`gradientFill`"]?
-- [`DCEv` "`patternFill`"]?
+- [`DCEv` "`angle`"]?
 - [`DCEv` "`bevelEmboss`"]?
+- [`DCEv` "`blue_points`"]?
+- [`DCEv` "`brightness_amount`"]?
+- [`DCEv` "`category`"]?
+- [`DCEv` "`cloud_color`"]?
+- [`DCEv` "`color`"]?
+- [`DCEv` "`contrast_amount`"]?
+- [`DCEv` "`dest_high_blue`"]?
+- [`DCEv` "`dest_high_green`"]?
+- [`DCEv` "`dest_high_red`"]?
+- [`DCEv` "`dest_high_rgb`"]?
+- [`DCEv` "`dest_low_blue`"]?
+- [`DCEv` "`dest_low_green`"]?
+- [`DCEv` "`dest_low_red`"]?
+- [`DCEv` "`dest_low_rgb`"]?
+- [`DCEv` "`distance`"]?
+- [`DCEv` "`dropShadow`"]?
+- [`DCEv` "`external_filter_have_scripting_data`"]?
+- [`DCEv` "`external_filter_key__0x436c7220`"]?
+- [`DCEv` "`external_filter_key__0x45646720`"]?
+- [`DCEv` "`external_filter_key__0x46637320`"]?
+- [`DCEv` "`external_filter_key__0x466c2020`"]?
+- [`DCEv` "`external_filter_key__BEvl`"]?
+- [`DCEv` "`external_filter_key__BMbs`"]?
+- [`DCEv` "`external_filter_key__BMbv`"]?
+- [`DCEv` "`external_filter_key__BMde`"]?
+- [`DCEv` "`external_filter_key__BMdi`"]?
+- [`DCEv` "`external_filter_key__BMgd`"]?
+- [`DCEv` "`external_filter_key__BMgw`"]?
+- [`DCEv` "`external_filter_key__BMmo`"]?
+- [`DCEv` "`external_filter_key__BMsm`"]?
+- [`DCEv` "`external_filter_key__Brgh`"]?
+- [`DCEv` "`external_filter_key__Cntr`"]?
+- [`DCEv` "`external_filter_key__Drct`"]?
+- [`DCEv` "`external_filter_key__Drkn`"]?
+- [`DCEv` "`external_filter_key__FLsi`"]?
+- [`DCEv` "`external_filter_key__FRcl`"]?
+- [`DCEv` "`external_filter_key__FlCl`"]?
+- [`DCEv` "`external_filter_key__GLcl`"]?
+- [`DCEv` "`external_filter_key__GRsh`"]?
+- [`DCEv` "`external_filter_key__INcl`"]?
+- [`DCEv` "`external_filter_key__Lngt`"]?
+- [`DCEv` "`external_filter_key__Mask`"]?
+- [`DCEv` "`external_filter_key__NLnl`"]?
+- [`DCEv` "`external_filter_key__Opct`"]?
+- [`DCEv` "`external_filter_key__PSfo`"]?
+- [`DCEv` "`external_filter_key__PSmo`"]?
+- [`DCEv` "`external_filter_key__PSob`"]?
+- [`DCEv` "`external_filter_key__PSpb`"]?
+- [`DCEv` "`external_filter_key__PSrs`"]?
+- [`DCEv` "`external_filter_key__REfr`"]?
+- [`DCEv` "`external_filter_key__RPwi`"]?
+- [`DCEv` "`external_filter_key__RndS`"]?
+- [`DCEv` "`external_filter_key__RplS`"]?
+- [`DCEv` "`external_filter_key__SHpa`"]?
+- [`DCEv` "`external_filter_key__SHpb`"]?
+- [`DCEv` "`external_filter_key__SHpc`"]?
+- [`DCEv` "`external_filter_key__SHpd`"]?
+- [`DCEv` "`external_filter_key__SHpe`"]?
+- [`DCEv` "`external_filter_key__SHpf`"]?
+- [`DCEv` "`external_filter_key__SHpg`"]?
+- [`DCEv` "`external_filter_key__SHph`"]?
+- [`DCEv` "`external_filter_key__STre`"]?
+- [`DCEv` "`external_filter_key__Shrp`"]?
+- [`DCEv` "`external_filter_key__Smth`"]?
+- [`DCEv` "`external_filter_key__Sppa`"]?
+- [`DCEv` "`external_filter_key__Sppb`"]?
+- [`DCEv` "`external_filter_key__Sppc`"]?
+- [`DCEv` "`external_filter_key__Sppd`"]?
+- [`DCEv` "`external_filter_key__Sppe`"]?
+- [`DCEv` "`external_filter_key__Sppf`"]?
+- [`DCEv` "`external_filter_key__Sppg`"]?
+- [`DCEv` "`external_filter_key__Spph`"]?
+- [`DCEv` "`external_filter_key__TApe`"]?
+- [`DCEv` "`external_filter_key__TEbr`"]?
+- [`DCEv` "`external_filter_key__TEcu`"]?
+- [`DCEv` "`external_filter_key__TEec`"]?
+- [`DCEv` "`external_filter_key__TEgo`"]?
+- [`DCEv` "`external_filter_key__TEgs`"]?
+- [`DCEv` "`external_filter_key__TEsc`"]?
+- [`DCEv` "`external_filter_key__TEss`"]?
+- [`DCEv` "`external_filter_key__TEst`"]?
+- [`DCEv` "`external_filter_key__TEth`"]?
+- [`DCEv` "`external_filter_key__TEvs`"]?
+- [`DCEv` "`external_filter_key__TIna`"]?
+- [`DCEv` "`external_filter_key__TInc`"]?
+- [`DCEv` "`external_filter_key__TxtF`"]?
+- [`DCEv` "`external_filter_key__WAve`"]?
+- [`DCEv` "`external_filter_key__Wdth`"]?
+- [`DCEv` "`external_filter_key__blur`"]?
+- [`DCEv` "`external_filter_key__bvlS`"]?
+- [`DCEv` "`external_filter_key__sdwC`"]?
+- [`DCEv` "`external_filter_key__sdwO`"]?
+- [`DCEv` "`gamma_blue`"]?
+- [`DCEv` "`gamma_green`"]?
+- [`DCEv` "`gamma_red`"]?
+- [`DCEv` "`gamma_rgb`"]?
+- [`DCEv` "`gaussian_blur_radius`"]?
+- [`DCEv` "`gradientFill`"]?
+- [`DCEv` "`green_points`"]?
+- [`DCEv` "`hls_colorize`"]?
+- [`DCEv` "`hue_amount`"]?
+- [`DCEv` "`innerGlow`"]?
+- [`DCEv` "`innerShadow`"]?
+- [`DCEv` "`lightness_amount`"]?
+- [`DCEv` "`motion_blur_angle`"]?
+- [`DCEv` "`motion_blur_distance`"]?
+- [`DCEv` "`name`"]?
+- [`DCEv` "`outerGlow`"]?
+- [`DCEv` "`patternFill`"]?
+- [`DCEv` "`radial_blur_amount`"]?
+- [`DCEv` "`radial_blur_quality`"]?
+- [`DCEv` "`red_points`"]?
+- [`DCEv` "`rgb_points`"]?
+- [`DCEv` "`satin`"]?
+- [`DCEv` "`saturation_amount`"]?
+- [`DCEv` "`sky_color`"]?
+- [`DCEv` "`solidFill`"]?
+- [`DCEv` "`source_high_blue`"]?
+- [`DCEv` "`source_high_green`"]?
+- [`DCEv` "`source_high_red`"]?
+- [`DCEv` "`source_high_rgb`"]?
+- [`DCEv` "`source_low_blue`"]?
+- [`DCEv` "`source_low_green`"]?
+- [`DCEv` "`source_low_red`"]?
+- [`DCEv` "`source_low_rgb`"]?
 - [`DCEv` "`stroke`"]?
+- [`DCEv` "`unsharp_mask_amount`"]?
+- [`DCEv` "`unsharp_mask_radius`"]?
+- [`DCEv` "`unsharp_mask_threshold`"]?
+- [`DCEv` "`usecolor`"]?
+- [`DCEv` "`zoom_blur_amount`"]?
+- [`DCEv` "`zoom_blur_quality`"]?
 
 ## `EXPv` **Exp**ort Options
 
@@ -5986,74 +7489,78 @@ Parent: [`MKBv`] / [`MSTv`] / [`PDCv`] / [`URLv`]
 
 Contains:
 
-- [`FMTi`] Format
-- [`MCTi`]?
-- [`MCCi`]?
-- [`CLRi`] Colour Mode
-- [`PLTi`] Palette Type
-- [`PALv`] Palette
-- [`PLNi`] Palette Number of entries
-- [`PLRi`] Palette Remaining Colours
-- [`PTNi`] Palette Transparency Type
-- [`PLOb`] Palette Pruning
-- [`APLb`]
-- [`APSb`]
 - [`AACb`] Export GIF Animation Crop
 - [`AADb`] Export GIF Animation Diff
+- [`APLb`]
+- [`APSb`]
 - [`ASTi`] Websnap Tolerance
-- [`PLDi`] Palette Dither Level
+- [`CLRi`] Colour Mode
+- [`FLPi`] Frame Loop
+- [`FMTi`] Format
+- [`GFIb`] Interlaced
 - [`GLTi`] GIF Loss
-- [`JPQi`] JPEG Quality
-- [`JPSi`] JPEG Smoothing
 - [`JPOi`] JPEG Colour
 - [`JPPb`] JPEG Progressive
-- [`GFIb`] Interlaced
-- [`JSQi`]
-- [`JSEb`]
-- [`JSTb`]
+- [`JPQi`] JPEG Quality
+- [`JPSi`] JPEG Smoothing
 - [`JSBb`]
-- [`FLPi`] Frame Loop
-- [`FNLv`]? Frame Configuration List
-- [`GSLb`]?
-- [`LSUb`]?
-- [`DSUb`]? HTML Drop Un-Sliced Areas
-- [`LSDb`]? HTML Multiple Nav Bars
-- [`CSMb`]? HTML CSS Menus
-- [`ECSi`]? HTML External CSS
-- [`NYSb`]?
-- [`LSSi`]? HTML Slice Spacing
-- [`HTMi`]? Export HTML Layout
-- [`HTTs`]? HTML Style
-- [`XFSi`]? Export Format Selection
-- [`XMDi`]?
-- [`TRMb`]? Export Trimmed Images
-- [`HTMb`]? Export HTML
-- [`XDAb`]?
-- [`EFXs`]? Export File Filter.
-- [`NM4v`]? HTML Slice Export Names
-- [`NMFv`]? HTML Slice Export Names Frame
-- [`ENCi`]? HTML Encoding
-- [`TALi`]?
-- [`TPWi`]?
-- [`XTMi`]? XHTML
-- [`CBUs`]? Cell Background URL
-- [`CBRi`]? Cell Background (Slice) Repeat
+- [`JSEb`]
+- [`JSQi`]
+- [`JSTb`]
+- [`PALv`] Palette
+- [`PLDi`] Palette Dither Level
+- [`PLNi`] Palette Number of entries
+- [`PLOb`] Palette Pruning
+- [`PLRi`] Palette Remaining Colours
+- [`PLTi`] Palette Type
+- [`PTNi`] Palette Transparency Type
 - [`CBAi`]? Cell Background (Slice) Attachment
+- [`CBRi`]? Cell Background (Slice) Repeat
+- [`CBUs`]? Cell Background URL
 - [`CDAi`]? HTML Page Alignment
 - [`CDMv`]?
-- [`CXBb`]?
-- [`LRLi`]? Export Area Left
-- [`LRTi`]? Export Area Top
-- [`LRRi`]? Export Area Right
-- [`LRBi`]? Export Area Bottom
-- [`IMDs`]? Image Directory
-- [`LXDs`]? Last Export Directory
-- [`EFBs`]? Last Export Filename
-- [`EXPv`.`FCLi`]? Matte Colour
+- [`CLPi`]? Export Scale Propotion
 - [`CLSb`]? Export Scale Constrained
 - [`CNSb`]? Export Scale
-- [`CLPi`]? Export Scale Propotion
+- [`CSMb`]? HTML CSS Menus
+- [`CXBb`]?
+- [`DSUb`]? HTML Drop Un-Sliced Areas
+- [`ECSi`]? HTML External CSS
+- [`EFBs`]? Last Export Filename
+- [`EFXs`]? Export File Filter.
+- [`ENCi`]? HTML Encoding
+- [`EXPv`.`FCLi`]? Matte Colour
+- [`FNLv`]? Frame Configuration List
+- [`GSLb`]?
+- [`HTMb`]? Export HTML
+- [`HTMi`]? Export HTML Layout
+- [`HTTs`]? HTML Style
+- [`IMDs`]? Image Directory
+- [`LRBi`]? Export Area Bottom
+- [`LRLi`]? Export Area Left
+- [`LRRi`]? Export Area Right
+- [`LRTi`]? Export Area Top
+- [`LSDb`]? HTML Multiple Nav Bars
+- [`LSSi`]? HTML Slice Spacing
+- [`LSUb`]?
+- [`LXDs`]? Last Export Directory
+- [`MCCi`]?
+- [`MCTi`]?
+- [`NM4v`]? HTML Slice Export Names
+- [`NMFv`]? HTML Slice Export Names Frame
+- [`NS0s`]?
+- [`NS1s`]?
+- [`NS2s`]?
+- [`NS3s`]?
+- [`NYSb`]?
+- [`TALi`]?
+- [`TPWi`]?
+- [`TRMb`]? Export Trimmed Images
+- [`XDAb`]?
+- [`XFSi`]? Export Format Selection
+- [`XMDi`]?
 - [`XSZi`]? Export X Size
+- [`XTMi`]? XHTML
 - [`YSZi`]? Export Y Size
 
 ## `EXPv`.`FCLi` Matte **C**o**l**our
@@ -6072,6 +7579,8 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`ZSTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 A **signed** 32-bit number, relating to Bottom.
 
 ## `FALi`
@@ -6079,6 +7588,8 @@ A **signed** 32-bit number, relating to Bottom.
 [`FALi`]: #fali
 
 Parent: [`ZSTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 A **signed** 32-bit number, relating to Left.
 
@@ -6088,6 +7599,8 @@ A **signed** 32-bit number, relating to Left.
 
 Parent: [`ZSTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 A **signed** 32-bit number, relating to Right.
 
 ## `FATi`
@@ -6095,6 +7608,8 @@ A **signed** 32-bit number, relating to Right.
 [`FATi`]: #fati
 
 Parent: [`ZSTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 A **signed** 32-bit number, relating to Top.
 
@@ -6170,10 +7685,12 @@ Observed value range: `0x00000000`..`0x0000006c` (`0`..`108`)
 
 Parent: [`FGYv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Contains:
 
-- [`FNCi`] Fill Gradient Number of Control Points
 - [`FGIv`] (x2 +) Fill Gradient Control Point
+- [`FNCi`] Fill Gradient Number of Control Points
 
 ## `FG1v` **F**ill **G**radient **1** (Alpha)
 
@@ -6181,10 +7698,12 @@ Contains:
 
 Parent: [`FGYv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Contains:
 
-- [`FNCi`] Fill Gradient Number of Control Points
 - [`FGIv`] (x2 +) Fill Gradient Control Point
+- [`FNCi`] Fill Gradient Number of Control Points
 
 ## `FGCi` **F**ill **G**radient Control Point **C**olour
 
@@ -6194,6 +7713,18 @@ Parent: [`FGIv`]
 
 Value range: `0x00000000`..`0xffffffff`
 
+## `FGDb`
+
+[`FGDb`]: #fgdb
+
+Parent: [`FGYv`]
+
+Observed in versions: Adobe Fireworks CS5 - Adobe Fireworks CS6
+
+Values:
+
+- `false`: unknown - TODO
+
 ## `FGIv` **F**ill **G**radient Control Point
 
 [`FGIv`]: #fgiv-fill-gradient-control-point
@@ -6202,8 +7733,8 @@ Parent: [`FG0v`] / [`FG1v`] / [`FGVv`]
 
 Contains:
 
-- [`FGPf`] Fill Gradient Control Point Position
 - [`FGCi`] Fill Gradient Control Point Colour
+- [`FGPf`] Fill Gradient Control Point Position
 
 ## `FGLv` **F**ill **G**radient
 
@@ -6213,9 +7744,9 @@ Parent: [`FPLv`] / [`GLDv`]
 
 Contains:
 
-- [`CATs`] Category
-- [`INMs`] Internal Name
+- [`CATs`] Category Name
 - [`FGVv`] Fill Gradient Vertices
+- [`INMs`] Internal Name
 - [`FGYv`]? Fill Gradient RGB + Alpha
 - [`UNMs`]? User-facing Name
 
@@ -6237,8 +7768,8 @@ Used by old versions; has a single list of stops with RGBA values at each stop. 
 
 Contains:
 
-- [`FNCi`] Fill Gradient Number of Control Points
 - [`FGIv`] (x2 +) Fill Gradient Control Point
+- [`FNCi`] Fill Gradient Number of Control Points
 
 ## `FGYv` **F**ill **G**radient RGB + Alpha
 
@@ -6246,18 +7777,23 @@ Contains:
 
 Parent: [`FGLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Used by newer versions; has separate RGB and Alpha gradients. Replaces [`FGVv`].
 
 Contains:
 
 - [`FG0v`] Fill Gradient 0 (RGB)
 - [`FG1v`] Fill Gradient 1 (Alpha)
+- [`FGDb`]?
 
 ## `FILs` **L**abel
 
 [`FILs`]: #fils-label
 
-Parent: [`ALSv`] / [`ISSv`] / [`URLv`]
+Parent: [`ALSv`] / [`ISSv`] / [`MSTv`] / [`URLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5
 
 ## `FLDv` **F**i**l**l Type **D**efinitions
 
@@ -6325,8 +7861,8 @@ Parent: [`FNLv`]
 
 Contains:
 
-- [`FNPi`]
 - [`FNDi`] Frame Duration
+- [`FNPi`]
 - [`VISb`] Visible
 - [`OBNs`]? Object Name
 
@@ -6339,12 +7875,15 @@ Parent: [`FNMv`]
 Values:
 
 - `0`: unknown - TODO
+- `1`: unknown - TODO
 
 ## `FOAb`
 
 [`FOAb`]: #foab
 
 Parent: [`TXTv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 Values:
 
@@ -6357,59 +7896,7 @@ Values:
 
 Parent: [`BEHv`] / [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
-Values:
-
-- ``
-- `Arial`
-- `Arial Black`
-- `Arial-Black`
-- `ArialMT`
-- `Arioso`
-- `BalloonEFExtraBold`
-- `BankGothic Md BT`
-- `Batang`
-- `BritannicEFBold`
-- `Brush Script MT`
-- `Cartoon`
-- `Century Gothic`
-- `Chalkboard`
-- `Chalkboard-Bold`
-- `Chaparral Pro`
-- `ChaparralPro-Bold`
-- `Cochin`
-- `Comic Sans MS`
-- `CommunicationPiEF`
-- `Courier New`
-- `Geneva`
-- `GothicI`
-- `GulimChe`
-- `Helvetica`
-- `Helvetica Neue`
-- `HelveticaNeue`
-- `HoratioDMed`
-- `Impact`
-- `Italic`
-- `Lucida Grande`
-- `LucidaGrande`
-- `MS Sans Serif`
-- `Minion Pro`
-- `MinionPro-Regular`
-- `Monotype Corsiva`
-- `Myriad Pro`
-- `MyriadPro-Bold`
-- `MyriadPro-Regular`
-- `OCR A Std`
-- `OCRAStd`
-- `Ringbearer`
-- `Rosewood Std`
-- `RosewoodStd-Regular`
-- `SimHei`
-- `Tekton Pro`
-- `TektonPro-BoldCond`
-- `Times`
-- `Times New Roman`
-- `Verdana`
-- `Verdana, Arial, Helvetica, sans-serif`
+e.g. "Arial Black"
 
 ## `FOTb` **F**ill **O**n **T**op
 
@@ -6430,25 +7917,25 @@ Parent: [`FLDv`] / [`PATv`]
 
 Contains:
 
-- [`CATs`] Category
-- [`INMs`] Internal Name
-- [`UNMs`] User-facing Name
-- [`RDOb`] Read-Only
-- [`FTBi`] Fill Texture Blend
+- [`CATs`] Category Name
 - [`FEFi`] Feather Fill Amount
-- [`FSMi`] Fill Stamping Mode
 - [`FPLv`.`FETi`] Fill Edge Anti-alias
 - [`FRDb`]
 - [`FRRi`]
 - [`FSHi`] Fill Shape
-- [`FSXi`]? Fill Shape Extended
-- [`FGLv`]? Fill Gradient
+- [`FSMi`] Fill Stamping Mode
+- [`FTBi`] Fill Texture Blend
+- [`INMs`] Internal Name
+- [`RDOb`] Read-Only
+- [`UNMs`] User-facing Name
 - [`FD1i`]? Fill Dither Colour 1
 - [`FD2i`]? Fill Dither Colour 2
 - [`FD3i`]? Fill Dither Colour 3
 - [`FD4i`]? Fill Dither Colour 4
 - [`FDTb`]? Fill Dither Transparent
+- [`FGLv`]? Fill Gradient
 - [`FPTv`]? Fill Pattern Tile
+- [`FSXi`]? Fill Shape Extended
 
 ## `FPLv`.`FETi` **F**ill **E**dge An**t**i-alias
 
@@ -6467,10 +7954,13 @@ Values:
 
 Parent: [`FPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Contains:
 
-- [`INMs`] Internal Name
 - [`IMGv`] Image
+- [`INMs`] Internal Name
+- [`UNMs`]? User-facing Name
 
 ## `FRCi` **Fr**ame **C**ount
 
@@ -6505,6 +7995,8 @@ Values:
 [`FRTi`]: #frti-over-while-down-state-number
 
 Parent: [`BEHv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Frame/state number to use as the over-while-down ("hit") state.
 
@@ -6549,6 +8041,8 @@ Values:
 [`FSXi`]: #fsxi-fill-shape-extended
 
 Parent: [`FPLv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Values:
 
@@ -6626,123 +8120,125 @@ Parent: [`MKBv`] / [`MSTv`] / [`PDCv`]
 
 Contains:
 
-- [`GDLb`]? Guides Locked
-- [`GDKi`]? Guides Colour
 - [`GDHv`] Guides Horizontal
 - [`GDVv`] Guides Vertical
+- [`GDKi`]? Guides Colour
+- [`GDLb`]? Guides Locked
 
 ## `GDTv` Nested **D**ic**t**ionary
 
 [`GDTv`]: #gdtv-nested-dictionary
 
-Parent: [`DCEv` "`alrtmsg`"] / [`DCEv` "`constants`"] / [`DCEv` "`custData`"] / [`DCEv` "`origPoints3D`"] / [`DCEv` "`origPoints3D`"."`p0`"] / [`DCEv` "`origPoints3D`"."`p1`"] / [`DCEv` "`origPoints3D`"."`p2`"] / [`DCEv` "`origPoints3D`"."`p3`"] / [`DCEv` "`origPoints3D`"."`p4`"] / [`DCEv` "`origPoints3D`"."`p5`"] / [`DCEv` "`origPoints3D`"."`p6`"] / [`DCEv` "`origPoints3D`"."`p7`"] / [`DCEv` "`points3D`"] / [`DCEv` "`points3D`"."`p0`"] / [`DCEv` "`points3D`"."`p1`"] / [`DCEv` "`points3D`"."`p2`"] / [`DCEv` "`points3D`"."`p3`"] / [`DCEv` "`points3D`"."`p4`"] / [`DCEv` "`points3D`"."`p5`"] / [`DCEv` "`points3D`"."`p6`"] / [`DCEv` "`points3D`"."`p7`"] / [`DCEv` "`rotation`"] / [`DCEv` "`toolTips`"] / [`DCEv` "`tooltips`"] / [`GVRv`]
+Parent: [`DCEv`]
+
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS5
 
 Contains:
 
-- [`DCEv` "`points3D`"."`p0`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p0`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p0`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p1`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p1`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p1`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p2`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p2`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p2`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p3`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p3`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p3`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p4`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p4`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p4`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p5`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p5`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p5`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p6`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p6`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p6`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p7`"."`_x`"]?
-- [`DCEv` "`points3D`"."`p7`"."`_y`"]?
-- [`DCEv` "`points3D`"."`p7`"."`_z`"]?
-- [`DCEv` "`points3D`"."`p0`"]?
-- [`DCEv` "`points3D`"."`p1`"]?
-- [`DCEv` "`points3D`"."`p2`"]?
-- [`DCEv` "`points3D`"."`p3`"]?
-- [`DCEv` "`points3D`"."`p4`"]?
-- [`DCEv` "`points3D`"."`p5`"]?
-- [`DCEv` "`points3D`"."`p6`"]?
-- [`DCEv` "`points3D`"."`p7`"]?
+- [`DCEv` "`alrtmsg`"."`maxmsg`"]?
+- [`DCEv` "`alrtmsg`"."`minmsg`"]?
+- [`DCEv` "`constants`"."`maxB`"]?
+- [`DCEv` "`constants`"."`maxNodes`"]?
+- [`DCEv` "`constants`"."`minB`"]?
+- [`DCEv` "`constants`"."`minNodes`"]?
+- [`DCEv` "`constants`"."`ppc`"]?
+- [`DCEv` "`currentValues`"\[\]."`name`"]?
+- [`DCEv` "`currentValues`"\[\]."`type`"]?
+- [`DCEv` "`currentValues`"\[\]."`value`"]?
+- [`DCEv` "`custData`"."`box`"]?
+- [`DCEv` "`custData`"."`head1`"]?
+- [`DCEv` "`custData`"."`head2`"]?
+- [`DCEv` "`custData`"."`none`"]?
+- [`DCEv` "`custData`"."`tail`"]?
+- [`DCEv` "`origPoints3D`"."`p0`"]?
 - [`DCEv` "`origPoints3D`"."`p0`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p0`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p0`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p1`"]?
 - [`DCEv` "`origPoints3D`"."`p1`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p1`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p1`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p2`"]?
 - [`DCEv` "`origPoints3D`"."`p2`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p2`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p2`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p3`"]?
 - [`DCEv` "`origPoints3D`"."`p3`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p3`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p3`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p4`"]?
 - [`DCEv` "`origPoints3D`"."`p4`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p4`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p4`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p5`"]?
 - [`DCEv` "`origPoints3D`"."`p5`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p5`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p5`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p6`"]?
 - [`DCEv` "`origPoints3D`"."`p6`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p6`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p6`"."`_z`"]?
+- [`DCEv` "`origPoints3D`"."`p7`"]?
 - [`DCEv` "`origPoints3D`"."`p7`"."`_x`"]?
 - [`DCEv` "`origPoints3D`"."`p7`"."`_y`"]?
 - [`DCEv` "`origPoints3D`"."`p7`"."`_z`"]?
-- [`DCEv` "`origPoints3D`"."`p0`"]?
-- [`DCEv` "`origPoints3D`"."`p1`"]?
-- [`DCEv` "`origPoints3D`"."`p2`"]?
-- [`DCEv` "`origPoints3D`"."`p3`"]?
-- [`DCEv` "`origPoints3D`"."`p4`"]?
-- [`DCEv` "`origPoints3D`"."`p5`"]?
-- [`DCEv` "`origPoints3D`"."`p6`"]?
-- [`DCEv` "`origPoints3D`"."`p7`"]?
+- [`DCEv` "`points3D`"."`p0`"]?
+- [`DCEv` "`points3D`"."`p0`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p0`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p0`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p1`"]?
+- [`DCEv` "`points3D`"."`p1`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p1`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p1`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p2`"]?
+- [`DCEv` "`points3D`"."`p2`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p2`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p2`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p3`"]?
+- [`DCEv` "`points3D`"."`p3`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p3`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p3`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p4`"]?
+- [`DCEv` "`points3D`"."`p4`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p4`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p4`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p5`"]?
+- [`DCEv` "`points3D`"."`p5`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p5`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p5`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p6`"]?
+- [`DCEv` "`points3D`"."`p6`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p6`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p6`"."`_z`"]?
+- [`DCEv` "`points3D`"."`p7`"]?
+- [`DCEv` "`points3D`"."`p7`"."`_x`"]?
+- [`DCEv` "`points3D`"."`p7`"."`_y`"]?
+- [`DCEv` "`points3D`"."`p7`"."`_z`"]?
 - [`DCEv` "`rotation`"."`_x`"]?
 - [`DCEv` "`rotation`"."`_y`"]?
 - [`DCEv` "`rotation`"."`_z`"]?
-- [`DCEv` "`currentValues`"\[\]."`name`"]?
-- [`DCEv` "`currentValues`"\[\]."`value`"]?
-- [`DCEv` "`currentValues`"\[\]."`type`"]?
-- [`DCEv` "`alrtmsg`"."`maxmsg`"]?
-- [`DCEv` "`alrtmsg`"."`minmsg`"]?
-- [`DCEv` "`constants`"."`maxNodes`"]?
-- [`DCEv` "`constants`"."`minNodes`"]?
-- [`DCEv` "`tooltips`"."`points`"]?
-- [`DCEv` "`tooltips`"."`radius0`"]?
-- [`DCEv` "`tooltips`"."`roundness1`"]?
-- [`DCEv` "`tooltips`"."`radius1`"]?
-- [`DCEv` "`tooltips`"."`roundness2`"]?
-- [`DCEv` "`tooltips`"."`openclose`"]?
-- [`DCEv` "`tooltips`"."`spirals`"]?
-- [`DCEv` "`constants`"."`ppc`"]?
-- [`DCEv` "`constants`"."`maxB`"]?
-- [`DCEv` "`constants`"."`minB`"]?
-- [`DCEv` "`tooltips`"."`reset`"]?
-- [`DCEv` "`tooltips`"."`altopt`"]?
-- [`DCEv` "`tooltips`"."`inner`"]?
-- [`DCEv` "`tooltips`"."`scale`"]?
-- [`DCEv` "`tooltips`"."`sides`"]?
-- [`DCEv` "`tooltips`"."`sections`"]?
-- [`DCEv` "`tooltips`"."`radius`"]?
 - [`DCEv` "`toolTips`"."`angle`"]?
+- [`DCEv` "`toolTips`"."`drag`"]?
+- [`DCEv` "`toolTips`"."`head`"]?
 - [`DCEv` "`toolTips`"."`inch`"]?
 - [`DCEv` "`toolTips`"."`length`"]?
-- [`DCEv` "`toolTips`"."`drag`"]?
-- [`DCEv` "`toolTips`"."`px`"]?
-- [`DCEv` "`toolTips`"."`head`"]?
 - [`DCEv` "`toolTips`"."`of`"]?
+- [`DCEv` "`toolTips`"."`px`"]?
 - [`DCEv` "`toolTips`"."`resize`"]?
-- [`DCEv` "`custData`"."`none`"]?
-- [`DCEv` "`custData`"."`head1`"]?
-- [`DCEv` "`custData`"."`head2`"]?
-- [`DCEv` "`custData`"."`tail`"]?
-- [`DCEv` "`custData`"."`box`"]?
+- [`DCEv` "`tooltips`"."`altopt`"]?
+- [`DCEv` "`tooltips`"."`inner`"]?
+- [`DCEv` "`tooltips`"."`openclose`"]?
+- [`DCEv` "`tooltips`"."`points`"]?
+- [`DCEv` "`tooltips`"."`radius`"]?
+- [`DCEv` "`tooltips`"."`radius0`"]?
+- [`DCEv` "`tooltips`"."`radius1`"]?
+- [`DCEv` "`tooltips`"."`reset`"]?
+- [`DCEv` "`tooltips`"."`roundness1`"]?
+- [`DCEv` "`tooltips`"."`roundness2`"]?
+- [`DCEv` "`tooltips`"."`scale`"]?
+- [`DCEv` "`tooltips`"."`sections`"]?
+- [`DCEv` "`tooltips`"."`sides`"]?
+- [`DCEv` "`tooltips`"."`spirals`"]?
 
 ## `GDVv` **G**ui**d**es **V**ertical
 
@@ -6828,40 +8324,42 @@ Parent: [`MKBv`] / [`MSTv`] / [`PDCv`]
 
 Contains:
 
+- [`GCLi`] Grid Colour
 - [`GOXf`] Grid Offset X
 - [`GOYf`] Grid Offset Y
 - [`GSXf`] Grid Size X
 - [`GSYf`] Grid Size Y
-- [`GCLi`] Grid Colour
 
 ## `GRPv` **Gr**ou**p**
 
 [`GRPv`]: #grpv-group
 
-Parent: [`ELMv`]
+Parent: [`ELMv`] / [`MRMv`]
 
 Contains:
 
-- [`LCKb`]? Lock
-- [`GRTi`] Group Type
 - [`ELMv`] Elements
-- [`OBNs`]? Object Name
+- [`GRTi`] Group Type
+- [`BLDi`]? Blend Mode
 - [`DTAv`]? Data
+- [`EFLv`]? Effect List
 - [`IMGv`]? Image
 - [`ISSv`]? Smart Shape
-- [`EFLv`]? Effect List
-- [`MNAb`]? Mask Not Appear
-- [`VISb`]? Visible
-- [`OPAi`]? Opacity
-- [`MRMv`]?
+- [`LCKb`]? Lock
 - [`LNKb`]? Linked
-- [`BLDi`]? Blend Mode
+- [`MNAb`]? Mask Not Appear
+- [`MRMv`]?
+- [`MRXb`]?
+- [`OBNs`]? Object Name
+- [`OPAi`]? Opacity
+- [`VISb`]? Visible
+- [`ZSNs`]? Saved Style Name
 
 ## `GRTi` **Gr**oup **T**ype
 
 [`GRTi`]: #grti-group-type
 
-Parent: [`GRPv`]
+Parent: [`CSGv`] / [`GRPv`]
 
 Values:
 
@@ -6877,7 +8375,8 @@ Parent: [`EXPv`]
 
 Values:
 
-- `false`: unknown - TODO - observed in all files
+- `false`: unknown - TODO
+- `true`: unknown - TODO
 
 ## `GSXf` **G**rid **S**ize **X**
 
@@ -6897,6 +8396,8 @@ Parent: [`GRDv`]
 
 Parent: [`DCEv` "`currentValues`"] / [`DCEv` "`tags`"]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 Contains:
 
 - [`GDTv`]\* Nested Dictionary
@@ -6906,6 +8407,8 @@ Contains:
 [`HICi`]: #hici-highlight-colour
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 An ARGB colour for the popup menu border highlight.
 
@@ -6918,6 +8421,8 @@ Values:
 [`HIMb`]: #himb
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Values:
 
@@ -6945,7 +8450,7 @@ The height of a raster image.
 
 Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
-Observed value range: `0.3`..`2`
+Observed value range: `0.135`..`16.352`
 
 ## `HTMb` Export **HTM**L
 
@@ -6965,7 +8470,18 @@ Values:
 
 - `0`: HTML and images together
 - `1`: Put images in a subfolder
+- `2`: unknown - TODO
 - `3`: Copy HTML to clipboard
+
+## `HTMs` Export **HTM**L Content
+
+[`HTMs`]: #htms-export-html-content
+
+Parent: [`URLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Macromedia Fireworks MX 2004
+
+HTML content to include in place of this slice when generating a HTML document.
 
 ## `HTTs` **HT**ML S**t**yle
 
@@ -6975,16 +8491,21 @@ Parent: [`EXPv`]
 
 Values:
 
+- ``
 - `AIR`
 - `Dreamweaver`
+- `FrontPage`
 - `Generic`
 - `GoLive`
+- `StuntAction`
 
 ## `IDSb`
 
 [`IDSb`]: #idsb
 
 Parent: [`MSTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Values:
 
@@ -6996,6 +8517,8 @@ Values:
 [`ILLb`]: #illb
 
 Parent: [`MKBv`]
+
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
 Observed in all Fireworks CS4 files, not seen in Fireworks 8 files. Always seems to be `false`.
 
@@ -7015,28 +8538,28 @@ Directory where image was last exported, as a URI beginning with "file://"
 
 [`IMGv`]: #imgv-image
 
-Parent: [`ALSv`] / [`ELMv`] / [`FPTv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
+Parent: [`ALSv`] / [`CSGv`] / [`ELMv`] / [`FPTv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
 
 A raster image, composed of one or more [`mkBT`] tiles. This is typically a "cached" render of vector data (e.g. rendered text)
 
 Contains:
 
-- [`LCKb`]? Lock
-- [`XOFf`] X Offset
-- [`YOFf`] Y Offset
-- [`XLCf`] X Location
-- [`YLCf`] Y Location
-- [`WPXi`] Width Pixels
 - [`HPXi`] Height Pixels
-- [`TSZi`] Tile Size
 - [`TILv`] Tile ID List
+- [`TSZi`] Tile Size
+- [`WPXi`] Width Pixels
+- [`XLCf`] X Location
+- [`XOFf`] X Offset
+- [`YLCf`] Y Location
+- [`YOFf`] Y Offset
+- [`BLDi`]? Blend Mode
 - [`DTAv`]? Data
-- [`VISb`]? Visible
-- [`OBNs`]? Object Name
 - [`EFLv`]? Effect List
 - [`IMGv`]? Image
-- [`BLDi`]? Blend Mode
+- [`LCKb`]? Lock
+- [`OBNs`]? Object Name
 - [`OPAi`]? Opacity
+- [`VISb`]? Visible
 
 ## `IMPb` **I**s **M**aster **P**age
 
@@ -7044,311 +8567,23 @@ Contains:
 
 Parent: [`MKBv`] / [`PDCv`]
 
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
+
 One page can be marked as the "Master Page", which is then referenced by [`MPLv`] nodes in each page (using [`PIDs`])
 
 ## `INMs` **I**nternal **N**a**m**e
 
 [`INMs`]: #inms-internal-name
 
-Parent: [`BPLv`] / [`EFLv`] / [`FGLv`] / [`FPLv`] / [`FPTv`] / [`TXBv`] / [`TXFv`] / [`URLv`]
-
-Values:
-
-- `+Flat`
-- `1-Pixel Hard`
-- `1-Pixel Soft`
-- `1px 30 transparent`
-- `3D Glow`
-- `Accented Edges...`
-- `Add Noise...`
-- `Angled Strokes...`
-- `Auto Levels`
-- `Bars`
-- `Bas Relief...`
-- `Berber Rug`
-- `Bevel Boss...`
-- `Blue Green`
-- `Blue Wave`
-- `Blur`
-- `Blur More`
-- `Brightness/Contrast...`
-- `Bubbles`
-- `Burlap`
-- `Chalk && Charcoal...`
-- `Chiffon`
-- `Chrome...`
-- `Cloth-Blue`
-- `Cloth-Gray`
-- `Cloth-Teal`
-- `Clouds`
-- `Color Fill`
-- `Colored Pencil...`
-- `Confetti`
-- `Conical`
-- `Contour`
-- `Conté Crayon...`
-- `Convert to Alpha`
-- `Cotton`
-- `Course-Orange`
-- `Craquelure...`
-- `Crosshatch 1`
-- `Crosshatch 2`
-- `Crosshatch 3`
-- `Crosshatch...`
-- `Curves...`
-- `DNA`
-- `Dark Flower`
-- `Dark Strokes...`
-- `Difference Clouds`
-- `Diffuse Glow...`
-- `Dots-Small`
-- `Dots-Small 2`
-- `Dots-large`
-- `Dry Brush...`
-- `Edges...`
-- `Elliptical`
-- `Fiber`
-- `Film Grain...`
-- `Find Edges`
-- `Flames`
-- `Gaussian Blur...`
-- `Glass Bubble`
-- `Glass-Textured`
-- `Glass...`
-- `Glowing Edges...`
-- `Goo-Blue`
-- `Grain`
-- `Grain...`
-- `Grass`
-- `Grass-Large`
-- `Grid 1`
-- `Grid 2`
-- `Grid 3`
-- `Grid 4`
-- `Grid 5`
-- `Grid 6`
-- `Grid 7`
-- `Hatch 1`
-- `Hatch 2`
-- `Hatch 3`
-- `Hatch 4`
-- `Hatch 5`
-- `Hue/Saturation...`
-- `Illusion 1`
-- `Illusion 2`
-- `Impressionist-Blue`
-- `Impressionist-Green`
-- `Ink Outlines...`
-- `Inner Glow`
-- `Inner Shadow`
-- `Interlace Soft`
-- `Invert`
-- `Leaves`
-- `Levels...`
-- `Light Panel`
-- `Light Panel 2`
-- `Line Horiz 2`
-- `Line-Diag 1`
-- `Line-Diag 2`
-- `Line-Horiz 1`
-- `Line-Horiz 2`
-- `Line-Horiz 3`
-- `Line-Horiz 4`
-- `Line-Vert 1`
-- `Line-Vert 2`
-- `Line-Vert 3`
-- `Linear Smooth`
-- `Marble...`
-- `Mesh`
-- `Metal`
-- `Metal-Bars`
-- `Metal-Bars-Small`
-- `Metal-Slip`
-- `Metal-Turbine`
-- `Moon`
-- `Mossy Rock`
-- `Motion Blur...`
-- `Motion Trail...`
-- `NN_slash_r08`
-- `Neon Glow...`
-- `Note Paper...`
-- `Ocean Ripple...`
-- `Oil Paint 1`
-- `Oil Paint 2`
-- `Oil Paint 3`
-- `Oilslick`
-- `Onyx`
-- `Paint Blue`
-- `Paint Dark`
-- `Paint Daubs...`
-- `Palette Knife...`
-- `Parchment`
-- `Patchwork...`
-- `Pattern`
-- `Photocopy...`
-- `Photoshop Live Effects`
-- `PhotoshopEffects...`
-- `Piano Keys`
-- `Pinch`
-- `Pits-Green`
-- `Plaid Loose`
-- `Plaid Tight`
-- `Plaster`
-- `Plaster...`
-- `Plastic Wrap...`
-- `Radial`
-- `Radial Blur...`
-- `Rectangular`
-- `Red Amber`
-- `Reticulation...`
-- `Ripple`
-- `Rough Pastels...`
-- `Sand`
-- `Sandpaper`
-- `Satin`
-- `Scratch`
-- `Sharpen`
-- `Sharpen More`
-- `Sienna`
-- `Smear`
-- `Smoky`
-- `Smudge Stick...`
-- `Smudge-Green`
-- `Smudge-Red`
-- `Soft Rounded`
-- `Solid`
-- `Solid Shadow...`
-- `Spatter...`
-- `Spherize...`
-- `Sponge...`
-- `Sprayed Strokes...`
-- `Stamp...`
-- `Static_01`
-- `Sumi-e...`
-- `Swirls`
-- `Swish`
-- `Texturizer...`
-- `Threads 1`
-- `Threads 2`
-- `Threads 3`
-- `Torn Edges...`
-- `Tweed`
-- `Twill`
-- `UNUSED`
-- `Underpainting...`
-- `Unsharp Mask...`
-- `Untitled`
-- `Vein`
-- `Violet`
-- `Viscous Alien Paint`
-- `Waffle`
-- `Water Paper...`
-- `Watercolor...`
-- `Waves`
-- `Weave`
-- `Web Dither`
-- `Wood`
-- `Wood 2`
-- `Wood 3`
-- `Zoom Blur...`
-- `bn_1-Pixel`
-- `bn_1-Pixel Anti-Aliased`
-- `bn_3D`
-- `bn_3D Glow`
-- `bn_Bamboo`
-- `bn_Basic`
-- `bn_Bristle`
-- `bn_Broad Splatter`
-- `bn_Chameleon`
-- `bn_Colored Pencil`
-- `bn_Confetti`
-- `bn_Creamy`
-- `bn_Dark Marker`
-- `bn_Dashed_Basic`
-- `bn_Dashed_Double`
-- `bn_Dashed_Hard`
-- `bn_Dashed_Heavy`
-- `bn_Dashed_Triple`
-- `bn_Dots`
-- `bn_Dotted`
-- `bn_Fluid Splatter`
-- `bn_Fur`
-- `bn_Graphite`
-- `bn_Hard Line`
-- `bn_Hard Rounded`
-- `bn_Heavy`
-- `bn_Highlighter`
-- `bn_Light Marker`
-- `bn_Outline`
-- `bn_Paint Splatter`
-- `bn_Pastel`
-- `bn_Quill`
-- `bn_Rake`
-- `bn_Ribbon`
-- `bn_Soft`
-- `bn_Soft Line`
-- `bn_Soft Rounded`
-- `bn_Splatter`
-- `bn_Squares`
-- `bn_Strands`
-- `bn_Textured`
-- `bn_Textured Bristle`
-- `bn_Thick`
-- `bn_Thin`
-- `bn_Toothpaste`
-- `bn_Toxic Waste`
-- `bn_Viscous Alien Paint`
-- `bn_Wet`
-- `bn_Yarn`
-- `cn_BlackWhite`
-- `cn_BlueRedYellow`
-- `cn_BlueYellowBlue`
-- `cn_Cobalt Blue`
-- `cn_Copper`
-- `cn_Custom`
-- `cn_Emerald Green`
-- `cn_Pastels`
-- `cn_RedBlue`
-- `cn_RedGreenBlue`
-- `cn_Silver`
-- `cn_Spectrum`
-- `cn_VioletOrange`
-- `cn_WhiteBlack`
-- `en_Black_Shadow`
-- `en_Flat`
-- `en_Halo`
-- `en_Inset`
-- `en_Normal`
-- `en_Raise`
-- `en_Ring`
-- `en_Ruffle`
-- `en_Smooth`
-- `en_Smooth_Inverted`
-- `en_Soft`
-- `en_ZigZag`
-- `en_ZigZag2`
-- `fn_Bars`
-- `fn_Conical`
-- `fn_ContourGrad`
-- `fn_Elliptical`
-- `fn_Folds`
-- `fn_Linear`
-- `fn_Normal`
-- `fn_Pattern`
-- `fn_Pinch`
-- `fn_Radial`
-- `fn_Rectangular`
-- `fn_Ripple`
-- `fn_Satin`
-- `fn_Waves`
-- `fn_WebDither`
-- `tmt_stucco4`
+Parent: [`ALSv`] / [`BPLv`] / [`EFLv`] / [`FGLv`] / [`FPLv`] / [`FPTv`] / [`MSTv`] / [`TXBv`] / [`TXFv`] / [`URLv`]
 
 ## `IODb`
 
 [`IODb`]: #iodb
 
 Parent: [`MSTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Values:
 
@@ -7372,6 +8607,8 @@ Values:
 
 Parent: [`LSAv`] / [`LSEv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Values:
 
 - `false`: this is a reference to an element defined elsewhere, based on the [`UIDs`] value (an [`LSAv`])
@@ -7383,12 +8620,15 @@ Values:
 
 Parent: [`GRPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
+
 Contains:
 
+- [`CPSv`] Control Points
 - [`FILs`] Label
 - [`JSVv`] JavaScript Script
 - [`MTXv`] Matrix
-- [`CPSv`] Control Points
+- [`CRSv`]?
 
 ## `ITLb` **It**a**l**ic
 
@@ -7467,13 +8707,16 @@ Parent: [`EXPv`]
 
 Values:
 
-- `90`: unknown - TODO - observed in all files
+- `40`: unknown - TODO
+- `90`: unknown - TODO
 
 ## `JSSs` **J**ava**S**cript **S**ubstring
 
 [`JSSs`]: #jsss-javascript-substring
 
 Parent: [`JSVv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
 
 A fragment of a JavaScript script.
 
@@ -7507,6 +8750,8 @@ Values:
 
 Parent: [`ISSv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
+
 A JavaScript script, potentially split into multiple [`JSSs`] pieces which must be concatenated together (this is to avoid the 65535-byte string length limit of the data format). Used for calculating changes to smart shapes.
 
 Contains:
@@ -7517,9 +8762,9 @@ Contains:
 
 [`KRNf`]: #krnf
 
-Parent: [`TXTv`]
+Parent: [`TFSv`] / [`TXTv`]
 
-Observed value range: `0`..`0`
+Observed value range: `-1`..`0.14`
 
 ## `LAYv` **Lay**er
 
@@ -7532,20 +8777,20 @@ An individual top-level layer. Nested layers use [`LSLv`].
 Contains:
 
 - [`BKGb`]
-- [`URLb`]
+- [`CLLv`] Animation Cell List
 - [`LNMs`] Layer Name
 - [`MSLb`] Special Layer
-- [`CLLv`] Animation Cell List
+- [`URLb`]
+- [`DISb`]? Display
 - [`LLLi`]? Layer Nesting Level
 - [`MCLb`]? Frame Changing Layer
-- [`DISb`]? Display
 - [`VIFv`]? Visibility per Frame
 
 ## `LCKb` **L**o**ck**
 
 [`LCKb`]: #lckb-lock
 
-Parent: [`ALSv`] / [`CELv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`URLv`]
+Parent: [`ALSv`] / [`CELv`] / [`CSGv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`URLv`]
 
 Values:
 
@@ -7571,7 +8816,7 @@ Parent: [`TFSv`] / [`TXTv`] / [`ZSTv`]
 
 Line height, in units defined by [`LDMi`]
 
-Observed value range: `0.8`..`40`
+Observed value range: `0`..`40`
 
 ## `LFAf` **L**e**f**t **A**nchor
 
@@ -7579,9 +8824,9 @@ Observed value range: `0.8`..`40`
 
 Parent: [`TXTv`]
 
-This is the location of the text anchor point, which for left-aligned text or text with an explicit width is typically the same as [`LFTf`]. For centred and right-aligned text without an explicit width, `LFTf` will be set to the left bounds of the text, making it less than `LFAf`. This property is also independent of paragraph indents (see [`PINf`])
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
-Observed value range: `-282`..`962`
+This is the location of the text anchor point, which for left-aligned text or text with an explicit width is typically the same as [`LFTf`]. For centred and right-aligned text without an explicit width, `LFTf` will be set to the left bounds of the text, making it less than `LFAf`. This property is also independent of paragraph indents (see [`PINf`])
 
 ## `LFNs` **F**ile **N**ame
 
@@ -7589,13 +8834,15 @@ Observed value range: `-282`..`962`
 
 Parent: [`MSTv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 Some file path (as a URI) related to the symbol, perhaps a Linked File Name?
 
 ## `LFTf` **L**e**ft**
 
 [`LFTf`]: #lftf-left
 
-Parent: [`CDMv`] / [`NGMv`] / [`NGVv`] / [`RCTv`] / [`TXTv`] / [`URLv`]
+Parent: [`CDMv`] / [`MSVv`] / [`NGMv`] / [`NGVv`] / [`OSSv`] / [`RCTv`] / [`TXTv`] / [`URLv`]
 
 Distance (pixels) from left of container to left of entity.
 
@@ -7605,6 +8852,8 @@ Distance (pixels) from left of container to left of entity.
 
 Parent: [`LAYv`] / [`LSLv`]
 
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
+
 Appears to be the indentation level for the layer, counting from `0` for root-level layers.
 
 ## `LMNi`
@@ -7613,13 +8862,17 @@ Appears to be the indentation level for the layer, counting from `0` for root-le
 
 Parent: [`MSTv`]
 
-Observed value range: `0x00cd7c6a`..`0x7d78b795` (`13466730`..`2105063317`)
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
+Observed value range: `0x00000000`..`0x7f5fad00` (`0`..`2136976640`)
 
 ## `LNKb` **L**i**nk**ed
 
 [`LNKb`]: #lnkb-linked
 
 Parent: [`GRPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 For mask groups, this controls whether the mask moves when the content is moved. Note that this node is never present with a value of `true`; `true` is implied by its absence.
 
@@ -7639,6 +8892,8 @@ Parent: [`LAYv`] / [`LSLv`] / [`MPLv`]
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 Y coordinate of bottom of export area (or not present if entire image is to be exported).
 
 ## `LRLi` Export A**r**ea **L**eft
@@ -7646,6 +8901,8 @@ Y coordinate of bottom of export area (or not present if entire image is to be e
 [`LRLi`]: #lrli-export-area-left
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 X coordinate of left of export area (or not present if entire image is to be exported).
 
@@ -7655,6 +8912,8 @@ X coordinate of left of export area (or not present if entire image is to be exp
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 X coordinate of right of export area (or not present if entire image is to be exported).
 
 ## `LRTi` Export A**r**ea **T**op
@@ -7662,6 +8921,8 @@ X coordinate of right of export area (or not present if entire image is to be ex
 [`LRTi`]: #lrti-export-area-top
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Y coordinate of top of export area (or not present if entire image is to be exported).
 
@@ -7671,12 +8932,14 @@ Y coordinate of top of export area (or not present if entire image is to be expo
 
 Parent: [`LYLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Links to an [`LSEv`] from the [`LSMv`] list in [`MKBv`].
 
 Contains:
 
-- [`UIDs`] Unique ID
 - [`ISPb`] Is Primary
+- [`UIDs`] Unique ID
 
 ## `LSDb` HTML Multiple Nav Bars
 
@@ -7692,13 +8955,15 @@ Parent: [`EXPv`]
 
 Parent: [`LSMv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Same as [`LAYv`] but defines a layer for future reference by [`LSAv`] rather than to display.
 
 Contains:
 
-- [`UIDs`] Unique ID
 - [`ISPb`] Is Primary
 - [`LAYv`] Layer
+- [`UIDs`] Unique ID
 
 ## `LSLv` **L**ayer **S**ub-**L**ayer
 
@@ -7706,18 +8971,20 @@ Contains:
 
 Parent: [`ELMv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 A layer nested inside another layer. Shares the same structure as [`LAYv`].
 
 Contains:
 
 - [`BKGb`]
-- [`URLb`]
-- [`LNMs`] Layer Name
-- [`LLLi`] Layer Nesting Level
-- [`MSLb`] Special Layer
-- [`MCLb`] Frame Changing Layer
-- [`DISb`] Display
 - [`CLLv`] Animation Cell List
+- [`DISb`] Display
+- [`LLLi`] Layer Nesting Level
+- [`LNMs`] Layer Name
+- [`MCLb`] Frame Changing Layer
+- [`MSLb`] Special Layer
+- [`URLb`]
 - [`VIFv`] Visibility per Frame
 
 ## `LSMv` **L**ayer **S**hared Definitions
@@ -7725,6 +8992,8 @@ Contains:
 [`LSMv`]: #lsmv-layer-shared-definitions
 
 Parent: [`MKBv`] / [`PDCv`]
+
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
 Contains definitions of layers which are shared between pages and can be referenced by [`LSAv`] nodes. Appears to always be empty in [`PDCv`] nodes.
 
@@ -7760,6 +9029,8 @@ Values:
 [`LUTs`]: #luts-last-update-time
 
 Parent: [`MSTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Last update time for this symbol, in `d/M/yy HH:mm` format.
 
@@ -7851,6 +9122,8 @@ Parent: [`ATMv`] / [`MTXv`]
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5
+
 Appears to represent a 4-character ASCII string.
 
 Values:
@@ -7874,6 +9147,8 @@ Values:
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5
+
 Image format disambiguation if [`FMTi`] is `3`. Represents a 4-character ASCII string.
 
 Values:
@@ -7889,6 +9164,8 @@ Values:
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 A BGRA (?) colour for the text of highlighted menu items.
 
 Value range: `0x00000000`..`0xffffffff`
@@ -7899,17 +9176,23 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 ## `MITi` **M**enu **I**ndent **T**ext
 
 [`MITi`]: #miti-menu-indent-text
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 ## `MIVb` **M**enu **I**tems **V**ertical
 
 [`MIVb`]: #mivb-menu-items-vertical
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Values:
 
@@ -7922,6 +9205,8 @@ Values:
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 ## `MKBv` Document
 
 [`MKBv`]: #mkbv-document
@@ -7932,45 +9217,48 @@ Defines any layer content which is shared between pages (in [`LSMv`] as [`LSEv`]
 
 Contains:
 
+- [`BGCi`] Background Colour
 - [`FRCi`]+ Frame Count
-- [`XLCf`] X Location
-- [`YLCf`] Y Location
-- [`WIDf`] Width
 - [`HITf`] Height
+- [`LYLv`] Layer List
 - [`RESf`] Resolution
 - [`RSUi`] Resolution Unit
-- [`BGCi`] Background Colour
-- [`LYLv`] Layer List
-- [`VRSi`]?
-- [`VRMi`]?
-- [`RQNi`]?
-- [`PLLv`]? Brush Definitions
-- [`FLDv`]? Fill Type Definitions
-- [`GLDv`]? Gradient List Definitions
+- [`WIDf`] Width
+- [`XLCf`] X Location
+- [`YLCf`] Y Location
 - [`EFDv`]? Effect Definitions
-- [`MSLv`]? Symbol Definition List
-- [`ZSLv`]? Saved Style List
-- [`PATv`]? Pattern
 - [`EXPv`]? Export Options
-- [`MNFv`]?
-- [`PGNs`]? Page Name
-- [`IMPb`]? Is Master Page
-- [`PILb`]? Page Is Linked
-- [`PIDs`]? Page ID
-- [`LSMv`]? Layer Shared Definitions
-- [`ILLb`]?
-- [`GRDv`]? Grid
+- [`FLDv`]? Fill Type Definitions
 - [`GDSv`]? Guides
-- [`OSBi`]? Onion Skinning Before Frames
-- [`OSAi`]? Onion Skinning After Frames
+- [`GLDv`]? Gradient List Definitions
+- [`GRDv`]? Grid
+- [`ILLb`]?
+- [`IMPb`]? Is Master Page
+- [`LSMv`]? Layer Shared Definitions
 - [`LXDs`]? Last Export Directory
 - [`LXFs`]? Last Export Filename
+- [`MNFv`]?
+- [`MSLv`]? Symbol Definition List
+- [`MSVv`]?
+- [`OSAi`]? Onion Skinning After Frames
+- [`OSBi`]? Onion Skinning Before Frames
+- [`PATv`]? Pattern
+- [`PGNs`]? Page Name
+- [`PIDs`]? Page ID
+- [`PILb`]? Page Is Linked
+- [`PLLv`]? Brush Definitions
+- [`RQNi`]?
+- [`VRMi`]?
+- [`VRSi`]?
+- [`ZSLv`]? Saved Style List
 
 ## `MNAb` **M**ask **N**ot **A**ppear
 
 [`MNAb`]: #mnab-mask-not-appear
 
 Parent: [`GRPv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 For mask groups, this controls whether the mask image itself is visible (toggled in Fireworks via "Show fill and stroke"). Note that this node is never present with a value of `false`; `false` is implied by its absence.
 
@@ -7993,12 +9281,28 @@ Parent: [`MKBv`] / [`PDCv`]
 Contains:
 
 - [`MNDs`]? Default ALT Tag
+- [`MNTi`]?
+- [`URLv`]? Image Slice / Hotspot
+
+## `MNTi`
+
+[`MNTi`]: #mnti
+
+Parent: [`MNFv`]
+
+Observed in version: Macromedia Fireworks 4.0
+
+Values:
+
+- `1`: unknown - TODO
 
 ## `MOXf`
 
 [`MOXf`]: #moxf
 
 Parent: [`MSTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
 
 Observed value range: `0`..`0`
 
@@ -8008,6 +9312,8 @@ Observed value range: `0`..`0`
 
 Parent: [`MSTv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 Observed value range: `0`..`0`
 
 ## `MPLv` **M**aster **P**age **L**ink
@@ -8016,13 +9322,15 @@ Observed value range: `0`..`0`
 
 Parent: [`LYLv`]
 
+Observed in versions: Adobe Fireworks CS3 - Adobe Fireworks CS4
+
 References all layers from another [`PDCv`] (the "Master Page"), by [`PIDs`]. The referenced layers are atomic, but the whole structure can be displayed / hidden for this specific page as part of the reference.
 
 Contains:
 
-- [`PIDs`] Page ID
 - [`DISb`] Display
 - [`LNMs`] Layer Name
+- [`PIDs`] Page ID
 - [`VIFv`] Visibility per Frame
 
 ## `MRMv`
@@ -8031,26 +9339,49 @@ Contains:
 
 Parent: [`GRPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 Grayscale mask definition ?
 
 Contains:
 
-- [`PTHv`] Path
+- [`GRPv`]? Group
+- [`PTHv`]? Path
+
+## `MRXb`
+
+[`MRXb`]: #mrxb
+
+Parent: [`GRPv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Macromedia Fireworks MX 2004
+
+Values:
+
+- `true`: unknown - TODO
+
+## `MSGs` **M**e**s**sa**g**e
+
+[`MSGs`]: #msgs-message
+
+Parent: [`MSTv`]
+
+Observed in version: Macromedia Fireworks 4.0
 
 ## `MSKv` **M**a**sk**
 
 [`MSKv`]: #mskv-mask
 
-Parent: [`TXBv`] / [`TXFv`]
+Parent: [`MSVv`] / [`OSSv`] / [`TXBv`] / [`TXFv`]
 
 A raster mask, composed of one or more [`mkBT`] tiles.
 
 Contains:
 
-- [`WPXi`] Width Pixels
 - [`HPXi`] Height Pixels
-- [`TSZi`] Tile Size
 - [`TILv`] Tile ID List
+- [`TSZi`] Tile Size
+- [`WPXi`] Width Pixels
 
 ## `MSLb` **S**pecial **L**ayer
 
@@ -8067,7 +9398,7 @@ Values:
 
 [`MSLv`]: #mslv-symbol-definition-list
 
-Parent: [`MKBv`]
+Parent: [`MKBv`] / [`PDCv`]
 
 Contains:
 
@@ -8079,9 +9410,23 @@ Contains:
 
 Parent: [`ALSv`] / [`BEHv`] / [`MSTv`] / [`URLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 A 32-bit number which uniquely defines a symbol / entity in the document. Used to link [`ALSv`] instances to [`MSTv`] definitions, and [`BEHv`] actions to [`URLv`] slices.
 
-Observed value range: `0x00103c95`..`0x7fbbc439` (`1064085`..`2143011897`)
+Observed value range: `0x00000000`..`0x7ffddba1` (`0`..`2147343265`)
+
+## `MSSv`
+
+[`MSSv`]: #mssv
+
+Parent: [`PDCv`]
+
+Observed in version: Adobe Fireworks CS4
+
+Contains:
+
+- [`OSSv`]
 
 ## `MSTv` **S**ymbol Definition
 
@@ -8089,38 +9434,62 @@ Observed value range: `0x00103c95`..`0x7fbbc439` (`1064085`..`2143011897`)
 
 Parent: [`MSLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5.1
+
 A node containing many of the same elements as a page ([`PDCv`]), defining a symbol which can be referenced multiple times in the document by [`ALSv`] nodes with [`MSNi`] IDs.
 
 Contains:
 
-- [`UNMs`] User-facing Name
-- [`MSNi`] Symbol Unique Number
-- [`MOXf`]
-- [`MOYf`]
-- [`LFNs`]? File Name
-- [`LMNi`]?
+- [`ATSb`]
+- [`BGCi`] Background Colour
+- [`DVLb`]
+- [`FRCi`] Frame Count
+- [`GDSv`] Guides
+- [`GRDv`] Grid
+- [`IDSb`]
+- [`IODb`]
 - [`LUTs`] Last Update Time
 - [`LYLv`] Layer List
-- [`GRDv`] Grid
-- [`GDSv`] Guides
-- [`FRCi`] Frame Count
-- [`OSBi`] Onion Skinning Before Frames
+- [`MOXf`]
+- [`MOYf`]
+- [`MSNi`] Symbol Unique Number
 - [`OSAi`] Onion Skinning After Frames
-- [`BGCi`] Background Colour
-- [`ATSb`]
-- [`IDSb`]
-- [`DVLb`]
-- [`IODb`]
+- [`OSBi`] Onion Skinning Before Frames
+- [`UNMs`] User-facing Name
+- [`A2Ts`]? Anchor Link Alt Text
+- [`ALTs`]? Anchor Link Target
+- [`BEVv`]? Behaviour List
+- [`EXPv`]? Export Options
+- [`FILs`]? Label
+- [`INMs`]? Internal Name
+- [`LFNs`]? File Name
+- [`LMNi`]?
+- [`MSGs`]? Message
 - [`MSYi`]? Symbol Type
 - [`NGSv`]? Nine Slice Guide
 - [`WJSs`]? Widget JavaScript
-- [`EXPv`]? Export Options
+
+## `MSVv`
+
+[`MSVv`]: #msvv
+
+Parent: [`MKBv`] / [`PDCv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
+Contains:
+
+- [`LFTf`] Left
+- [`MSKv`] Mask
+- [`TOPf`] Top
 
 ## `MSYi` **S**ymbol T**y**pe
 
 [`MSYi`]: #msyi-symbol-type
 
 Parent: [`MSTv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Graphic symbols omit this node rather than setting it to 0.
 
@@ -8155,6 +9524,8 @@ Contains:
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Defines which of [`DO1i`] / [`DF1i`] .. [`DO3i`] / [`DF3i`] are used
 
 Value range: `0`..`3`
@@ -8165,6 +9536,8 @@ Value range: `0`..`3`
 
 Parent: [`NGSv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 A set of 4 ordered control points for the 9-slice guide: top, bottom, left, right
 
 ## `NGKi` **N**ine Slice **G**uide Colour
@@ -8172,6 +9545,8 @@ A set of 4 ordered control points for the 9-slice guide: top, bottom, left, righ
 [`NGKi`]: #ngki-nine-slice-guide-colour
 
 Parent: [`NGSv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
 
 An ARGB (or BGRA?) colour for the 9-slice guide-lines.
 
@@ -8183,20 +9558,24 @@ Value range: `0x00000000`..`0xffffffff`
 
 Parent: [`NGSv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 ## `NGMv` **N**ine Slice **G**uide Shape Bounds
 
 [`NGMv`]: #ngmv-nine-slice-guide-shape-bounds
 
 Parent: [`NGSv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 Bounds of the symbol's content, relative to the symbol origin.
 
 Contains:
 
-- [`LFTf`] Left
-- [`TOPf`] Top
-- [`RITf`] Right
 - [`BOTf`] Bottom
+- [`LFTf`] Left
+- [`RITf`] Right
+- [`TOPf`] Top
 
 ## `NGSv` **N**ine **S**lice Guide
 
@@ -8204,11 +9583,13 @@ Contains:
 
 Parent: [`MSTv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 Contains:
 
-- [`NGLb`] Nine Slice Guide Locked
-- [`NGKi`] Nine Slice Guide Colour
 - [`NGCf`] (x4) Nine Slice Guide Control
+- [`NGKi`] Nine Slice Guide Colour
+- [`NGLb`] Nine Slice Guide Locked
 - [`NGMv`] Nine Slice Guide Shape Bounds
 - [`NGVv`] Nine Slice Guide Limits
 
@@ -8218,14 +9599,16 @@ Contains:
 
 Parent: [`NGSv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 Bounds of the space available for the 9-slice guide, relative to the symbol origin (defines a space a few pixels larger than the canvas).
 
 Contains:
 
-- [`LFTf`] Left
-- [`TOPf`] Top
-- [`RITf`] Right
 - [`BOTf`] Bottom
+- [`LFTf`] Left
+- [`RITf`] Right
+- [`TOPf`] Top
 
 ## `NM4i` HTML Slice Export **N**a**m**e Part
 
@@ -8290,6 +9673,66 @@ Contains:
 
 - [`NMFi`] (x2) HTML Slice Export Name Frame Part
 
+## `NMSs`
+
+[`NMSs`]: #nmss
+
+Parent: [`OSSv`]
+
+Observed in version: Adobe Fireworks CS4
+
+Values:
+
+- `Default`: unknown - TODO
+
+## `NS0s`
+
+[`NS0s`]: #ns0s
+
+Parent: [`EXPv`]
+
+Observed in versions: Adobe Fireworks CS5 - Adobe Fireworks CS6
+
+Values:
+
+- ``: unknown - TODO
+
+## `NS1s`
+
+[`NS1s`]: #ns1s
+
+Parent: [`EXPv`]
+
+Observed in versions: Adobe Fireworks CS5 - Adobe Fireworks CS6
+
+Values:
+
+- ``: unknown - TODO
+
+## `NS2s`
+
+[`NS2s`]: #ns2s
+
+Parent: [`EXPv`]
+
+Observed in versions: Adobe Fireworks CS5 - Adobe Fireworks CS6
+
+Values:
+
+- ``: unknown - TODO
+
+## `NS3s`
+
+[`NS3s`]: #ns3s
+
+Parent: [`EXPv`]
+
+Observed in versions: Adobe Fireworks CS5 - Adobe Fireworks CS6
+
+Values:
+
+- ``: unknown - TODO
+
 ## `NSDf` **N**ext **S**egment **D**istance
 
 [`NSDf`]: #nsdf-next-segment-distance
@@ -8313,7 +9756,7 @@ Values:
 
 [`OBNs`]: #obns-object-name
 
-Parent: [`ALSv`] / [`CPTv`] / [`FNMv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`URLv`]
+Parent: [`ALSv`] / [`CPTv`] / [`CSGv`] / [`FNMv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`URLv`]
 
 ## `ONCb` **On** **C**ontrol Point
 
@@ -8339,6 +9782,8 @@ Value range: `0` (transparent) .. `1000` (opaque)
 [`OPQb`]: #opqb
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Values:
 
@@ -8377,11 +9822,28 @@ Number of frames before the current frame to display for onion skinning.
 
 Value range: `0`..inf
 
+## `OSSv`
+
+[`OSSv`]: #ossv
+
+Parent: [`MSSv`]
+
+Observed in version: Adobe Fireworks CS4
+
+Contains:
+
+- [`LFTf`] Left
+- [`MSKv`] Mask
+- [`NMSs`]
+- [`TOPf`] Top
+
 ## `OVHb` **Ov**erride **H**eight
 
 [`OVHb`]: #ovhb-override-height
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Values:
 
@@ -8393,6 +9855,8 @@ Values:
 [`OVWb`]: #ovwb-override-width
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Values:
 
@@ -8409,11 +9873,11 @@ Contains multiple colours, each beginning with [`FCLi`] and followed by zero or 
 
 Contains:
 
-- [`FCLi`]\* Fill Colour
-- [`CLLb`]\* Colour Locked
-- [`CLTb`]\* Colour Transparent
-- [`CLMb`]? Colour Mapped
 - [`BCLi`]? Brush Colour
+- [`CLLb`]\* Colour Locked
+- [`CLMb`]? Colour Mapped
+- [`CLTb`]\* Colour Transparent
+- [`FCLi`]\* Fill Colour
 
 ## `PATv` **Pat**tern
 
@@ -8425,10 +9889,10 @@ Contains:
 
 - [`BCLi`] Brush Colour
 - [`FCLi`] Fill Colour
+- [`BPLv`]? Brush Property List
 - [`FPLv`]? Fill Pattern Properties
 - [`TXBv`]? Texture Brush
 - [`TXFv`]? Texture Fill
-- [`BPLv`]? Brush Property List
 
 ## `PBLv` **P**ath **B**ezier **L**ist
 
@@ -8448,8 +9912,8 @@ Parent: [`PBLv`] / [`URLv`]
 
 Contains:
 
-- [`ISCb`] Is Closed
 - [`BSLf`]
+- [`ISCb`] Is Closed
 - [`PPCi`] Path Point Count
 - [`PBTv`]\* Path Bezier Point
 
@@ -8461,17 +9925,17 @@ Parent: [`PBPv`]
 
 Contains:
 
+- [`BZLv`] Bezier Sub-Points List
 - [`XLCf`] X Location
 - [`YLCf`] Y Location
-- [`XPCf`]? X Primary Control
-- [`YPCf`]? Y Primary Control
-- [`XSCf`]? X Secondary Control
-- [`YSCf`]? Y Secondary Control
 - [`CRVb`]? Is Curve
-- [`RNDi`]? Random Seed
 - [`NSDf`]? Next Segment Distance
-- [`BZLv`] Bezier Sub-Points List
 - [`PPLv`]? Path Point List
+- [`RNDi`]? Random Seed
+- [`XPCf`]? X Primary Control
+- [`XSCf`]? X Secondary Control
+- [`YPCf`]? Y Primary Control
+- [`YSCf`]? Y Secondary Control
 
 ## `PCFb`
 
@@ -8501,40 +9965,45 @@ Contains:
 
 Parent: [Root]
 
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
+
 An individual page. Contains frames ("states") and layers. Layers shared to all pages reference a source defined in [`MKBv`].
 
 Contains:
 
-- [`VRSi`]
-- [`VRMi`]
-- [`FRCi`] (x2) Frame Count
-- [`RQNi`]
-- [`XLCf`] X Location
-- [`YLCf`] Y Location
-- [`WIDf`] Width
-- [`HITf`] Height
-- [`RESf`] Resolution
-- [`RSUi`] Resolution Unit
 - [`BGCi`] Background Colour
-- [`PLLv`] Brush Definitions
-- [`FLDv`] Fill Type Definitions
-- [`GLDv`] Gradient List Definitions
 - [`EFDv`] Effect Definitions
-- [`PATv`] Pattern
 - [`EXPv`] Export Options
-- [`MNFv`]
-- [`PGNs`] Page Name
+- [`FLDv`] Fill Type Definitions
+- [`FRCi`] (x2) Frame Count
+- [`GDSv`] Guides
+- [`GLDv`] Gradient List Definitions
+- [`HITf`] Height
 - [`IMPb`] Is Master Page
-- [`PILb`]? Page Is Linked
-- [`PIDs`] Page ID
 - [`LSMv`] Layer Shared Definitions
 - [`LYLv`] Layer List
-- [`GDSv`] Guides
-- [`OSBi`] Onion Skinning Before Frames
+- [`MNFv`]
 - [`OSAi`] Onion Skinning After Frames
+- [`OSBi`] Onion Skinning Before Frames
+- [`PATv`] Pattern
+- [`PGNs`] Page Name
+- [`PIDs`] Page ID
+- [`PLLv`] Brush Definitions
+- [`RESf`] Resolution
+- [`RQNi`]
+- [`RSUi`] Resolution Unit
+- [`VRMi`]
+- [`VRSi`]
+- [`WIDf`] Width
+- [`XLCf`] X Location
+- [`YLCf`] Y Location
+- [`GRDv`]? Grid
 - [`LXDs`]? Last Export Directory
 - [`LXFs`]? Last Export Filename
-- [`GRDv`]? Grid
+- [`MSLv`]? Symbol Definition List
+- [`MSSv`]?
+- [`MSVv`]?
+- [`PILb`]? Page Is Linked
 
 ## `PEXf` Fill **P**oint 2 (**E**) **X**
 
@@ -8566,11 +10035,15 @@ Parent: [`PRIv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
 
 Parent: [`MKBv`] / [`PDCv`]
 
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
+
 ## `PIDs` **P**age **ID**
 
 [`PIDs`]: #pids-page-id
 
 Parent: [`MKBv`] / [`MPLv`] / [`PDCv`]
+
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
 A UUID for the page.
 
@@ -8580,6 +10053,8 @@ A UUID for the page.
 
 Parent: [`MKBv`] / [`PDCv`]
 
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
+
 Marks page as "linked" to the "Master Page". Linked pages are automatically updated with new properties set on the master page (e.g. background colour).
 
 ## `PINf` **P**aragraph **In**dent
@@ -8587,6 +10062,8 @@ Marks page as "linked" to the "Master Page". Linked pages are automatically upda
 [`PINf`]: #pinf-paragraph-indent
 
 Parent: [`TFSv`] / [`TXTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Amount to indent the first line of the paragraph by. This indent is relative to [`LFAf`] and may cause the bounds ([`LFTf`]) to change.
 
@@ -8637,7 +10114,7 @@ Parent: [`EXPv`]
 
 Number of colours actually used in palette.
 
-Observed value range: `0x00000002`..`0x00000100` (`2`..`256`)
+Observed value range: `0x00000000`..`0x00000100` (`0`..`256`)
 
 ## `PLTi` **P**a**l**e**t**te **T**ype
 
@@ -8655,6 +10132,25 @@ Values:
 - `5`: windows
 - `6`: exact
 - `7`: web 216
+
+## `POPi`
+
+[`POPi`]: #popi
+
+Parent: [`PTHv`]
+
+Observed in versions: Adobe Fireworks CS5 - Adobe Fireworks CS6
+
+Values:
+
+- `1`: unknown - TODO
+- `3`: unknown - TODO
+- `17605`: unknown - TODO
+- `6553632`: unknown - TODO
+- `7471221`: unknown - TODO
+- `287513044`: unknown - TODO
+- `1862288896`: unknown - TODO
+- `4294967295`: unknown - TODO
 
 ## `PPCi` **P**ath **P**oint **C**ount
 
@@ -8674,9 +10170,9 @@ List of points defining an interpolated path. The source of truth for this path 
 
 Contains:
 
+- [`PPTv`]+ Path Point
 - [`ISCb`]? Is Closed
 - [`PPCi`]? Path Point Count
-- [`PPTv`]+ Path Point
 
 ## `PPTv` **P**ath **P**oin**t**
 
@@ -8686,19 +10182,21 @@ Parent: [`PPLv`]
 
 Contains:
 
-- [`XLCf`] X Location
-- [`YLCf`] Y Location
 - [`PRSf`] Pressure
 - [`VELf`] Velocity
+- [`XLCf`] X Location
+- [`YLCf`] Y Location
 - [`DURi`]? Duration
-- [`RNDi`] Random Seed
 - [`ONCb`]? On Control Point
+- [`RNDi`]? Random Seed
 
 ## `PREb` **Pre**load
 
 [`PREb`]: #preb-preload
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 If true, target images will be preloaded when the page loads.
 
@@ -8712,17 +10210,29 @@ The source shape and transformation which created the current path. Allows modif
 
 Contains:
 
+- [`MTXv`] Matrix
 - [`PCFb`]
-- [`PSXf`] Fill Point 1 (S) X
-- [`PSYf`] Fill Point 1 (S) Y
 - [`PEXf`] Fill Point 2 (E) X
 - [`PEYf`] Fill Point 2 (E) Y
 - [`PFXf`] Fill Point 3 (F) X
 - [`PFYf`] Fill Point 3 (F) Y
-- [`MTXv`] Matrix
+- [`PSXf`] Fill Point 1 (S) X
+- [`PSYf`] Fill Point 1 (S) Y
 - [`RCTv`] Rectangle
-- [`RDMb`]? Border Radius Maintain
 - [`EFLv`]? Effect List
+- [`RDMb`]? Border Radius Maintain
+
+## `PRPb`
+
+[`PRPb`]: #prpb
+
+Parent: [`PTHv`]
+
+Observed in version: Adobe Fireworks CS6
+
+Values:
+
+- `true`: unknown - TODO
 
 ## `PRSf` **Pr**e**s**sure
 
@@ -8738,6 +10248,8 @@ Value range: `0`..`1`
 
 Parent: [`TFSv`] / [`TXTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Paragraph bottom margin (pixels)
 
 ## `PSBf` **P**aragraph **S**pace **B**efore
@@ -8745,6 +10257,8 @@ Paragraph bottom margin (pixels)
 [`PSBf`]: #psbf-paragraph-space-before
 
 Parent: [`TFSv`] / [`TXTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Paragraph top margin (pixels)
 
@@ -8764,36 +10278,38 @@ Parent: [`PRIv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
 
 [`PTHv`]: #pthv-path
 
-Parent: [`ELMv`] / [`MRMv`] / [`TAPv`]
+Parent: [`CSGv`] / [`ELMv`] / [`MRMv`] / [`TAPv`]
 
 Contains:
 
-- [`LCKb`]? Lock
-- [`PATv`] Pattern
 - [`BRPi`] Brush Placement
-- [`PTTi`] Path Templated
 - [`FOTb`] Fill On Top
-- [`RNDi`] Random Seed
-- [`TOXf`] Texture Offset X
-- [`TOYf`] Texture Offset Y
+- [`PATv`] Pattern
+- [`PBLv`] Path Bezier List
 - [`PCFb`]
-- [`PSXf`] Fill Point 1 (S) X
-- [`PSYf`] Fill Point 1 (S) Y
+- [`PCLv`] Path Contour List
 - [`PEXf`] Fill Point 2 (E) X
 - [`PEYf`] Fill Point 2 (E) Y
 - [`PFXf`] Fill Point 3 (F) X
 - [`PFYf`] Fill Point 3 (F) Y
-- [`PBLv`] Path Bezier List
-- [`PCLv`] Path Contour List
-- [`DTAv`]? Data
-- [`EOFb`]? Even-Odd Fill Rule
+- [`PSXf`] Fill Point 1 (S) X
+- [`PSYf`] Fill Point 1 (S) Y
+- [`PTTi`] Path Templated
+- [`RNDi`] Random Seed
+- [`TOXf`] Texture Offset X
+- [`TOYf`] Texture Offset Y
 - [`AGMb`]?
-- [`IMGv`]? Image
-- [`OBNs`]? Object Name
-- [`EFLv`]? Effect List
-- [`OPAi`]? Opacity
 - [`BLDi`]? Blend Mode
+- [`DTAv`]? Data
+- [`EFLv`]? Effect List
+- [`EOFb`]? Even-Odd Fill Rule
+- [`IMGv`]? Image
+- [`LCKb`]? Lock
+- [`OBNs`]? Object Name
+- [`OPAi`]? Opacity
+- [`POPi`]?
 - [`PRIv`]? Primitive
+- [`PRPb`]?
 - [`VISb`]? Visible
 - [`ZSNs`]? Saved Style Name
 
@@ -8835,17 +10351,19 @@ Parent: [`PRIv`]
 
 Contains:
 
-- [`RDSf`] Border Radius
-- [`LFTf`] Left
-- [`TOPf`] Top
-- [`RITf`] Right
 - [`BOTf`] Bottom
+- [`LFTf`] Left
+- [`RDSf`] Border Radius
+- [`RITf`] Right
+- [`TOPf`] Top
 
 ## `RDMb` Border **R**a**d**ius **M**aintain
 
 [`RDMb`]: #rdmb-border-radius-maintain
 
 Parent: [`PRIv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 [`RDSf`] is always measured as a percentage (0-100), but if this is `true`, it will be recalculated when the shape changes size to maintain an absolute radius size.
 
@@ -8876,6 +10394,8 @@ Value range: `0`..`100` (percent)
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 Values:
 
 - `true`: unknown - TODO
@@ -8893,6 +10413,8 @@ The resolution of the image. Units are specified in [`RSUi`].
 [`RIAf`]: #riaf
 
 Parent: [`TXTv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 `0` if [`ATEb`] is `true` (i.e. if the text box auto-resizes to its content). Otherwise this is a positive integer of unknown meaning (TODO).
 
@@ -8920,6 +10442,8 @@ Observed value range: `-1`..`5`
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 If true, swapped images will automatically be reverted on mouse out.
 
 ## `RNDi` **R**a**nd**om Seed
@@ -8928,13 +10452,15 @@ If true, swapped images will automatically be reverted on mouse out.
 
 Parent: [`PBTv`] / [`PPTv`] / [`PTHv`] / [`TXTv`]
 
-Observed value range: `0x00000000`..`0x71e1fd14` (`0`..`1910635796`)
+Value range: `0x00000000`..`0xffffffff`
 
 ## `ROLi` **Rol**l Behaviour
 
 [`ROLi`]: #roli-roll-behaviour
 
 Parent: [`BEHv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Used by Set Nav Bar behaviour.
 
@@ -8951,7 +10477,7 @@ Values:
 
 Parent: [`MKBv`] / [`PDCv`]
 
-Observed value range: `0x0001184a`..`0x7eb46c2d` (`71754`..`2125753389`)
+Observed value range: `0x0001184a`..`0x7fef22d7` (`71754`..`2146378455`)
 
 ## `RSUi` **R**e**s**olution **U**nit
 
@@ -8972,6 +10498,8 @@ Values:
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SHBi` **S**ensitivity to **H**orizontal on **B**lackness
@@ -8979,6 +10507,8 @@ Value range: `0`..`1000` (per mille)
 [`SHBi`]: #shbi-sensitivity-to-horizontal-on-blackness
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -8988,6 +10518,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SHLi` **S**ensitivity to **H**orizontal on **L**ightness
@@ -8995,6 +10527,8 @@ Value range: `0`..`1000` (per mille)
 [`SHLi`]: #shli-sensitivity-to-horizontal-on-lightness
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9004,6 +10538,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SHRi` **S**ensitivity to **H**orizontal on Scatte**r**
@@ -9011,6 +10547,8 @@ Value range: `0`..`1000` (per mille)
 [`SHRi`]: #shri-sensitivity-to-horizontal-on-scatter
 
 Parent: [`BPLv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9020,6 +10558,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SHZi` **S**ensitivity to **H**orizontal on Si**z**e
@@ -9028,6 +10568,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SPAi` **S**ensitivity to **P**ressure on **A**ngle
@@ -9035,6 +10577,8 @@ Value range: `0`..`1000` (per mille)
 [`SPAi`]: #spai-sensitivity-to-pressure-on-angle
 
 Parent: [`BPLv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9060,6 +10604,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SPOi` **S**ensitivity to **P**ressure on **O**pacity
@@ -9083,6 +10629,8 @@ Value range: `0`..`1000` (per mille)
 [`SPSi`]: #spsi-sensitivity-to-pressure-on-saturation
 
 Parent: [`BPLv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9124,6 +10672,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SROi` **S**ensitivity to **R**andom on **O**pacity
@@ -9164,6 +10714,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SSBi` **S**ensitivity to **S**peed on **B**lackness
@@ -9187,6 +10739,8 @@ Value range: `0`..`1000` (per mille)
 [`SSLi`]: #ssli-sensitivity-to-speed-on-lightness
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9212,6 +10766,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SSZi` **S**ensitivity to **S**peed on Si**z**e
@@ -9228,6 +10784,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SVBi` **S**ensitivity to **V**ertical on **B**lackness
@@ -9235,6 +10793,8 @@ Value range: `0`..`1000` (per mille)
 [`SVBi`]: #svbi-sensitivity-to-vertical-on-blackness
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9244,6 +10804,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SVLi` **S**ensitivity to **V**ertical on **L**ightness
@@ -9251,6 +10813,8 @@ Value range: `0`..`1000` (per mille)
 [`SVLi`]: #svli-sensitivity-to-vertical-on-lightness
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9260,6 +10824,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SVRi` **S**ensitivity to **V**ertical on Scatte**r**
@@ -9267,6 +10833,8 @@ Value range: `0`..`1000` (per mille)
 [`SVRi`]: #svri-sensitivity-to-vertical-on-scatter
 
 Parent: [`BPLv`]
+
+Observed in version: Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9276,6 +10844,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`BPLv`]
 
+Observed in version: Adobe Fireworks CS4
+
 Value range: `0`..`1000` (per mille)
 
 ## `SVZi` **S**ensitivity to **V**ertical on Si**z**e
@@ -9283,6 +10853,8 @@ Value range: `0`..`1000` (per mille)
 [`SVZi`]: #svzi-sensitivity-to-vertical-on-size
 
 Parent: [`BPLv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Value range: `0`..`1000` (per mille)
 
@@ -9292,6 +10864,8 @@ Value range: `0`..`1000` (per mille)
 
 Parent: [`TXTv`] / [`ZSTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Value range: `0`..`255`
 
 ## `TA2i` **T**ext **A**nti-Aliasing Strength
@@ -9299,6 +10873,8 @@ Value range: `0`..`255`
 [`TA2i`]: #ta2i-text-anti-aliasing-strength
 
 Parent: [`TXTv`] / [`ZSTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Value range: `0`..`255`
 
@@ -9322,15 +10898,20 @@ Values:
 
 Parent: [`EXPv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Values:
 
 - `0`: unknown - TODO
+- `1`: unknown - TODO
 
 ## `TAMi` **T**ext **A**lign**m**ent
 
 [`TAMi`]: #tami-text-alignment
 
 Parent: [`TAPv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
 
 Controls text orientation when following a path.
 
@@ -9347,17 +10928,21 @@ Values:
 
 Parent: [`TXTv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS4
+
 Contains:
 
-- [`TAMi`] Text Alignment
 - [`CHOf`] Character Offset
 - [`PTHv`] Path
+- [`TAMi`] Text Alignment
 
 ## `TDTs` Cell (**TD**) **T**ext
 
 [`TDTs`]: #tdts-cell-td-text
 
 Parent: [`URLv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
 
 ## `TFSv` **T**ext **F**ormatted **S**tring
 
@@ -9369,28 +10954,31 @@ Contains a list of formatting operations and text runs.
 
 Contains:
 
-- [`FONs`]\* Font Family
-- [`PTSf`]\* Font Point Size
-- [`BOLb`]\* Bold
-- [`ITLb`]\* Italic
-- [`UNDb`]\* Underline
-- [`HSCf`]\* Horizontal Scale
-- [`RKNf`]\* Kerning
 - [`BLSf`]\* Baseline Shift
-- [`LEDf`]\* Leading (Line Height)
-- [`LDMi`]\* Leading Mode
-- [`JSTi`]\* Justification
+- [`BOLb`]\* Bold
 - [`FCLi`]\* Fill Colour
+- [`FONs`]\* Font Family
+- [`HSCf`]\* Horizontal Scale
+- [`ITLb`]\* Italic
+- [`JSTi`]\* Justification
+- [`KRNf`]\*
+- [`LDMi`]\* Leading Mode
+- [`LEDf`]\* Leading (Line Height)
 - [`PINf`]\* Paragraph Indent
-- [`PSBf`]\* Paragraph Space Before
 - [`PSAf`]\* Paragraph Space After
-- [`TRNs`]+ Text Run
+- [`PSBf`]\* Paragraph Space Before
+- [`PTSf`]\* Font Point Size
+- [`RKNf`]\* Kerning
+- [`TRNs`]\* Text Run
+- [`UNDb`]\* Underline
 
 ## `TFTi` **T**ext **F**low
 
 [`TFTi`]: #tfti-text-flow
 
 Parent: [`TXTv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 Values:
 
@@ -9404,6 +10992,8 @@ Values:
 [`TIAb`]: #tiab
 
 Parent: [`ZSTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Values:
 
@@ -9429,6 +11019,7 @@ Contains:
 
 - [`TIDi`]\* Tile ID
 - [`TMCi`]\* Tile Matte Colour
+- [`TMMi`]?
 
 ## `TMCi` **T**ile **M**atte **C**olour
 
@@ -9440,11 +11031,25 @@ Substitute for [`TIDi`] if only a solid colour is required for the tile area. Re
 
 Value range: `0x00000000`..`0xffffffff`
 
+## `TMMi`
+
+[`TMMi`]: #tmmi
+
+Parent: [`TILv`]
+
+Observed in version: Macromedia Fireworks MX 2004
+
+Values:
+
+- `0`: unknown - TODO
+
 ## `TMOi` Menu Delay
 
 [`TMOi`]: #tmoi-menu-delay
 
 Parent: [`BEHv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Menu delay in milliseconds
 
@@ -9454,13 +11059,15 @@ Menu delay in milliseconds
 
 Parent: [`TXTv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
+
 Observed value range: `-82.365051`..`997`
 
 ## `TOPf` **Top**
 
 [`TOPf`]: #topf-top
 
-Parent: [`CDMv`] / [`NGMv`] / [`NGVv`] / [`RCTv`] / [`TXTv`] / [`URLv`]
+Parent: [`CDMv`] / [`MSVv`] / [`NGMv`] / [`NGVv`] / [`OSSv`] / [`RCTv`] / [`TXTv`] / [`URLv`]
 
 Distance (pixels) from top of container to top of entity.
 
@@ -9469,6 +11076,8 @@ Distance (pixels) from top of container to top of entity.
 [`TOSi`]: #tosi-text-anti-aliasing-over-sample
 
 Parent: [`TXTv`] / [`ZSTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Values:
 
@@ -9493,6 +11102,8 @@ Parent: [`PTHv`] / [`TXTv`]
 [`TPWi`]: #tpwi
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Not seen in Fireworks MX files. In Fireworks 8+, this seems to always be `0`
 
@@ -9520,10 +11131,13 @@ Used for parts of text which share formatting options, and also used by [`BEHv`]
 
 Parent: [`URLv`]
 
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5
+
 Values:
 
 - `0`: foreground
 - `2`: background
+- `3`: unknown - TODO
 
 ## `TSZi` **T**ile **S**i**z**e
 
@@ -9544,6 +11158,8 @@ Values:
 
 Parent: [`CPTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
+
 Grab handle config controlled by `toolTipTracksDrag` in JavaScript.
 
 Values:
@@ -9556,6 +11172,8 @@ Values:
 [`TTPs`]: #ttps-tooltip
 
 Parent: [`CPTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS5
 
 ## `TXBv` **T**e**x**ture **B**rush
 
@@ -9590,72 +11208,75 @@ A text entity. The formatted text itself is defined in the [`TFSv`] subnode.
 
 Contains:
 
-- [`LFTf`] Left
-- [`TOPf`] Top
-- [`RITf`] Right
-- [`BOTf`] Bottom
-- [`LFAf`]? Left Anchor
-- [`TOAf`]?
-- [`RIAf`]?
-- [`BOAf`]? Bounds
-- [`TFTi`]? Text Flow
-- [`FOAb`]?
-- [`LCKb`]? Lock
-- [`PATv`] Pattern
-- [`BRPi`] Brush Placement
-- [`PTTi`] Path Templated
-- [`FOTb`] Fill On Top
-- [`RNDi`] Random Seed
-- [`TOXf`] Texture Offset X
-- [`TOYf`] Texture Offset Y
-- [`ORIi`] Orientation
-- [`XFMi`]
-- [`TAAi`] Text Anti-Alias
-- [`TA1i`]? Text Anti-Aliasing Sharpness
-- [`TA2i`]? Text Anti-Aliasing Strength
-- [`TOSi`]? Text Anti-Aliasing Over-Sample
 - [`ATEb`] Auto-Enlarge
 - [`ATKb`] Auto-Kern
-- [`FONs`] Font Family
-- [`CFTs`]? Font Typeface
-- [`PTSf`] Font Point Size
-- [`BOLb`] Bold
-- [`ITLb`] Italic
-- [`UNDb`] Underline
-- [`HSCf`] Horizontal Scale
-- [`KRNf`]
-- [`RKNf`] Kerning
 - [`BLSf`] Baseline Shift
-- [`LEDf`] Leading (Line Height)
-- [`LDMi`] Leading Mode
+- [`BOLb`] Bold
+- [`BOTf`] Bottom
+- [`BRPi`] Brush Placement
+- [`FONs`] Font Family
+- [`FOTb`] Fill On Top
+- [`HSCf`] Horizontal Scale
+- [`ITLb`] Italic
 - [`JSTi`] Justification
-- [`PINf`]? Paragraph Indent
-- [`PSBf`]? Paragraph Space Before
-- [`PSAf`]? Paragraph Space After
+- [`KRNf`]
+- [`LDMi`] Leading Mode
+- [`LEDf`] Leading (Line Height)
+- [`LFTf`] Left
+- [`ORIi`] Orientation
+- [`PATv`] Pattern
+- [`PTSf`] Font Point Size
+- [`PTTi`] Path Templated
+- [`RITf`] Right
+- [`RKNf`] Kerning
+- [`RNDi`] Random Seed
+- [`TAAi`] Text Anti-Alias
 - [`TFSv`] Text Formatted String
+- [`TOPf`] Top
+- [`TOXf`] Texture Offset X
+- [`TOYf`] Texture Offset Y
+- [`UNDb`] Underline
+- [`XFMi`]
+- [`AIDi`]?
+- [`BLDi`]? Blend Mode
+- [`BOAf`]? Bounds
+- [`CFTs`]? Font Typeface
 - [`DTAv`]? Data
+- [`EFLv`]? Effect List
+- [`FOAb`]?
 - [`IMGv`]? Image
+- [`LCKb`]? Lock
+- [`LFAf`]? Left Anchor
 - [`MTXv`]? Matrix
+- [`OBNs`]? Object Name
+- [`OPAi`]? Opacity
 - [`PCFb`]?
-- [`PSXf`]? Fill Point 1 (S) X
-- [`PSYf`]? Fill Point 1 (S) Y
 - [`PEXf`]? Fill Point 2 (E) X
 - [`PEYf`]? Fill Point 2 (E) Y
 - [`PFXf`]? Fill Point 3 (F) X
 - [`PFYf`]? Fill Point 3 (F) Y
-- [`OBNs`]? Object Name
-- [`AIDi`]?
-- [`OPAi`]? Opacity
+- [`PINf`]? Paragraph Indent
+- [`PSAf`]? Paragraph Space After
+- [`PSBf`]? Paragraph Space Before
+- [`PSXf`]? Fill Point 1 (S) X
+- [`PSYf`]? Fill Point 1 (S) Y
+- [`RIAf`]?
+- [`TA1i`]? Text Anti-Aliasing Sharpness
+- [`TA2i`]? Text Anti-Aliasing Strength
 - [`TAPv`]? Text Along Path
-- [`EFLv`]? Effect List
+- [`TFTi`]? Text Flow
+- [`TOAf`]?
+- [`TOSi`]? Text Anti-Aliasing Over-Sample
 - [`VISb`]? Visible
-- [`BLDi`]? Blend Mode
+- [`ZSNs`]? Saved Style Name
 
 ## `UIDs` **U**nique **ID**
 
 [`UIDs`]: #uids-unique-id
 
 Parent: [`LSAv`] / [`LSEv`]
+
+Observed in version: Adobe Fireworks CS4
 
 A UUID which is unique within the file. [`LSAv`] uses this to reference shared content defined in [`LSEv`] nodes.
 
@@ -9674,7 +11295,7 @@ Values:
 
 [`UNMs`]: #unms-user-facing-name
 
-Parent: [`BEHv`] / [`BPLv`] / [`FGLv`] / [`FPLv`] / [`MSTv`] / [`TXFv`]
+Parent: [`BEHv`] / [`BPLv`] / [`EFLv`] / [`FGLv`] / [`FPLv`] / [`FPTv`] / [`MSTv`] / [`TXFv`]
 
 ## `URLb`
 
@@ -9691,42 +11312,47 @@ Values:
 
 [`URLv`]: #urlv-image-slice-hotspot
 
-Parent: [`ELMv`]
+Parent: [`ELMv`] / [`MNFv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5
 
 Contains:
 
-- [`FCLi`] Fill Colour
-- [`URSi`] URL Hotspot Shape
-- [`LFTf`] Left
-- [`TOPf`] Top
-- [`RITf`] Right
 - [`BOTf`] Bottom
-- [`BEVv`]? Behaviour List
-- [`FILs`]? Label
-- [`TSLi`]? Type of Slice
-- [`MSNi`]? Symbol Unique Number
-- [`CBTb`]?
-- [`CBRi`]? Cell Background (Slice) Repeat
-- [`CBAi`]? Cell Background (Slice) Attachment
-- [`CBHi`]? Cell Background (Slice) Horizontal Position
-- [`CHVi`]? Cell Horizontal Value
-- [`CBVi`]? Cell Background (Slice) Vertical Position
-- [`CVVi`]? Cell Vertical Value
-- [`DTAv`]? Data
-- [`LCKb`]? Lock
-- [`TDTs`]? Cell (TD) Text
-- [`INMs`]? Internal Name
+- [`FCLi`] Fill Colour
+- [`LFTf`] Left
+- [`RITf`] Right
+- [`TOPf`] Top
+- [`URSi`] URL Hotspot Shape
 - [`A2Ts`]? Anchor Link Alt Text
 - [`ALTs`]? Anchor Link Target
-- [`PBPv`]? Path Bezier Points
-- [`OBNs`]? Object Name
+- [`BEVv`]? Behaviour List
+- [`CBAi`]? Cell Background (Slice) Attachment
+- [`CBHi`]? Cell Background (Slice) Horizontal Position
+- [`CBRi`]? Cell Background (Slice) Repeat
+- [`CBTb`]?
+- [`CBVi`]? Cell Background (Slice) Vertical Position
+- [`CHVi`]? Cell Horizontal Value
+- [`CVVi`]? Cell Vertical Value
+- [`DTAv`]? Data
 - [`EXPv`]? Export Options
+- [`FILs`]? Label
+- [`HTMs`]? Export HTML Content
+- [`INMs`]? Internal Name
+- [`LCKb`]? Lock
+- [`MSNi`]? Symbol Unique Number
+- [`OBNs`]? Object Name
+- [`PBPv`]? Path Bezier Points
+- [`TDTs`]? Cell (TD) Text
+- [`TSLi`]? Type of Slice
 
 ## `URSi` **UR**L Hotspot **S**hape
 
 [`URSi`]: #ursi-url-hotspot-shape
 
 Parent: [`URLv`]
+
+Observed in versions: Macromedia Fireworks 4.0 - Adobe Fireworks CS5
 
 Values:
 
@@ -9748,6 +11374,8 @@ Observed value range: `0`..`3.644531`
 
 Parent: [`BEHv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
 Values:
 
 - `1`: unknown - TODO
@@ -9768,13 +11396,15 @@ Contains:
 
 [`VISb`]: #visb-visible
 
-Parent: [`CELv`] / [`CPTv`] / [`FNMv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`VIFv`]
+Parent: [`ALSv`] / [`CELv`] / [`CPTv`] / [`CSGv`] / [`FNMv`] / [`GRPv`] / [`IMGv`] / [`PTHv`] / [`TXTv`] / [`VIFv`]
 
 ## `VRMi`
 
 [`VRMi`]: #vrmi
 
 Parent: [`MKBv`] / [`PDCv`]
+
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
 Not seen in Fireworks 8 files.
 
@@ -9787,6 +11417,8 @@ Values:
 [`VRSi`]: #vrsi
 
 Parent: [`MKBv`] / [`PDCv`]
+
+Observed in versions: Macromedia Fireworks 8 - Adobe Fireworks CS6
 
 Not seen in Fireworks 8 files.
 
@@ -9809,11 +11441,15 @@ The width of the document (pixels).
 
 Parent: [`MSTv`]
 
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
+
 ## `WPVs` **W**idget **P**arameter **V**alues
 
 [`WPVs`]: #wpvs-widget-parameter-values
 
 Parent: [`ALSv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS4
 
 Possibly a legacy version of [`DTAv`], using the format `name1&|&value1&|&type1&;&name2&|&value2&|&type2` (i.e. `&;&` separates fields, `&|&` separates properties within a field, and each field is defined by a name, value, and type).
 
@@ -9916,13 +11552,17 @@ Parent: [`PBTv`]
 
 Parent: [`BEHv`]
 
-Observed value range: `-5`..`-5`
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
+Observed value range: `-134`..`-5`
 
 ## `XSZi` Export **X** **S**i**z**e
 
 [`XSZi`]: #xszi-export-x-size
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Width (in pixels) of the exported image, if [`CNSb`] is `true`.
 
@@ -9931,6 +11571,8 @@ Width (in pixels) of the exported image, if [`CNSb`] is `true`.
 [`XTMi`]: #xtmi-xhtml
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 Values:
 
@@ -9969,13 +11611,17 @@ Parent: [`PBTv`]
 
 Parent: [`BEHv`]
 
-Observed value range: `7`..`7`
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
+
+Observed value range: `7`..`28`
 
 ## `YSZi` Export **Y** **S**i**z**e
 
 [`YSZi`]: #yszi-export-y-size
 
 Parent: [`EXPv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS4
 
 Height (in pixels) of the exported image, if [`CNSb`] is `true`.
 
@@ -9985,9 +11631,13 @@ Height (in pixels) of the exported image, if [`CNSb`] is `true`.
 
 Parent: [`ZSTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Values:
 
+- `432`: unknown - TODO
 - `447`: unknown - TODO
+- `508`: unknown - TODO
 - `511`: unknown - TODO
 
 ## `ZSLv` Saved **S**tyle **L**ist
@@ -9995,6 +11645,8 @@ Values:
 [`ZSLv`]: #zslv-saved-style-list
 
 Parent: [`MKBv`]
+
+Observed in versions: Adobe Fireworks - Adobe Fireworks CS6
 
 Contains:
 
@@ -10004,7 +11656,9 @@ Contains:
 
 [`ZSNs`]: #zsns-saved-style-name
 
-Parent: [`PTHv`] / [`ZSTv`]
+Parent: [`GRPv`] / [`PTHv`] / [`TXTv`] / [`ZSTv`]
+
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
 
 ## `ZSOi`
 
@@ -10012,8 +11666,11 @@ Parent: [`PTHv`] / [`ZSTv`]
 
 Parent: [`ZSTv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Values:
 
+- `0`: unknown - TODO
 - `8`: unknown - TODO
 - `31`: unknown - TODO
 
@@ -10023,42 +11680,44 @@ Values:
 
 Parent: [`BEHv`] / [`ZSLv`]
 
+Observed in versions: Macromedia Fireworks MX - Adobe Fireworks CS6
+
 Contains:
 
-- [`ZSNs`] Saved Style Name
-- [`ZSFi`]
-- [`ZSOi`]
+- [`ATKb`] Auto-Kern
+- [`BOLb`] Bold
+- [`BRPi`] Brush Placement
+- [`FABi`]
+- [`FALi`]
+- [`FARi`]
+- [`FATi`]
+- [`FONs`] Font Family
+- [`FOTb`] Fill On Top
+- [`HSCf`] Horizontal Scale
+- [`IMGv`] (x2) Image
+- [`ITLb`] Italic
+- [`JSTi`] Justification
+- [`LDMi`] Leading Mode
+- [`LEDf`] Leading (Line Height)
 - [`PATv`] Pattern
-- [`PSXf`] Fill Point 1 (S) X
-- [`PSYf`] Fill Point 1 (S) Y
 - [`PEXf`] Fill Point 2 (E) X
 - [`PEYf`] Fill Point 2 (E) Y
 - [`PFXf`] Fill Point 3 (F) X
 - [`PFYf`] Fill Point 3 (F) Y
-- [`BRPi`] Brush Placement
-- [`FOTb`] Fill On Top
-- [`FALi`]
-- [`FATi`]
-- [`FARi`]
-- [`FABi`]
-- [`EFLv`]? Effect List
-- [`FONs`] Font Family
-- [`CFTs`] Font Typeface
+- [`PSXf`] Fill Point 1 (S) X
+- [`PSYf`] Fill Point 1 (S) Y
 - [`PTSf`] Font Point Size
-- [`BOLb`] Bold
-- [`ITLb`] Italic
-- [`UNDb`] Underline
-- [`JSTi`] Justification
-- [`HSCf`] Horizontal Scale
 - [`RKNf`] Kerning
-- [`LEDf`] Leading (Line Height)
-- [`LDMi`] Leading Mode
-- [`ATKb`] Auto-Kern
-- [`TIAb`]
 - [`TAAi`] Text Anti-Alias
-- [`TA1i`] Text Anti-Aliasing Sharpness
-- [`TA2i`] Text Anti-Aliasing Strength
-- [`TOSi`] Text Anti-Aliasing Over-Sample
-- [`IMGv`] (x2) Image
+- [`TIAb`]
+- [`UNDb`] Underline
+- [`ZSFi`]
+- [`ZSNs`] Saved Style Name
+- [`ZSOi`]
+- [`CFTs`]? Font Typeface
+- [`EFLv`]? Effect List
+- [`TA1i`]? Text Anti-Aliasing Sharpness
+- [`TA2i`]? Text Anti-Aliasing Strength
+- [`TOSi`]? Text Anti-Aliasing Over-Sample
 
 [`mkBT`]: ./Fireworks.md#mkbt

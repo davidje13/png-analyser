@@ -1,50 +1,107 @@
-import { readFileSync } from 'node:fs';
-import { isPNG, readPNG } from '../../src/image/png/png.mjs';
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { join } from 'node:path';
+import { findChunk, isPNG, readPNG } from '../../src/image/png/png.mjs';
 import { makeID } from '../../src/image/png/chunks/private/fireworks/node-info.mjs';
 
+/** @typedef {import('../../src/image/png/chunks/ancillary/shared_text.mjs').textChunk} textChunk */
 /** @typedef {import('../../src/image/png/chunks/private/fireworks/mkTS.mjs').mkTSChunk} mkTSChunk */
 /** @typedef {import('../../src/image/png/chunks/private/fireworks/mkBS.mjs').mkBSChunk} mkBSChunk */
 /** @typedef {import('../../src/image/png/chunks/private/fireworks/tokeniser.mjs').NodeToken} NodeToken */
 
-/** @param {string[]} paths */
-export async function processFiles(paths) {
-	/** @type {{ path: string, mkts: NodeToken, mkbs?: NodeToken }[]} */ const files = [];
+export const ORDERED_VERSIONS = [
+	'Macromedia Fireworks 4.0',
+	'Macromedia Fireworks MX',
+	'Macromedia Fireworks MX 2004',
+	'Macromedia Fireworks MX 2005',
+	'Macromedia Fireworks 8',
+	'Adobe Fireworks',
+	'Adobe Fireworks 9',
+	'Adobe Fireworks CS3',
+	'Adobe Fireworks CS4',
+	'Adobe Fireworks CS5',
+	'Adobe Fireworks CS5.1',
+	'Adobe Fireworks CS6',
+];
 
-	for (const path of paths) {
-		const input = readFileSync(path);
+/** @param {string[]} inputs */
+export async function processFiles(inputs) {
+	/** @type {string[]} */ const filteredPaths = [];
+	/** @type {Map<string, Observed>} */ const nodes = new Map();
+	/** @type {Set<string>} */ const allSoftware = new Set();
+
+	for await (const path of allInputFiles(inputs)) {
+		if (!path.toLowerCase().endsWith('.png')) {
+			continue;
+		}
+		const input = await readFile(path);
 		if (!isPNG(input)) {
 			process.stderr.write(`skipping ${path}: not a PNG\n`);
 			continue;
 		}
 		const png = await readPNG(input);
-		//const software = png.chunks.find((c) => c.name === 'tEXt' && c.keyword === 'Software')?.value ?? 'unknown';
-		/** @type {mkTSChunk | undefined} */ const mkts = png.chunks.find((c) => c.name === 'mkTS');
-		/** @type {mkBSChunk | undefined} */ const mkbs = png.chunks.find((c) => c.name === 'mkBS');
-		if (!mkts?.raw) {
+		/** @type {mkTSChunk | undefined} */ const mkts = findChunk(png, 'mkTS');
+		/** @type {mkBSChunk | undefined} */ const mkbs = findChunk(png, 'mkBS');
+		if (!mkts && !mkbs) {
 			process.stderr.write(`skipping ${path}: not a Fireworks PNG\n`);
 			continue;
 		}
-		files?.push({ path, mkts: mkts.raw, mkbs: mkbs?.raw });
+
+		process.stderr.write(`analysing ${path}...\n`);
+		filteredPaths.push(path);
+
+		const software = findChunk(png, 'tEXt', (/** @type {textChunk} */ c) => c.keyword === 'Software')?.value;
+		if (!software) {
+			process.stderr.write(`software version missing in ${path}\n`);
+		} else if (!ORDERED_VERSIONS.includes(software)) {
+			process.stderr.write(`software version unknown in ${path}: ${software}\n`);
+		}
+		if (software) {
+			allSoftware.add(software);
+		}
+		if (mkbs?.raw) {
+			analyseNodes(software, '', mkbs.raw, nodes);
+		}
+		if (mkts?.raw) {
+			analyseNodes(software, path, mkts.raw, nodes);
+		}
 	}
 
-	/** @type {Map<string, Observed>} */ const nodes = new Map();
-	// mkBS seems to be the same in every file, so just process it once
-	const anyFile = files.values().next().value;
-	if (anyFile?.mkbs) {
-		analyseNodes('', anyFile.mkbs, nodes);
-	}
-	for (const file of files) {
-		process.stderr.write(`analysing ${file.path}...\n`);
-		analyseNodes(file.path, file.mkts, nodes);
-	}
+	return { paths: filteredPaths, nodes, allSoftware };
+}
 
-	return { paths: files.map((f) => f.path), nodes };
+/**
+ * @param {string[]} inputs
+ */
+export async function* allInputFiles(inputs) {
+	for (const input of inputs) {
+		const st = await stat(input);
+		if (st.isDirectory()) {
+			yield* recurFiles(input);
+		} else if (st.isFile()) {
+			yield input;
+		}
+	}
+}
+
+/**
+ * @param {string} dir
+ * @return {AsyncGenerator<string>}
+ */
+export async function* recurFiles(dir) {
+	for (const sub of await readdir(dir, { encoding: 'utf-8', withFileTypes: true })) {
+		if (sub.isDirectory()) {
+			yield* recurFiles(join(dir, sub.name));
+		} else if (sub.isFile()) {
+			yield join(dir, sub.name);
+		}
+	}
 }
 
 /**
  * @typedef {{
  *   id: string;
  *   parents: Set<string>;
+ *   software: Set<string>;
  * } & ({
  *   type: 'v';
  *   values?: Map<string, Set<string>> | undefined;
@@ -65,19 +122,20 @@ export async function processFiles(paths) {
  */
 
 /**
+ * @param {string | undefined} software
  * @param {string} fileID
  * @param {NodeToken} base
  * @param {Map<string, Observed>} output
  * @param {NodeToken[]} path
  * @return {Observed}
  */
-function analyseNodes(fileID, base, output, path = []) {
+function analyseNodes(software, fileID, base, output, path = []) {
 	const fullPath = [...path, base];
 	const id = makeID(fullPath);
 	/** @type {Map<string, number>} */ const curChildren = new Map();
 	if (base.type === 'v') {
 		for (const c of base.value) {
-			const sub = analyseNodes(fileID, c, output, fullPath);
+			const sub = analyseNodes(software, fileID, c, output, fullPath);
 			curChildren.set(sub.id, (curChildren.get(sub.id) ?? 0) + 1);
 			sub.parents.add(id);
 		}
@@ -90,6 +148,7 @@ function analyseNodes(fileID, base, output, path = []) {
 				type: base.type,
 				parents: new Set(),
 				children: new Map([...curChildren].map(([subID, c]) => [subID, { min: c, max: c }])),
+				software: new Set(),
 			};
 		} else {
 			node = /** @type {Observed} */ ({
@@ -97,6 +156,7 @@ function analyseNodes(fileID, base, output, path = []) {
 				type: base.type,
 				parents: new Set(),
 				values: new Map(),
+				software: new Set(),
 			});
 		}
 		output.set(id, node);
@@ -128,6 +188,9 @@ function analyseNodes(fileID, base, output, path = []) {
 			node.values ??= new Map();
 			accum(node.values, v, fileID);
 		}
+	}
+	if (software) {
+		node.software.add(software);
 	}
 	return node;
 }

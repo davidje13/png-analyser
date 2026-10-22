@@ -3,7 +3,7 @@
 import { Writable } from 'node:stream';
 import { createWriteStream } from 'node:fs';
 import { NODE_INFO } from '../../src/image/png/chunks/private/fireworks/node-info.mjs';
-import { processFiles } from './common.mjs';
+import { ORDERED_VERSIONS, processFiles } from './common.mjs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const basedir = dirname(fileURLToPath(import.meta.url));
 const includeDebugFilePaths = Boolean(process.env['FILE_PATHS']);
-const { paths, nodes } = await processFiles(process.argv.slice(2));
+const { paths, nodes, allSoftware } = await processFiles(process.argv.slice(2));
 
 const target = createWriteStream(join(basedir, '..', '..', 'docs', 'FireworksNodes.md'));
 target.write([
@@ -27,7 +27,7 @@ target.write([
 	'means 2 or more. No suffix means it has always been observed to appear',
 	'exactly once.',
 ].join('\n') + '\n\n');
-printInfo(target, nodes, paths, includeDebugFilePaths);
+printInfo(target, nodes, allSoftware, paths, includeDebugFilePaths);
 target.write('[`mkBT`]: ./Fireworks.md#mkbt\n');
 target.close();
 
@@ -57,10 +57,11 @@ function byHuman(a, b) {
 /**
  * @param {Writable} target
  * @param {Map<string, Observed>} nodes
+ * @param {Set<string>} allSoftware
  * @param {string[]} allFiles
  * @param {boolean} includeTODOFilePaths
  */
-function printInfo(target, nodes, allFiles, includeTODOFilePaths) {
+function printInfo(target, nodes, allSoftware, allFiles, includeTODOFilePaths) {
 	const sortedNodes = [...nodes].sort(byKey);
 	const seenNodes = new Set();
 	let hasDCEv = false;
@@ -88,8 +89,22 @@ function printInfo(target, nodes, allFiles, includeTODOFilePaths) {
 			process.stderr.write(`Node with no info: ${id}\n`);
 		}
 		printHeading(target, id, extraInfo?.name, headingLevel);
-		if (info.parents.size) {
+		if (id === 'DCKs' || id === 'DCVs' || id === 'GDTv') {
+			target.write('Parent: [`DCEv`]\n\n'); // avoid useless large list for this node
+		} else if (info.parents.size) {
 			target.write(`Parent: ${[...info.parents].sort().map(idToLink).join(' / ')}\n\n`);
+		}
+		if (!id.startsWith('DCEv.')) {
+			const versions = [...info.software].map((v) => ORDERED_VERSIONS.indexOf(v));
+			const minVersion = Math.min(...versions);
+			const maxVersion = Math.max(...versions);
+			if (minVersion > 0 || maxVersion < ORDERED_VERSIONS.length - 1) {
+				if (minVersion === maxVersion) {
+					target.write(`Observed in version: ${ORDERED_VERSIONS[minVersion] ?? 'unknown'}\n\n`);
+				} else {
+					target.write(`Observed in versions: ${ORDERED_VERSIONS[minVersion] ?? 'unknown'} - ${ORDERED_VERSIONS[maxVersion]}\n\n`);
+				}
+			}
 		}
 		if (extraInfo?.description) {
 			target.write(`${extraInfo.description}\n\n`);
@@ -181,7 +196,7 @@ function printHeading(target, id, name, level) {
  * @param {Observed & { type: 'v' }} info
  */
 function printChildren(target, info) {
-	for (const [subID, c] of info.children) {
+	for (const [subID, c] of [...info.children].sort(childOrder)) {
 		target.write(`- ${idToLink(subID)}`);
 		if (c.min === 1 && c.max === 1) {
 			// exactly one (no annotation)
@@ -202,6 +217,19 @@ function printChildren(target, info) {
 		}
 		target.write('\n');
 	}
+}
+
+/**
+ * @param {[string, { min: number }]} a
+ * @param {[string, { min: number }]} b
+ */
+function childOrder(a, b) {
+	const az = !a[1].min;
+	const bz = !b[1].min;
+	if (az !== bz) {
+		return az ? 1 : -1;
+	}
+	return a[0] > b[0] ? 1 : -1;
 }
 
 /**

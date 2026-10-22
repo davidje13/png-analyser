@@ -4,7 +4,7 @@ import { IMGv } from './IMGv.mjs';
 import { PATv } from './PATv.mjs';
 
 export class ZSTv extends MapNode {
-	//ZSNs = this.required('ZSNs');
+	name = this.optional('ZSNs');
 	//ZSFi = this.required('ZSFi');
 	//ZSOi = this.required('ZSOi');
 	pattern = this.optional('PATv', PATv);

@@ -8,7 +8,7 @@ registerEffect('{3439b08d-1922-11d3-9bde00e02910d580}', {
 		const hue = float(data['hue_amount']) ?? 0;
 		const saturation = (float(data['saturation_amount']) ?? 0) * 0.01;
 		const lightness = (float(data['lightness_amount']) ?? 0) * 0.01;
-		const colourise = data['hls_colorize'] === '1';
+		const colourise = data['hls_colorize'] === '1' || data['hls_colorize'] === 'true';
 
 		/** @type {SVGElement[]} */ const steps = [];
 		if (colourise) {

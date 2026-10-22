@@ -25,6 +25,24 @@ import './chunks/index.mjs';
  */
 export function readChunk(data, pos, filePos, warnings) {
   const d = asDataView(data);
+  if (d.byteLength < pos + 8) {
+    const data = subViewFrom(d, pos);
+    warnings.push('chunk is truncated, or rubbish at end of file');
+    return {
+      type: 0,
+      name: '????',
+      data,
+      filePos,
+      advance: d.byteLength,
+      toString() {
+        return `Invalid chunk fragment: ${printNice(data)}`;
+      },
+      display(summary, content) {
+        summary.append('Invalid chunk fragment');
+        content.append(printNice(data));
+      },
+    };
+  }
   const type = d.getUint32(pos + 4);
   for (let i = 0; i < 4; ++i) {
     const v = (type >>> (i * 8)) & 0xFF;
@@ -144,15 +162,15 @@ export async function parseChunks(chunks, warnings) {
   for (const chunk of chunks) {
     const name = printTag(chunk.type);
     const meta = getChunkInfo(chunk.type);
-    if (!meta) {
+    if (meta) {
+      await meta.read(chunk, state, warnings);
+    } else if (chunk.type) {
       if (chunk.type & 0x20000000) {
         warnings.push(`unknown ancillary chunk ${name}`);
       } else {
         warnings.push(`unknown critical chunk ${name}`);
       }
       chunk.toString = () => debugWrite(asBytes(chunk.data));
-    } else {
-      await meta.read(chunk, state, warnings);
     }
   }
   for (const meta of getAllChunkTypes()) {
