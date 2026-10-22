@@ -9,7 +9,7 @@ Some related formats are also included in very early stages:
 - BMP, ICNS, and ICO images
 
 It can be used as a commandline tool, or as a browser-based tool (PNG input
-only).
+only). Available online at <https://png.davidje13.com/>.
 
 When reading a Fireworks PNG, this tool will extract each page and frame of the
 document, and display them as individual SVGs (which can be saved). Hidden
