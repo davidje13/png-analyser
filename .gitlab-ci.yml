@@ -1,0 +1,46 @@
+image: alpine:latest
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH'
+
+stages:
+  - build
+  - package
+  - deploy
+
+build:
+  stage: build
+  image: node:24
+  script:
+    - npm install-test
+    - apt-get update && apt-get install -y --no-install-recommends zip
+    - npm run build
+  artifacts:
+    name: web
+    expire_in: 20 minutes
+    paths:
+      - web-bundle.zip
+
+sign:
+  stage: package
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  dependencies:
+    - build
+  environment: sign # grant access to SIGNING_KEY and SIGNING_KEY_PASS project variables
+  script:
+    - apk add --update --no-cache openssl
+    - openssl dgst -sha256 -sign "$SIGNING_KEY" -passin "file:$SIGNING_KEY_PASS" -out web-bundle.zip.sign web-bundle.zip
+  artifacts:
+    expire_in: 20 minutes # latest build does not expire until there is a new successful build https://gitlab.com/gitlab-org/gitlab/-/issues/36358#note_2232186823
+    paths:
+      - web-bundle.zip
+      - web-bundle.zip.sign
+
+deploy:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  trigger:
+    # trigger a separate (async) pipeline so that this one will be complete when the deploy server fetches assets
+    include: ci/gitlab-deploy.yml
