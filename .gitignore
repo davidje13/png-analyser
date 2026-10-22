@@ -3,3 +3,5 @@ node_modules/
 *.recoded.png
 testassets/
 research/
+build/
+web-bundle.zip

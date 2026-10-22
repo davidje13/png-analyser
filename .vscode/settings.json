@@ -3,7 +3,8 @@
 	"editor.insertSpaces": false,
 	"files.exclude": {
 		"node_modules": true,
-		"package-lock.json": true
+		"package-lock.json": true,
+		"build": true
 	},
 	"javascript.preferences.quoteStyle": "single",
 	"typescript.preferences.quoteStyle": "single"

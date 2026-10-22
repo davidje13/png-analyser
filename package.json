@@ -5,8 +5,8 @@
   "private": true,
   "bin": "./cli/png.mjs",
   "scripts": {
-    "minify-dependencies": "rollup --config rollup.deps.config.mjs",
-    "start": "npx web-listener . --no-cache",
+    "start": "rm -rf build; mkdir -p build/static && cp web/config.json build/config.json && web-listener -c build/config.json --dir web/static --no-cache --exec 'rollup --config rollup.config.mjs --watch'",
+    "build": "rm -rf build; mkdir -p build && cp -R web/static web/config.json build && rollup --config rollup.config.mjs && cd build && zip -8Xr -n .png - * > ../web-bundle.zip",
     "lint": "tsc",
     "test": "lean-test"
   },

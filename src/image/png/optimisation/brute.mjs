@@ -1,4 +1,4 @@
-import { deflate as deflatePako, deflateRaw as deflateRawPako } from '../../../third-party/pako-deflate.min.mjs';
+import { deflate as deflatePako, deflateRaw as deflateRawPako } from 'pako';
 import { applyFilters, makeFilterTargets } from './filters.mjs';
 import { ByteArrayBuilder } from '../../../data/builder.mjs';
 

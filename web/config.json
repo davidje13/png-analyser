@@ -1,0 +1,32 @@
+{
+	"$schema": "https://davidje13.com/schema/web-listener.1.5.3.json",
+	"servers": [
+		{
+			"port": 8080,
+			"mount": [
+				{
+					"type": "headers",
+					"headers": {
+						"cache-control": "public, max-age=3600, stale-while-revalidate=31536000, stale-if-error=31536000",
+						"content-security-policy": "base-uri 'self'; default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'none'",
+						"x-content-type-options": "nosniff",
+						"referrer-policy": "no-referrer"
+					}
+				},
+				{
+					"type": "files",
+					"path": "/",
+					"dir": "./static",
+					"options": {
+						"negotiation": [
+							{
+								"feature": "encoding",
+								"options": [{ "value": "gzip", "file": "{file}.gz" }]
+							}
+						]
+					}
+				}
+			]
+		}
+	]
+}

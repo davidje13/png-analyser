@@ -1,4 +1,4 @@
-import { constants } from '../../../third-party/pako-deflate.min.mjs';
+import { constants } from 'pako';
 
 /**
  * @typedef {{

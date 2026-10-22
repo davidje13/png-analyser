@@ -11,6 +11,5 @@
     "strictNullChecks": true,
     "noImplicitAny": true
   },
-  "include": ["."],
-  "exclude": ["src/third-party/*.min.mjs"]
+  "include": ["."]
 }
