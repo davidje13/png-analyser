@@ -1,7 +1,7 @@
 import { asDataView } from './utils.mjs';
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
  * @return {Promise<DataView>}
  */
 export async function inflate(data) {
@@ -13,7 +13,7 @@ export async function inflate(data) {
 }
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
  * @return {Promise<DataView>}
  */
 export async function inflateRaw(data) {

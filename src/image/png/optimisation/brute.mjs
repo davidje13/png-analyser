@@ -7,7 +7,7 @@ import { ByteArrayBuilder } from '../../../data/builder.mjs';
  *   level?: -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | undefined;
  *   windowBits?: number | undefined;
  *   memLevel?: number | undefined;
- *   strategy?: number | undefined;
+ *   strategy?: import('pako').Z_Strategy | undefined;
  * }} DeflateFunctionOptions
  *
  * @typedef {(data: Uint8Array, opts: DeflateFunctionOptions) => (ArrayBufferView | undefined)} DeflateFn

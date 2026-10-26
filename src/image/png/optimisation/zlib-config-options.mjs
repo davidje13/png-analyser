@@ -1,10 +1,4 @@
-// constants from https://github.com/nodeca/pako/blob/c43cab1a618613011c6bdbd9af8b9fd825ff55ba/src/zlib/constants.mjs#L52
-// see https://github.com/nodeca/pako/issues/326
-const Z_FILTERED =               1;
-const Z_HUFFMAN_ONLY =           2;
-const Z_RLE =                    3;
-const Z_FIXED =                  4;
-const Z_DEFAULT_STRATEGY =       0;
+import { Z_DEFAULT_STRATEGY, Z_FILTERED, Z_HUFFMAN_ONLY, Z_RLE } from 'pako';
 
 /**
  * @typedef {{
@@ -12,7 +6,7 @@ const Z_DEFAULT_STRATEGY =       0;
  *   level: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
  *   raw?: boolean,
  *   memLevel: number,
- *   strategy: number,
+ *   strategy: import('pako').Z_Strategy,
  *   weight: number,
  * }} ZLibConfigOption
  */
