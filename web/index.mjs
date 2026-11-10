@@ -231,11 +231,12 @@ async function processFile(data, name) {
         } else {
           chosenPalette = paletteSource;
         }
+        const ditherAmount = amount.valueAsNumber;
         ditheredData = quantise(ditherIn, chosenPalette, {
           colourspaceConversion: COLOURSPACES[colspace.selectedIndex].fromSRGB,
           dither: {
             matte: transparent.checked ? -1 : Number.parseInt(matte.value.substring(1), 16),
-            amount: Number.parseFloat(amount.value),
+            amount: Math.max(0, Math.min(1, Number.isNaN(ditherAmount) ? 0 : ditherAmount)),
             diffusion: DIFFUSION_TYPES[diffusion.selectedIndex].value,
             serpentine: serpentine.checked,
           },
