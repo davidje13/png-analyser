@@ -24,11 +24,16 @@ registerChunk('bKGD', { max: 1, notAfter: ['IDAT'], notBefore: ['PLTE'] }, (/** 
       warnings.push(`bKGD length ${chunk.data.byteLength} is not 1`);
     }
     chunk.backgroundIndex = chunk.data.getUint8(0);
+    chunk.toString = () => `background: index ${chunk.backgroundIndex}`;
   } else if (state.ihdr.rgb) {
     chunk.backgroundR = chunk.data.getUint16(0);
     chunk.backgroundG = chunk.data.getUint16(2);
     chunk.backgroundB = chunk.data.getUint16(4);
+    chunk.toString = () => `background: ${chunk.backgroundR}, ${chunk.backgroundG}, ${chunk.backgroundB}`;
   } else {
     chunk.backgroundG = chunk.data.getUint16(0);
+    chunk.toString = () => `background: ${chunk.backgroundG}, ${chunk.backgroundG}, ${chunk.backgroundG}`;
   }
+
+  chunk.display = (summary) => summary.append(chunk.toString());
 });

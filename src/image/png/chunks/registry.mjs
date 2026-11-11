@@ -20,7 +20,7 @@
  * @typedef {{
  *   type: number,
  *   name: string,
- *   data: DataView,
+ *   data: DataView<ArrayBuffer>,
  *   filePos: number,
  *   advance: number,
  *   toString: () => string,

@@ -2,7 +2,7 @@ import { asDataView } from './utils.mjs';
 
 /**
  * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
- * @return {Promise<DataView>}
+ * @return {Promise<DataView<ArrayBuffer>>}
  */
 export async function inflate(data) {
   return asDataView(await new Response(
@@ -14,7 +14,7 @@ export async function inflate(data) {
 
 /**
  * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
- * @return {Promise<DataView>}
+ * @return {Promise<DataView<ArrayBuffer>>}
  */
 export async function inflateRaw(data) {
   return asDataView(await new Response(

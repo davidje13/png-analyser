@@ -41,4 +41,7 @@ registerChunk('tIME', { max: 1 }, (/** @type {tIMEChunk} */ chunk, /** @type {tI
   if (chunk.second > 60) {
     warnings.push(`invalid second ${chunk.second} in tIME chunk`);
   }
+
+  chunk.toString = () => `${chunk.year}-${chunk.month?.toString(10).padStart(2, '0')}-${chunk.day?.toString(10).padStart(2, '0')} ${chunk.hour?.toString(10).padStart(2, '0')}:${chunk.minute?.toString(10).padStart(2, '0')}:${chunk.second?.toString(10).padStart(2, '0')}`;
+  chunk.display = (summary) => summary.append(chunk.toString());
 });

@@ -1,18 +1,18 @@
 /**
  * @param {string} text
- * @return {ArrayBufferView}
+ * @return {ArrayBufferView<ArrayBuffer>}
  */
 export function toLatin1(text) {
   return new Uint8Array(text.split('').map((c) => c.charCodeAt(0)));
 }
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
- * @return {Uint8Array}
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
+ * @return {Uint8Array<ArrayBuffer>}
  */
 export function asBytes(data) {
   if (data instanceof Uint8Array) {
-    return data;
+    return /** @type {Uint8Array<ArrayBuffer>} */ (data);
   } else if (ArrayBuffer.isView(data)) {
     return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
   } else {
@@ -21,12 +21,12 @@ export function asBytes(data) {
 }
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
- * @return {DataView}
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
+ * @return {DataView<ArrayBuffer>}
  */
 export function asDataView(data) {
   if (data instanceof DataView) {
-    return data;
+    return /** @type {DataView<ArrayBuffer>} */ (data);
   } else if (ArrayBuffer.isView(data)) {
     return new DataView(data.buffer, data.byteOffset, data.byteLength);
   } else {
@@ -35,20 +35,20 @@ export function asDataView(data) {
 }
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
  * @param {number} from
- * @return {DataView}
+ * @return {DataView<ArrayBuffer>}
  */
 export function subViewFrom(data, from) {
   return subViewLen(data, from, data.byteLength - from, null);
 }
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
  * @param {number} from
  * @param {number} length
  * @param {string[] | null} warnings
- * @return {DataView}
+ * @return {DataView<ArrayBuffer>}
  */
 export function subViewLen(data, from, length, warnings) {
   if (from < 0 || from + length > data.byteLength || length < 0) {
@@ -70,7 +70,7 @@ export function subViewLen(data, from, length, warnings) {
 
 /**
  * @param {string} encoding
- * @return {(...params: [ArrayBuffer | ArrayBufferView] | [ArrayBuffer | ArrayBufferView, number, number, string[] | null]) => string}
+ * @return {(...params: [ArrayBuffer | ArrayBufferView<ArrayBuffer>] | [ArrayBuffer | ArrayBufferView<ArrayBuffer>, number, number, string[] | null]) => string}
  */
 const makeDecoder = (encoding) => {
   const decoder = new TextDecoder(encoding);
@@ -83,8 +83,29 @@ export const getUTF16LE = makeDecoder('utf-16le');
 export const getUTF16BE = makeDecoder('utf-16be');
 
 /**
- * @param {ArrayBuffer | ArrayBufferView} data
- * @param {ArrayBuffer | ArrayBufferView | number} search
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
+ * @param {number} digits
+ * @param {number=} from
+ * @param {boolean=} fromHalf
+ * @return {number}
+ */
+export function getBinaryCodedDecimal(data, digits, from = 0, fromHalf = false) {
+  const raw = asBytes(data);
+  let r = 0;
+  for (let p = 0; p < digits; ++p) {
+    const shift = p + (fromHalf ? 1 : 0);
+    const v = (raw[from + (shift >>> 1)] >>> (shift & 1 ? 0 : 4)) & 0xF;
+    if (v > 9) {
+      throw new Error('Invalid Binary-Coded-Decimal value');
+    }
+    r = (r * 10) + v;
+  }
+  return r;
+}
+
+/**
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data
+ * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer> | number} search
  * @param {number=} from
  * @return {number}
  */
@@ -113,8 +134,8 @@ export function findIndex(data, search, from = 0) {
 }
 
 /**
- * @param {(ArrayBuffer | ArrayBufferView)[]} datas
- * @return {DataView}
+ * @param {(ArrayBuffer | ArrayBufferView<ArrayBuffer>)[]} datas
+ * @return {DataView<ArrayBuffer>}
  */
 export function concat(datas) {
   const l = datas.reduce((l, data) => l + data.byteLength, 0);

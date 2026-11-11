@@ -74,6 +74,11 @@ registerChunk('IHDR', { min: 1, max: 1 }, (/** @type {IHDRChunk} */ chunk, /** @
   } else if (!mode.bits.includes(chunk.bitDepth)) {
     warnings.push(`non-standard bit depth ${chunk.bitDepth} for colour type ${chunk.colourType} (can use ${mode.bits.join(' / ')})`);
   }
+
+  chunk.display = (summary, content) => {
+    summary.append(`${chunk.width} x ${chunk.height} ${chunk.rgb ? 'RGB' : 'L'}${chunk.alpha ? 'A' : ''}${chunk.indexed ? ' [indexed]' : ''} @${(chunk.bitDepth ?? 0) * (chunk.indexed ? 1 : (chunk.channels?.length ?? 0))}bpp${chunk.interlaceMethod ? ' [interlaced]' : ''}`);
+    content.append(`channels: ${chunk.channels?.join(', ')}\n${chunk.indexed ? 'indexed' : 'not indexed'}`);
+  };
 });
 
 const PERMITTED_MODES = [

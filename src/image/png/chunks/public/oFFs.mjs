@@ -7,11 +7,14 @@ import { registerChunk } from '../registry.mjs';
  * @typedef {import('../registry.mjs').Chunk & {
  *   ppx?: number,
  *   ppy?: number,
- *   unit?: string,
+ *   unit?: { name: string, suffix: string },
  * }} oFFsChunk
  */
 
-const UNITS = ['pixel', 'micrometer'];
+const UNITS = [
+  { name: 'pixel', suffix: 'px' },
+  { name: 'micrometer', suffix: '\u03BCm' },
+];
 
 registerChunk('oFFs', { max: 1, notAfter: ['IDAT'] }, (/** @type {oFFsChunk} */ chunk, /** @type {oFFsState} */ state, warnings) => {
   if (chunk.data.byteLength !== 9) {
@@ -26,4 +29,7 @@ registerChunk('oFFs', { max: 1, notAfter: ['IDAT'] }, (/** @type {oFFsChunk} */ 
   if (!chunk.unit) {
     warnings.push(`non-standard unit ${unit}`);
   }
+
+  chunk.toString = () => `offset: (${chunk.ppx}${chunk.unit?.suffix ?? ''}, ${chunk.ppy}${chunk.unit?.suffix ?? ''})`;
+  chunk.display = (summary) => summary.append(chunk.toString());
 });

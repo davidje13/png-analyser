@@ -14,5 +14,16 @@ registerChunk('sRGB', { max: 1, notAfter: ['iCCP', 'PLTE', 'IDAT'], notBefore: [
     warnings.push(`sRGB length ${chunk.data.byteLength} is not 1`);
   }
   state.srgb = chunk;
-  chunk.renderingIntent = chunk.data.getUint8(0);
+  const renderingIntent = chunk.data.getUint8(0);
+  chunk.renderingIntent = renderingIntent;
+
+  chunk.toString = () => `Rendering intent: ${RENDERING_INTENT.get(renderingIntent) ?? `unknown (${renderingIntent})`}`;
+  chunk.display = (summary) => summary.append(chunk.toString());
 });
+
+const RENDERING_INTENT = new Map([
+  [0, 'Perceptual'],
+  [1, 'Relative colorimetric'],
+  [2, 'Saturation'],
+  [3, 'Absolute colorimetric'],
+]);

@@ -87,7 +87,7 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     }
   }
 
-  /** @type {Uint8Array<ArrayBufferLike>} */ let raw = new Uint8Array(0);
+  let raw = new Uint8Array(0);
   try {
     if (state.isRawZlib) {
       raw = asBytes(await inflateRaw(concat(state.idats.map((c) => c.data))));

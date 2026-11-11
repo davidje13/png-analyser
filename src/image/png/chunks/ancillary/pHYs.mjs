@@ -35,4 +35,5 @@ registerChunk('pHYs', { max: 1, notAfter: ['IDAT'] }, (/** @type {pHYsChunk} */ 
       return `aspect = ${chunk.ppx} : ${chunk.ppy}`;
     }
   };
+  chunk.display = (summary) => summary.append(chunk.toString());
 });
