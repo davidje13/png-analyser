@@ -129,16 +129,17 @@ export function asImageData(image, alpha) {
 /**
  * @param {number} w
  * @param {number} h
+ * @param {CanvasRenderingContext2DSettings} options
  * @return {{ canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D }}
  */
-export function makeCanvas(w, h) {
+export function makeCanvas(w, h, options = {}) {
   if (w < 0 || h < 0) {
     throw new Error(`Invalid canvas size ${w} x ${h}`);
   }
   const canvas = el('canvas');
   canvas.width = w;
   canvas.height = h;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', options);
   if (!ctx) {
     throw new Error('Failed to get 2D context');
   }
