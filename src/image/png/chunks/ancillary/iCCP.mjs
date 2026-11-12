@@ -45,6 +45,7 @@ registerChunk('iCCP', { max: 1, notAfter: ['sRGB', 'PLTE', 'IDAT'], notBefore: [
     }
     try {
       chunk.value = readICCProfile(raw, warnings);
+      state.iccp = chunk;
     } catch (e) {
       warnings.push(`iCCP data is unreadable: ${e}`);
       chunk.value = null;

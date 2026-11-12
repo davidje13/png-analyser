@@ -8,34 +8,34 @@ import { asBytes, getJIS, getLatin1, getUTF8, subViewLen } from '../data/utils.m
  */
 export function readEXIF(data, warnings) {
 	const endianness = data.getUint16(0, false);
-  let littleEndian = false;
-  if (endianness === 0x4D4D) {
-    littleEndian = false;
-  } else if (endianness === 0x4949) {
-    littleEndian = true;
-  } else {
-    const versionTest = data.getUint16(2, false);
-    if (versionTest === 0x002A) {
-      warnings.push('EXIF: Unknown endianness, looks like big endian');
-      littleEndian = false;
-    } else if (versionTest === 0x2A00) {
-      warnings.push('EXIF: Unknown endianness, looks like little endian');
-      littleEndian = true;
-    } else {
-      warnings.push('EXIF: Unknown endianness, guessing big endian');
-    }
-  }
+	let littleEndian = false;
+	if (endianness === 0x4D4D) {
+		littleEndian = false;
+	} else if (endianness === 0x4949) {
+		littleEndian = true;
+	} else {
+		const versionTest = data.getUint16(2, false);
+		if (versionTest === 0x002A) {
+			warnings.push('EXIF: Unknown endianness, looks like big endian');
+			littleEndian = false;
+		} else if (versionTest === 0x2A00) {
+			warnings.push('EXIF: Unknown endianness, looks like little endian');
+			littleEndian = true;
+		} else {
+			warnings.push('EXIF: Unknown endianness, guessing big endian');
+		}
+	}
 
-  const tiffVersion = data.getUint16(2, littleEndian);
-  if (tiffVersion !== 42) {
-    warnings.push('EXIF: Unexpected TIFF version');
-  }
+	const tiffVersion = data.getUint16(2, littleEndian);
+	if (tiffVersion !== 42) {
+		warnings.push('EXIF: Unexpected TIFF version');
+	}
 
-  const tiffImages = readEXIFPart(data, data.getUint32(4, littleEndian), 2, 1, littleEndian, warnings);
+	const tiffImages = readEXIFPart(data, data.getUint32(4, littleEndian), 2, 1, littleEndian, warnings);
 
 	return {
 		toString() {
-			return tiffImages.map((img, i) => `- ${['metadata', 'thumbnail'][i]}:\n` + printTIFFMeta(img, '  ')).join('\n');
+			return tiffImages.map((img, i) => `- ${['metadata', 'thumbnail'][i]}:\n` + printTIFFMeta(img, '	')).join('\n');
 		},
 		extractThumbnailDataURI() {
 			const pos = findFieldNumber(tiffImages[1], 0x0201);
@@ -74,10 +74,13 @@ function printTIFFMeta(image, indent = '') {
 }
 
 /**
- * @param {TIFFImage} image
+ * @param {TIFFImage | undefined} image
  * @param {number} tag
  */
 function findFieldNumber(image, tag) {
+	if (!image) {
+		return null;
+	}
 	for (const field of image.fields) {
 		if (field.tag === tag) {
 			if (Array.isArray(field.value) && typeof field.value[0] === 'number') {
@@ -97,32 +100,32 @@ function findFieldNumber(image, tag) {
  * @param {string[]} warnings
  */
 function readEXIFPart(data, p, chainLimit, recurLimit, littleEndian, warnings) {
-  /** @type {TIFFImage[]} */
-  const tiffImages = [];
+	/** @type {TIFFImage[]} */
+	const tiffImages = [];
 
-  while (true) {
-    if (p & 1) {
-      warnings.push(`EXIF: TIFF IFD offset is not on a word boundary: ${p}`);
-    }
-    if (p < 8) {
-      warnings.push(`EXIF: TIFF IFD offset overlaps file header: ${p}`);
-    }
+	while (true) {
+		if (p & 1) {
+			warnings.push(`EXIF: TIFF IFD offset is not on a word boundary: ${p}`);
+		}
+		if (p < 8) {
+			warnings.push(`EXIF: TIFF IFD offset overlaps file header: ${p}`);
+		}
 		if (data.byteLength < p + 2) {
 			warnings.push('EXIF: truncated IFD structure');
 			break;
 		}
-    const fieldCount = data.getUint16(p, littleEndian);
+		const fieldCount = data.getUint16(p, littleEndian);
 		if (data.byteLength < p + 2 + fieldCount * 12) {
 			warnings.push('EXIF: truncated IFD structure');
 			break;
 		}
-    /** @type {{ tag: number, type: number, value: unknown }[]} */
-    const fields = [];
-    p += 2;
-    for (let n = 0; n < fieldCount; ++n) {
-      const tag = data.getUint16(p, littleEndian);
-      const type = data.getUint16(p + 2, littleEndian);
-      const typeInfo = TYPE_INFO.get(type);
+		/** @type {{ tag: number, type: number, value: unknown }[]} */
+		const fields = [];
+		p += 2;
+		for (let n = 0; n < fieldCount; ++n) {
+			const tag = data.getUint16(p, littleEndian);
+			const type = data.getUint16(p + 2, littleEndian);
+			const typeInfo = TYPE_INFO.get(type);
 			try {
 				if (!typeInfo) {
 					warnings.push(`EXIF: TIFF field ${tag.toString(16)}.H has unknown type: ${typeInfo} - skipping`);
@@ -165,24 +168,24 @@ function readEXIFPart(data, p, chainLimit, recurLimit, littleEndian, warnings) {
 			} catch (e) {
 				warnings.push(`EXIF: Error reading TIFF field ${tag.toString(16)}.H: ${e}`);
 			}
-      p += 12;
-    }
-    tiffImages.push({ fields });
+			p += 12;
+		}
+		tiffImages.push({ fields });
 
-    if (data.byteLength < p + 4) {
-      warnings.push('EXIF: TIFF structure does not end with null IFD offset');
-      break;
-    }
-    p = data.getUint32(p, littleEndian);
-    if (!p) {
-      break;
-    }
-    // TIFF format allows an infinite loop when reading images, so limit the image count
-    if (tiffImages.length >= chainLimit) {
-      warnings.push(`EXIF: Too many TIFF IFDs; skipping`);
-      break;
-    }
-  }
+		if (data.byteLength < p + 4) {
+			warnings.push('EXIF: TIFF structure does not end with null IFD offset');
+			break;
+		}
+		p = data.getUint32(p, littleEndian);
+		if (!p) {
+			break;
+		}
+		// TIFF format allows an infinite loop when reading images, so limit the image count
+		if (tiffImages.length >= chainLimit) {
+			warnings.push(`EXIF: Too many TIFF IFDs; skipping`);
+			break;
+		}
+	}
 
 	return tiffImages;
 }
@@ -215,7 +218,7 @@ function readMulticode(data, warnings) {
 
 /** @type {Map<number, { name: string, recurse?: boolean, multicode?: boolean, print: (data: any, type: number, indent: string) => unknown }>} */
 const TAGS = new Map([
-  [0x0103, { name: 'Compression', print: (value) => value[0] === 0x8005 ? 'PackBits' : [
+	[0x0103, { name: 'Compression', print: (value) => value[0] === 0x8005 ? 'PackBits' : [
 		null,
 		'Uncompressed',
 		'CCITT Group 3 1-Dimensional Modified Huffman run length encoding',
@@ -224,7 +227,7 @@ const TAGS = new Map([
 		null,
 		'JPEG',
 	][value[0]] ?? `unknown (${value[0]})` }],
-  [0x0112, { name: 'Orientation', print: (value) => [
+	[0x0112, { name: 'Orientation', print: (value) => [
 		null,
 		'x = left to right, y = top to bottom (normal)',
 		'x = right to left, y = top to bottom',
@@ -235,22 +238,22 @@ const TAGS = new Map([
 		'x = bottom to top, y = right to left',
 		'x = bottom to top, y = left to right',
 	][value[0]] ?? `unknown (${value[0]})` }],
-  [0x011A, { name: 'X Resolution', print: (value) => value[0] }],
-  [0x011B, { name: 'Y Resolution', print: (value) => value[0] }],
-  [0x0128, { name: 'Resolution Unit', print: (value) => [null, 'none', 'inch', 'cm'][value[0]] ?? `unknown (${value[0]})` }],
-  [0x0201, { name: 'JPEG Interchange Format Offset', print: (value) => value[0] }],
-  [0x0202, { name: 'JPEG Interchange Format Byte Length', print: (value) => value[0] }],
-  [0x0213, { name: 'YCbCr Positioning', print: (value) => [
+	[0x011A, { name: 'X Resolution', print: (value) => value[0] }],
+	[0x011B, { name: 'Y Resolution', print: (value) => value[0] }],
+	[0x0128, { name: 'Resolution Unit', print: (value) => [null, 'none', 'inch', 'cm'][value[0]] ?? `unknown (${value[0]})` }],
+	[0x0201, { name: 'JPEG Interchange Format Offset', print: (value) => value[0] }],
+	[0x0202, { name: 'JPEG Interchange Format Byte Length', print: (value) => value[0] }],
+	[0x0213, { name: 'YCbCr Positioning', print: (value) => [
 		null,
 		'centred',
 		'co-sited',
 	][value[0]] ?? `unknown (${value[0]})` }],
-  [0x8298, { name: 'Copyright', print: (value) => value }],
-  [0x8769, { name: 'EXIF IFD', recurse: true, print: (value, _, indent) => '\n' + printTIFFMeta(value[0], indent + '  ') }],
-  [0xA002, { name: 'X Dimension', print: (value) => value[0] }],
-  [0xA003, { name: 'Y Dimension', print: (value) => value[0] }],
-  [0x9000, { name: 'EXIF Version', print: (value) => getLatin1(value) }],
-  [0x9101, { name: 'Components Configuration', print: (value) => {
+	[0x8298, { name: 'Copyright', print: (value) => value }],
+	[0x8769, { name: 'EXIF IFD', recurse: true, print: (value, _, indent) => '\n' + printTIFFMeta(value[0], indent + '	') }],
+	[0xA002, { name: 'X Dimension', print: (value) => value[0] }],
+	[0xA003, { name: 'Y Dimension', print: (value) => value[0] }],
+	[0x9000, { name: 'EXIF Version', print: (value) => getLatin1(value) }],
+	[0x9101, { name: 'Components Configuration', print: (value) => {
 		const r = [];
 		for (let i = 0; i < value.byteLength; ++i) {
 			const v = value.getUint8(i);
@@ -258,123 +261,123 @@ const TAGS = new Map([
 		}
 		return r.join(', ');
 	}}],
-  [0x9286, { name: 'User Comment', multicode: true, print: (value) => value }],
-  [0xA000, { name: 'Flashpix Version', print: (value) => getLatin1(value) }],
-  [0xA001, { name: 'Colour Space', print: (value) => value[0] === 1 ? 'sRGB' : value[0] === 0xFFFF ? 'Uncalibrated' : `unknown (${value[0]})` }],
+	[0x9286, { name: 'User Comment', multicode: true, print: (value) => value }],
+	[0xA000, { name: 'Flashpix Version', print: (value) => getLatin1(value) }],
+	[0xA001, { name: 'Colour Space', print: (value) => value[0] === 1 ? 'sRGB' : value[0] === 0xFFFF ? 'Uncalibrated' : `unknown (${value[0]})` }],
 ]);
 
 /** @type {Map<number, { size: number, parse: (data: DataView<ArrayBuffer>, count: number, littleEndian: boolean, warnings: string[]) => unknown }>} */
 const TYPE_INFO = new Map([
-  [1, { size: 1, parse: (data, count) => { // uint8
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getUint8(i));
-    }
-    return r;
-  } }],
-  [2, { size: 1, parse: (data, count, _littleEndian, warnings) => { // ascii (null-terminated)
-    if (data.getUint8(count - 1) !== 0) {
-      warnings.push(`eXIf: ASCII TIFF field does not end with null character`);
-      return getLatin1(data);
-    } else {
-      return getLatin1(data, 0, count - 1, warnings);
-    }
-  } }],
-  [3, { size: 2, parse: (data, count, littleEndian) => { // uint16
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getUint16(i * 2, littleEndian));
-    }
-    return r;
-  } }],
-  [4, { size: 4, parse: (data, count, littleEndian) => { // uint32
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getUint32(i * 4, littleEndian));
-    }
-    return r;
-  } }],
-  [5, { size: 8, parse: (data, count, littleEndian) => { // rational (uint32, uint32)
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(new Rational(
-        data.getUint32(i * 8, littleEndian),
-        data.getUint32(i * 8 + 4, littleEndian),
-      ));
-    }
-    return r;
-  } }],
-  [6, { size: 1, parse: (data, count) => { // int8
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getInt8(i));
-    }
-    return r;
-  } }],
-  [7, { size: 1, parse: (data) => data }], // arbitrary byte
-  [8, { size: 2, parse: (data, count, littleEndian) => { // int16
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getInt16(i * 2, littleEndian));
-    }
-    return r;
-  } }],
-  [9, { size: 4, parse: (data, count, littleEndian) => { // int32
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getInt32(i * 4, littleEndian));
-    }
-    return r;
-  } }],
-  [10, { size: 8, parse: (data, count, littleEndian) => { // signed rational (int32, int32)
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(new Rational(
-        data.getInt32(i * 8, littleEndian),
-        data.getInt32(i * 8 + 4, littleEndian),
-      ));
-    }
-    return r;
-  } }],
-  [11, { size: 4, parse: (data, count, littleEndian) => { // float32
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getFloat32(i * 4, littleEndian));
-    }
-    return r;
-  } }],
-  [12, { size: 8, parse: (data, count, littleEndian) => { // float64
-    const r = [];
-    for (let i = 0; i < count; ++i) {
-      r.push(data.getFloat64(i * 4, littleEndian));
-    }
-    return r;
-  } }],
-  [129, { size: 1, parse: (data, count, _littleEndian, warnings) => { // utf-8 (null-terminated)
-    if (data.getUint8(count - 1) !== 0) {
-      warnings.push(`eXIf: UTF-8 TIFF field does not end with null character`);
-      return getUTF8(data);
-    } else {
-      return getUTF8(data, 0, count - 1, warnings);
-    }
-  } }],
+	[1, { size: 1, parse: (data, count) => { // uint8
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getUint8(i));
+		}
+		return r;
+	} }],
+	[2, { size: 1, parse: (data, count, _littleEndian, warnings) => { // ascii (null-terminated)
+		if (data.getUint8(count - 1) !== 0) {
+			warnings.push(`eXIf: ASCII TIFF field does not end with null character`);
+			return getLatin1(data);
+		} else {
+			return getLatin1(data, 0, count - 1, warnings);
+		}
+	} }],
+	[3, { size: 2, parse: (data, count, littleEndian) => { // uint16
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getUint16(i * 2, littleEndian));
+		}
+		return r;
+	} }],
+	[4, { size: 4, parse: (data, count, littleEndian) => { // uint32
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getUint32(i * 4, littleEndian));
+		}
+		return r;
+	} }],
+	[5, { size: 8, parse: (data, count, littleEndian) => { // rational (uint32, uint32)
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(new Rational(
+				data.getUint32(i * 8, littleEndian),
+				data.getUint32(i * 8 + 4, littleEndian),
+			));
+		}
+		return r;
+	} }],
+	[6, { size: 1, parse: (data, count) => { // int8
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getInt8(i));
+		}
+		return r;
+	} }],
+	[7, { size: 1, parse: (data) => data }], // arbitrary byte
+	[8, { size: 2, parse: (data, count, littleEndian) => { // int16
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getInt16(i * 2, littleEndian));
+		}
+		return r;
+	} }],
+	[9, { size: 4, parse: (data, count, littleEndian) => { // int32
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getInt32(i * 4, littleEndian));
+		}
+		return r;
+	} }],
+	[10, { size: 8, parse: (data, count, littleEndian) => { // signed rational (int32, int32)
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(new Rational(
+				data.getInt32(i * 8, littleEndian),
+				data.getInt32(i * 8 + 4, littleEndian),
+			));
+		}
+		return r;
+	} }],
+	[11, { size: 4, parse: (data, count, littleEndian) => { // float32
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getFloat32(i * 4, littleEndian));
+		}
+		return r;
+	} }],
+	[12, { size: 8, parse: (data, count, littleEndian) => { // float64
+		const r = [];
+		for (let i = 0; i < count; ++i) {
+			r.push(data.getFloat64(i * 4, littleEndian));
+		}
+		return r;
+	} }],
+	[129, { size: 1, parse: (data, count, _littleEndian, warnings) => { // utf-8 (null-terminated)
+		if (data.getUint8(count - 1) !== 0) {
+			warnings.push(`eXIf: UTF-8 TIFF field does not end with null character`);
+			return getUTF8(data);
+		} else {
+			return getUTF8(data, 0, count - 1, warnings);
+		}
+	} }],
 ]);
 
 class Rational {
-  /**
-   * @param {number} num
-   * @param {number} den
-   */
-  constructor(num, den) {
-    this.num = num;
-    this.den = den;
-  }
+	/**
+	 * @param {number} num
+	 * @param {number} den
+	 */
+	constructor(num, den) {
+		this.num = num;
+		this.den = den;
+	}
 
-  valueOf() {
-    return this.num / this.den;
-  }
+	valueOf() {
+		return this.num / this.den;
+	}
 
-  toString() {
-    return `${this.num} / ${this.den}`;
-  }
+	toString() {
+		return `${this.num} / ${this.den}`;
+	}
 }
