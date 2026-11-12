@@ -1,4 +1,4 @@
-import { getJIS, getLatin1, getUTF8, subViewLen } from '../data/utils.mjs';
+import { asBytes, getJIS, getLatin1, getUTF8, subViewLen } from '../data/utils.mjs';
 
 /** @typedef {{ fields: { tag: number, type: number, value: unknown }[] }} TIFFImage */
 
@@ -37,6 +37,25 @@ export function readEXIF(data, warnings) {
 		toString() {
 			return tiffImages.map((img, i) => `- ${['metadata', 'thumbnail'][i]}:\n` + printTIFFMeta(img, '  ')).join('\n');
 		},
+		extractThumbnailDataURI() {
+			const pos = findFieldNumber(tiffImages[1], 0x0201);
+			let size = findFieldNumber(tiffImages[1], 0x0202);
+			if (pos === null) {
+				return null;
+			}
+			if (size === null) {
+				size = data.byteLength - pos;
+			}
+			if (pos < 0 || pos + size > data.byteLength) {
+				return null;
+			}
+			const jpegData = /** @type {{ toBase64?: () => string }} */ (asBytes(subViewLen(data, pos, size, [])));
+			if (jpegData.toBase64) {
+				return `data:image/jpeg;base64,${jpegData.toBase64()}`;
+			} else {
+				return null;
+			}
+		},
 	};
 }
 
@@ -52,6 +71,21 @@ function printTIFFMeta(image, indent = '') {
 			return `${indent}- ${f.tag.toString(16).padStart(4, '0')}.H: (type ${f.type}) ${JSON.stringify(f.value)}`;
 		}
 	}).join('\n');
+}
+
+/**
+ * @param {TIFFImage} image
+ * @param {number} tag
+ */
+function findFieldNumber(image, tag) {
+	for (const field of image.fields) {
+		if (field.tag === tag) {
+			if (Array.isArray(field.value) && typeof field.value[0] === 'number') {
+				return field.value[0];
+			}
+		}
+	}
+	return null;
 }
 
 /**
@@ -204,7 +238,7 @@ const TAGS = new Map([
   [0x011A, { name: 'X Resolution', print: (value) => value[0] }],
   [0x011B, { name: 'Y Resolution', print: (value) => value[0] }],
   [0x0128, { name: 'Resolution Unit', print: (value) => [null, 'none', 'inch', 'cm'][value[0]] ?? `unknown (${value[0]})` }],
-  [0x0201, { name: 'JPEG Interchange Format Offset', print: (value) => `${value[0]} (TODO)` }],
+  [0x0201, { name: 'JPEG Interchange Format Offset', print: (value) => value[0] }],
   [0x0202, { name: 'JPEG Interchange Format Byte Length', print: (value) => value[0] }],
   [0x0213, { name: 'YCbCr Positioning', print: (value) => [
 		null,
@@ -216,6 +250,14 @@ const TAGS = new Map([
   [0xA002, { name: 'X Dimension', print: (value) => value[0] }],
   [0xA003, { name: 'Y Dimension', print: (value) => value[0] }],
   [0x9000, { name: 'EXIF Version', print: (value) => getLatin1(value) }],
+  [0x9101, { name: 'Components Configuration', print: (value) => {
+		const r = [];
+		for (let i = 0; i < value.byteLength; ++i) {
+			const v = value.getUint8(i);
+			r.push(['-', 'Y', 'Cb', 'Cr', 'R', 'G', 'B'][v] ?? `unknown (${v})`);
+		}
+		return r.join(', ');
+	}}],
   [0x9286, { name: 'User Comment', multicode: true, print: (value) => value }],
   [0xA000, { name: 'Flashpix Version', print: (value) => getLatin1(value) }],
   [0xA001, { name: 'Colour Space', print: (value) => value[0] === 1 ? 'sRGB' : value[0] === 0xFFFF ? 'Uncalibrated' : `unknown (${value[0]})` }],
