@@ -2,6 +2,7 @@ import { registerChunk } from '../registry.mjs';
 import { getPrimariesXYZ } from '../../../../colour/xyz.mjs';
 import { el } from '../../../../display/pretty.mjs';
 import { visualiseColourSpace } from '../../../../display/colour.mjs';
+import { XYZ_D65 } from 'colorjs.io/fn';
 
 /**
  * @typedef {import('../../../../colour/xyz.mjs').FullXYZ} FullXYZ
@@ -44,6 +45,7 @@ registerChunk('cHRM', { max: 1, notAfter: ['PLTE', 'IDAT'] }, (/** @type {cHRMCh
     chunk.toString(),
     el('br'),
     visualiseColourSpace({
+      space: XYZ_D65,
       perimeter: [red, green, blue],
       points: [
         [red, '#FF0000'],

@@ -8,7 +8,8 @@ import { registerChunk } from '../../registry.mjs';
  *     indexed: boolean,
  *     rgb: boolean,
  *     alpha: boolean,
- *     gammaLookupTables: number[][],
+ *     alphaLookup: number[],
+ *     mapCol: (r: number, g: number, b: number) => number,
  *   }) => (((channels: number[]) => number) | null),
  * }} CgBIState
  * @typedef {import('../../registry.mjs').Chunk & {
@@ -169,12 +170,12 @@ registerChunk('CgBI', { max: 1, notAfter: ['IHDR'], allowBeforeIHDR: true }, (/*
   }
 
   state.isRawZlib = chunk.isRawZlib;
-  state.customLookup = ({ bits, indexed, rgb, alpha, gammaLookupTables }) => {
+  state.customLookup = ({ bits, indexed, rgb, alpha, alphaLookup, mapCol }) => {
     if (indexed || !rgb || !alpha || alphaType === '') {
       return null;
     }
     if (alphaType === 'only') {
-      return ([a]) => gammaLookupTables[3][a] << 24;
+      return ([a]) => alphaLookup[a] << 24;
     }
     const max = (1 << bits) - 1;
     return (channels) => {
@@ -184,26 +185,11 @@ registerChunk('CgBI', { max: 1, notAfter: ['IHDR'], allowBeforeIHDR: true }, (/*
           return 0;
         }
         const m = max / a;
-        return (
-          (gammaLookupTables[3][a] << 24) |
-          (gammaLookupTables[0][(r * m)|0] << 16) |
-          (gammaLookupTables[1][(g * m)|0] << 8) |
-          gammaLookupTables[2][(b * m)|0]
-        );
+        return (alphaLookup[a] << 24) | mapCol((r * m)|0, (g * m)|0, (b * m)|0);
       } else if (alphaType === 'non-premultiplied') {
-        return (
-          (gammaLookupTables[3][a] << 24) |
-          (gammaLookupTables[0][r] << 16) |
-          (gammaLookupTables[1][g] << 8) |
-          gammaLookupTables[2][b]
-        );
+        return (alphaLookup[a] << 24) | mapCol(r, g, b);
       } else {
-        return (
-          (gammaLookupTables[3][255] << 24) |
-          (gammaLookupTables[0][r] << 16) |
-          (gammaLookupTables[1][g] << 8) |
-          gammaLookupTables[2][b]
-        );
+        return (alphaLookup[255] << 24) | mapCol(r, g, b);
       }
     };
   };

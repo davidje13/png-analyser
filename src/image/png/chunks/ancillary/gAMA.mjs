@@ -25,9 +25,9 @@ registerChunk('gAMA', { max: 1, notAfter: ['PLTE', 'IDAT'] }, (/** @type {gAMACh
   chunk.gamma = gamma;
   state.gama = chunk;
 
-  chunk.toString = () => `Gamma: ${gamma}`;
+  chunk.toString = () => `Gamma: ${gamma.toFixed(5)}`;
   chunk.display = (summary, content) => {
-    summary.append(`Gamma: ${gamma}`);
+    summary.append(`Gamma: ${gamma.toFixed(5)}`);
     content.append(drawChart(100, 100, 1, (v) => Math.pow(v, 1 / gamma)));
   };
 });

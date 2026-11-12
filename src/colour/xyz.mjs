@@ -15,8 +15,8 @@ import { inv, multiply_v3_m3x3 } from 'colorjs.io/src/util.js';
  * @return {FullXYZ}
  */
 export function project_xyY_XYZ(x, y, Y) {
-  const z = 1 - x - y;
-  return { x, y, z, X: Y * x / y, Y, Z: Y * z / y };
+	const z = 1 - x - y;
+	return { x, y, z, X: Y * x / y, Y, Z: Y * z / y };
 }
 
 /**
@@ -24,7 +24,8 @@ export function project_xyY_XYZ(x, y, Y) {
  * @return {xy}
  */
 export function project_XYZ_xy({ X, Y, Z }) {
-  return { x: X / (X + Y + Z), y: Y / (X + Y + Z) };
+	const d = X + Y + Z;
+	return { x: X / d, y: Y / d };
 }
 
 /**
@@ -56,6 +57,21 @@ export function getPrimariesXYZ({ white, red, green, blue }) {
 		blue: { x: bx, y: by, z: bz, X: bx * bs, Y: by * bs, Z: bz * bs },
 	};
 }
+
+/**
+ * @param {{ red: XYZ, green: XYZ, blue: XYZ }} a
+ * @param {{ red: XYZ, green: XYZ, blue: XYZ }} b
+ */
+export function primariesMatch(a, b, threshold = 1e-6) {
+	const t2 = threshold * threshold;
+	return xyzDist2(a.red, b.red) < t2 && xyzDist2(a.green, b.green) < t2 && xyzDist2(a.blue, b.blue) < t2
+}
+
+/**
+ * @param {XYZ} a
+ * @param {XYZ} b
+ */
+const xyzDist2 = (a, b) => Math.hypot(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 
 /** @type {[number, number, number][]} */
 export const SPECTRUM_XYZ = [

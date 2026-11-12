@@ -1,12 +1,16 @@
+import { ColorSpace, XYZ_D50 } from 'colorjs.io/fn';
 import { getBinaryCodedDecimal, getLatin1, getUTF8, subViewFrom, subViewLen } from '../../data/utils.mjs';
 import { visualiseColourSpace } from '../../display/colour.mjs';
 import { makeCanvas } from '../../display/pretty.mjs';
 import { project_XYZ_xy } from '../xyz.mjs';
 
 /**
- * @typedef {import('../xyz.mjs').xy} xy
+ * @typedef {import('../xyz.mjs').XYZ} XYZ
+ * @typedef {import('../xyz.mjs').FullXYZ} FullXYZ
  *
  * @typedef {{ type: string, dataType: string, value: unknown }} ICCTag
+ *
+ * @typedef {(v: number) => v} Transfer
  *
  * @typedef {{
  *   version: string,
@@ -26,14 +30,11 @@ import { project_XYZ_xy } from '../xyz.mjs';
  *   creatorSignature: string,
  *   profileID: DataView<ArrayBuffer>,
  *   tags: ICCTag[],
+ *   illuminantColourSpace: ColorSpace,
+ *   transfer: [Transfer, Transfer, Transfer],
+ *   primaries: { white: XYZ | undefined, red: XYZ | undefined, green: XYZ | undefined, blue: XYZ | undefined },
  *   display(target: HTMLElement): void,
  * }} ICCProfile
- *
- * @typedef {(
- *   | { type: 'identity' }
- *   | { type: 'gamma', g: number }
- *   | { type: 'table', points: number[] }
- * )} Transfer
  */
 
 /**
@@ -126,6 +127,7 @@ export function readICCProfile(data, warnings) {
     y: getS15Fixed16(data, 72),
     z: getS15Fixed16(data, 76),
   };
+  let illuminantColourSpace = XYZ_D50;
   if (
     illuminant.x.toFixed(4) !== '0.9642' ||
     illuminant.y.toFixed(4) !== '1.0000' ||
@@ -280,9 +282,14 @@ export function readICCProfile(data, warnings) {
         case 'ncl2':
           // TODO
           break;
-        case 'para':
-          // TODO
+        case 'para': {
+          const params = [];
+          for (let i = 4; i + 4 <= tagData.byteLength; i += 4) {
+            params.push(getS15Fixed16(tagData, i));
+          }
+          value = { type: 'parametric', fn: tagData.getUint16(0), params };
           break;
+        }
         case 'pseq':
           // TODO
           break;
@@ -373,6 +380,42 @@ export function readICCProfile(data, warnings) {
     tags.push({ type, dataType, value });
   }
 
+  let desc = '';
+  let license = '';
+  /** @type {XYZ | undefined} */ let white;
+  /** @type {XYZ | undefined} */ let red;
+  /** @type {XYZ | undefined} */ let green;
+  /** @type {XYZ | undefined} */ let blue;
+  /** @type {(v: number) => number} */ let redTr = (v) => v;
+  /** @type {(v: number) => number} */ let greenTr = (v) => v;
+  /** @type {(v: number) => number} */ let blueTr = (v) => v;
+  /** @type {XYZ} */ let black = { X: 0, Y: 0, Z: 0 };
+
+  for (const tag of tags) {
+    const v = /** @type {any} */ (tag.value);
+    if (tag.type === 'wtpt' && tag.dataType === 'XYZ ' && v.length === 1) {
+      white = v[0];
+    } else if (tag.type === 'bkpt' && tag.dataType === 'XYZ ' && v.length === 1) {
+      black = v[0];
+    } else if (tag.type === 'rXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
+      red = v[0];
+    } else if (tag.type === 'gXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
+      green = v[0];
+    } else if (tag.type === 'bXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
+      blue = v[0];
+    } else if (tag.type === 'rTRC' && (tag.dataType === 'curv' || tag.dataType === 'para')) {
+      redTr = getTransferFunction(v, warnings);
+    } else if (tag.type === 'gTRC' && (tag.dataType === 'curv' || tag.dataType === 'para')) {
+      greenTr = getTransferFunction(v, warnings);
+    } else if (tag.type === 'bTRC' && (tag.dataType === 'curv' || tag.dataType === 'para')) {
+      blueTr = getTransferFunction(v, warnings);
+    } else if (tag.type === 'desc' && tag.dataType === 'desc') {
+      desc = v.unicode?.value || v.ascii;
+    } else if (tag.type === 'cprt' && tag.dataType === 'text') {
+      license = v;
+    }
+  }
+
   return {
     version: `${vMajor}.${vMinor}.${vSub1}.${vSub2}`,
     created,
@@ -392,43 +435,11 @@ export function readICCProfile(data, warnings) {
     profileID,
     tags,
 
+    illuminantColourSpace,
+    primaries: { white, red, green, blue },
+    transfer: [redTr, greenTr, blueTr],
+
     display(content) {
-      let desc = '';
-      let license = '';
-      /** @type {xy | undefined} */ let white;
-      /** @type {xy | undefined} */ let red;
-      /** @type {xy | undefined} */ let green;
-      /** @type {xy | undefined} */ let blue;
-      /** @type {Transfer} */ let redTr = { type: 'identity' };
-      /** @type {Transfer} */ let greenTr = { type: 'identity' };
-      /** @type {Transfer} */ let blueTr = { type: 'identity' };
-      let black = { x: 0, y: 0 };
-
-      for (const tag of tags) {
-        const v = /** @type {any} */ (tag.value);
-        if (tag.type === 'wtpt' && tag.dataType === 'XYZ ' && v.length === 1) {
-          white = project_XYZ_xy(v[0]);
-        } else if (tag.type === 'bkpt' && tag.dataType === 'XYZ ' && v.length === 1) {
-          black = project_XYZ_xy(v[0]);
-        } else if (tag.type === 'rXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
-          red = project_XYZ_xy(v[0]);
-        } else if (tag.type === 'gXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
-          green = project_XYZ_xy(v[0]);
-        } else if (tag.type === 'bXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
-          blue = project_XYZ_xy(v[0]);
-        } else if (tag.type === 'rTRC' && tag.dataType === 'curv') {
-          redTr = v;
-        } else if (tag.type === 'gTRC' && tag.dataType === 'curv') {
-          greenTr = v;
-        } else if (tag.type === 'bTRC' && tag.dataType === 'curv') {
-          blueTr = v;
-        } else if (tag.type === 'desc' && tag.dataType === 'desc') {
-          desc = v.unicode?.value || v.ascii;
-        } else if (tag.type === 'cprt' && tag.dataType === 'text') {
-          license = v;
-        }
-      }
-
       content.append(
         `ICC Profile v${vMajor}.${vMinor}.${vSub1}.${vSub2}\n`,
         `Description:              ${desc || '-'}\n`,
@@ -448,15 +459,21 @@ export function readICCProfile(data, warnings) {
         `Creator:                  ${creatorSignature}\n`,
       );
       if (red || green || blue || white) {
+        const r = red && project_XYZ_xy(red);
+        const g = green && project_XYZ_xy(green);
+        const b = blue && project_XYZ_xy(blue);
+        const w = white && project_XYZ_xy(white);
+        const k = black && project_XYZ_xy(black);
         content.append(visualiseColourSpace({
-          perimeter: red && green && blue ? [red, green, blue] : null,
+          space: illuminantColourSpace,
+          perimeter: r && g && b ? [r, g, b] : null,
           points: [
             [illuminant, '#FFFF00'],
-            [black, '#000000'],
-            [red, '#FF0000'],
-            [green, '#00FF00'],
-            [blue, '#0000FF'],
-            [white, '#FFFFFF'],
+            [k, '#000000'],
+            [r, '#FF0000'],
+            [g, '#00FF00'],
+            [b, '#0000FF'],
+            [w, '#FFFFFF'],
           ],
         }));
       }
@@ -475,10 +492,75 @@ export function readICCProfile(data, warnings) {
 }
 
 /**
+ * @param {(
+ *   | { type: 'identity', g?: 0 }
+ *   | { type: 'gamma', g: number }
+ *   | { type: 'table', points: number[] }
+ *   | { type: 'parametric', fn: number, params: number[] }
+ * )} transfer
+ * @param {string[]} warnings
+ * @return {(v: number) => number}
+ */
+function getTransferFunction(transfer, warnings) {
+  if (
+    !transfer ||
+    transfer.type === 'identity' ||
+    (transfer.type === 'gamma' && transfer.g === 1)
+  ) {
+    return (v) => v;
+  }
+  if (transfer.type === 'table') {
+    const pts = transfer.points;
+    const N = pts.length - 1;
+    return (v) => {
+      const x = v * N;
+      const xi = x | 0;
+      const l = pts[xi];
+      const r = pts[xi + 1] ?? l;
+      return l + (r - l) * (x - xi);
+    };
+  }
+  if (transfer.type === 'gamma') {
+    return (v) => Math.pow(v, transfer.g);
+  }
+
+  switch (transfer.fn) {
+    case 0: {
+      const [g = 0] = transfer.params;
+      return (v) => Math.pow(v, g);
+    }
+    case 1: {
+      const [g = 0, a = 1, b = 0] = transfer.params;
+      const t = -b / a;
+      return (v) => v > t ? Math.pow(v * a + b, g) : 0;
+    }
+    case 2: {
+      const [g = 0, a = 1, b = 0, c = 0] = transfer.params;
+      const t = -b / a;
+      return (v) => clamp((v > t ? Math.pow(v * a + b, g) : 0) + c);
+    }
+    case 3: {
+      const [g = 0, a = 1, b = 0, c = 0, d = 0] = transfer.params;
+      return (v) => v >= d ? Math.pow(v * a + b, g) : clamp(c * v);
+    }
+    case 4: {
+      const [g = 0, a = 1, b = 0, c = 0, d = 0, e = 0, f = 0] = transfer.params;
+      return (v) => clamp(v >= d ? Math.pow(v * a + b, g) + e : (c * v + f));
+    }
+    default:
+      warnings.push(`ICC Profile: unknown parametric transfer function ${transfer.fn}`);
+      return (v) => v;
+  }
+}
+
+/** @param {number} v */
+const clamp = (v) => v > 0 ? v < 1 ? v : 1 : 0;
+
+/**
  * @param {number} w
  * @param {number} h
  * @param {number} pad
- * @param {[Transfer, string][]} lines
+ * @param {[(v: number) => number, string][]} lines
  * @return {HTMLCanvasElement}
  */
 function drawTransferFunctions(w, h, pad, lines) {
@@ -487,26 +569,12 @@ function drawTransferFunctions(w, h, pad, lines) {
   chart.ctx.fillRect(0, 0, w + pad * 2, h + pad * 2);
   chart.ctx.lineWidth = 1;
   chart.ctx.globalCompositeOperation = 'darken';
-  for (const [t, c] of lines) {
+  for (const [fn, c] of lines) {
     chart.ctx.strokeStyle = c;
     chart.ctx.beginPath();
-    switch (t.type) {
-      case 'identity':
-        chart.ctx.moveTo(pad, h + pad);
-        chart.ctx.lineTo(w + pad, pad);
-        break;
-      case 'gamma':
-        chart.ctx.moveTo(pad, h + pad);
-        for (let x = 1; x <= w; ++x) {
-          chart.ctx.lineTo(x + pad, (1 - Math.pow(x / w, t.g)) * h + pad);
-        }
-        break;
-      case 'table':
-        chart.ctx.moveTo(pad, (1 - t.points[0]) * h + pad);
-        for (let i = 1, n = t.points.length; i < n; ++i) {
-          chart.ctx.lineTo((i / (n - 1)) * w + pad, (1 - t.points[i]) * h + pad);
-        }
-        break;
+    chart.ctx.moveTo(pad, (1 - fn(0)) * h + pad);
+    for (let x = 1; x <= w; ++x) {
+      chart.ctx.lineTo(x + pad, (1 - fn(x / w)) * h + pad);
     }
     chart.ctx.stroke();
   }

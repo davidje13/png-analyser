@@ -1,18 +1,25 @@
-import { P3, sRGB, to, toGamut, XYZ_D65 } from 'colorjs.io/fn';
+import { ColorSpace, P3, sRGB, to, toGamut, XYZ_D50 } from 'colorjs.io/fn';
 import { makeCanvas, svgEl } from './pretty.mjs';
 import { SPECTRUM_xy } from '../colour/xyz.mjs';
 
 /**
  * @param {{
+ *   space: ColorSpace,
  *   perimeter?: { x: number, y: number }[] | null | undefined,
  *   points?: [{ x: number, y: number } | null | undefined, string][],
  *   height?: number,
  * }} options
  */
-export function visualiseColourSpace({ perimeter = null, points = [], height = 300 }) {
+export function visualiseColourSpace({ space, perimeter = null, points = [], height = 300 }) {
   const id = crypto.randomUUID();
 
-	return svgEl('svg', {
+  let img = cachedXY.get(space);
+  if (!img) {
+    img = generateXYImage(space);
+    cachedXY.set(space, img);
+  }
+
+  return svgEl('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
     viewBox: `0 0 760 860`,
     width: height * 760 / 860,
@@ -31,7 +38,7 @@ export function visualiseColourSpace({ perimeter = null, points = [], height = 3
     ]),
     svgEl('g', { transform: 'translate(10 850) scale(1 -1)' }, [
       svgEl('image', {
-        href: (cachedXY ??= generateXYImage()),
+        href: img,
         width: '750',
         height: '850',
         preserveAspectRatio: 'none',
@@ -39,10 +46,10 @@ export function visualiseColourSpace({ perimeter = null, points = [], height = 3
       }),
       svgEl('use', { href: `#${id}-p`, stroke: '#000000', 'stroke-width': 1.5 }),
       perimeter ? svgEl('use', { href: `#${id}-b`, stroke: '#000000' }) : null,
-			...points.map(([p, c]) => p && (p.x > 0 || p.y > 0)
-				? svgEl('circle', { cx: p.x * 1000, cy: p.y * 1000, r: 8, fill: c, stroke: '#000000', 'vector-effect': 'non-scaling-stroke' })
-				: null
-			),
+      ...points.map(([p, c]) => p && (!Number.isNaN(p.x) && !Number.isNaN(p.y))
+        ? svgEl('circle', { cx: p.x * 1000, cy: p.y * 1000, r: 8, fill: c, stroke: '#000000', 'vector-effect': 'non-scaling-stroke' })
+        : null
+      ),
     ]),
   ]);
 }
@@ -50,9 +57,10 @@ export function visualiseColourSpace({ perimeter = null, points = [], height = 3
 /** @param {[number, number]} coord */
 const toPt = ([x, y]) => `${(x * 1000).toFixed(0)} ${(y * 1000).toFixed(0)}`;
 
-let cachedXY = null;
+/** @type {Map<ColorSpace, string>} */ let cachedXY = new Map();
 
-function generateXYImage() {
+/** @param {ColorSpace} space */
+function generateXYImage(space) {
   const rx = 0.75;
   const ry = 0.85;
   const w = 100;
@@ -68,14 +76,11 @@ function generateXYImage() {
       const p = (y * w + x) * 4;
       const xx = x * sx;
       const yy = Math.max(y * sy, 0.0001);
-			let c = to({
-        space: XYZ_D65,
-        coords: [xx / yy, 1, (1 - xx - yy) / yy],
-      }, P3);
-			c = pNorm(c, 8);
-			if (targetSpace !== P3) {
-				c = to(c, targetSpace);
-			}
+      let c = to({ space, coords: [xx / yy, 1, (1 - xx - yy) / yy] }, P3);
+      c = pNorm(c, 8);
+      if (targetSpace !== P3) {
+        c = to(c, targetSpace);
+      }
       c = toGamut(c, { method: 'clip' });
       dat.data[p] = (c.coords[0] ?? 0) * 255;
       dat.data[p + 1] = (c.coords[1] ?? 0) * 255;

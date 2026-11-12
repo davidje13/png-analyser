@@ -1,17 +1,25 @@
+import { sRGB, to, toGamutCSS, XYZ_D65 } from 'colorjs.io/fn';
 import { inflate, inflateRaw } from '../../../../data/inflate.mjs';
 import { asBytes, concat, subViewLen } from '../../../../data/utils.mjs';
 import { registerChunk } from '../registry.mjs';
 import { asCanvas, printImage } from '../../../../display/pretty.mjs';
+import { getPrimariesXYZ, primariesMatch } from '../../../../colour/xyz.mjs';
 
 /**
  * @typedef {{ image: number[][], filters: number[] }} SubImage
+ * @typedef {import('../../../../colour/icc/ICCProfile.mjs').Transfer} Transfer
+ * @typedef {import('../../../../colour/xyz.mjs').XYZ} XYZ
+ * @typedef {{ red: XYZ, green: XYZ, blue: XYZ }} Primaries
  *
  * @typedef {import('../registry.mjs').State & import('../apng/shared_state.mjs').apngState & {
  *   ihdr?: import('./IHDR.mjs').IHDRChunk,
  *   plte?: import('./PLTE.mjs').PLTEChunk,
  *   trns?: import('../ancillary/tRNS.mjs').tRNSChunk,
  *   sbit?: import('../ancillary/sBIT.mjs').sBITChunk,
+ *   srgb?: import('../ancillary/sRGB.mjs').sRGBChunk,
+ *   iccp?: import('../ancillary/iCCP.mjs').iCCPChunk,
  *   gama?: import('../ancillary/gAMA.mjs').gAMAChunk,
+ *   chrm?: import('../ancillary/cHRM.mjs').cHRMChunk,
  *   idot?: import('../private/apple/iDOT.mjs').iDOTChunk,
  *   idat?: { raw: ArrayBufferView, image: number[][], levels: SubImage[] },
  *   idats?: import('../registry.mjs').Chunk[],
@@ -21,13 +29,21 @@ import { asCanvas, printImage } from '../../../../display/pretty.mjs';
  *     indexed: boolean,
  *     rgb: boolean,
  *     alpha: boolean,
- *     gammaLookupTables: number[][],
+ *     alphaLookup: number[],
+ *     mapCol: (r: number, g: number, b: number) => number,
  *   }) => (((channels: number[]) => number) | null),
  * }} IDATState
  */
 
-const displayGamma = 1 / 2.2;
+const sRGBGamma = 2.2;
+const sRGBPrimaries = getPrimariesXYZ({
+  white: { x: 0.31270, y: 0.32900, Y: 1 },
+  red: { x: 0.64000, y: 0.33000 },
+  green: { x: 0.30000, y: 0.60000 },
+  blue: { x: 0.15000, y: 0.06000 },
+});
 const displayMax = 255;
+const alphaMax = 255;
 
 registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState} */ state, warnings) => {
   state.idats ||= [];
@@ -110,31 +126,85 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
   const indexed = state.ihdr.indexed ?? false;
   const rgb = state.ihdr.rgb ?? true;
   const alpha = state.ihdr.alpha ?? true;
-  const gamma = displayGamma / (state.gama?.gamma ?? displayGamma);
 
   const colChannels = rgb ? 3 : 1;
   const channels = indexed ? 1 : (colChannels + (alpha ? 1 : 0));
 
-  /** @type {number[][]} */ const lookupTables = [];
-  for (let i = 0; i < colChannels + 1; ++i) {
-    const colBits = indexed ? 8 : bits;
-    const max = (1 << colBits) - 1;
-    const originalMax = (1 << (state.sbit?.originalBits?.[i] ?? colBits)) - 1;
-    const isAlpha = i === colChannels;
-    /** @type {number[]} */ const table = [];
-    for (let j = 0; j < (1 << colBits); ++j) {
-      let v = j;
-      v = (v * originalMax / max + 0.5)|0; // scale to original bit depth (and round)
-      // scale to display bit depth and apply gamma correction
-      if (!isAlpha && gamma !== 1) {
-        v = Math.pow(v / originalMax, gamma) * displayMax;
-      } else {
-        v *= displayMax / originalMax;
-      }
-      table[j] = (v + 0.5)|0; // round
+  /** @type {Transfer[]} */ let transfers;
+  /** @type {Primaries} */ let primaries = sRGBPrimaries;
+  let colourSpace = XYZ_D65;
+  if (state.srgb) {
+    /** @type {Transfer} */ const t = (v) => Math.pow(v, sRGBGamma);
+    transfers = [t, t, t];
+  } else if (state.iccp?.value) {
+    transfers = state.iccp.value.transfer;
+    primaries = {
+      red: state.iccp.value.primaries.red ?? primaries.red,
+      green: state.iccp.value.primaries.green ?? primaries.green,
+      blue: state.iccp.value.primaries.blue ?? primaries.blue,
+    };
+    colourSpace = state.iccp.value.illuminantColourSpace;
+  } else {
+    if (state.chrm) {
+      primaries = {
+        red: state.chrm.red ?? primaries.red,
+        green: state.chrm.green ?? primaries.green,
+        blue: state.chrm.blue ?? primaries.blue,
+      };
     }
-    lookupTables.push(table);
+    if (state.gama?.gamma) {
+      const g = 1 / state.gama.gamma;
+      /** @type {Transfer} */ const t = (v) => Math.pow(v, g);
+      transfers = [t, t, t];
+    } else {
+      /** @type {Transfer} */ const t = (v) => Math.pow(v, sRGBGamma);
+      transfers = [t, t, t];
+    }
   }
+
+  /** @type {number[][]} */ const lookupTables = [];
+  for (let i = 0; i < 3; ++i) {
+    lookupTables.push(makeTransferTable(
+      indexed ? 8 : bits,
+      state.sbit?.originalBits?.[i] ?? state.sbit?.originalBits?.[0],
+      transfers[i],
+    ));
+  }
+
+  /** @type {(r: number, g: number, b: number) => number} */
+  let mapCol;
+
+  if (colourSpace === XYZ_D65 && primariesMatch(primaries, sRGBPrimaries)) {
+    for (const t of lookupTables) {
+      for (let i = 0; i < t.length; ++i) {
+        t[i] = (Math.pow(t[i], 1 / sRGBGamma) * displayMax + 0.5)|0;
+      }
+    }
+    mapCol = (r, g, b) => (
+      (lookupTables[0][r] << 16) |
+      (lookupTables[1][g] << 8) |
+      lookupTables[2][b]
+    );
+  } else {
+    mapCol = (r, g, b) => {
+      const R = lookupTables[0][r];
+      const G = lookupTables[1][g];
+      const B = lookupTables[2][b];
+      const X = primaries.red.X * R + primaries.green.X * G + primaries.blue.X * B;
+      const Y = primaries.red.Y * R + primaries.green.Y * G + primaries.blue.Y * B;
+      const Z = primaries.red.Z * R + primaries.green.Z * G + primaries.blue.Z * B;
+      const c = toGamutCSS(to({ space: colourSpace, coords: [X, Y, Z] }, sRGB)).coords;
+      const outR = ((c[0] ?? 0) * displayMax + 0.5)|0;
+      const outG = ((c[1] ?? 0) * displayMax + 0.5)|0;
+      const outB = ((c[2] ?? 0) * displayMax + 0.5)|0;
+      return (outR << 16) | (outG << 8) | outB;
+    };
+  }
+
+  const alphaLookup = makeTransferTable(
+    indexed ? 8 : bits,
+    state.sbit?.originalBits?.[colChannels],
+  ).map((v) => (v * alphaMax + 0.5)|0);
 
   /** @type {(c: number[]) => number} */ let lookup;
 
@@ -150,20 +220,13 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     for (let i = 0; i < paletteRGB.length; ++i) {
       const c = paletteRGB[i];
       lookupPalette.push(
-        (lookupTables[3][paletteA[i] ?? 0xFF] << 24) |
-        (lookupTables[0][c >>> 16] << 16) |
-        (lookupTables[1][(c >>> 8) & 0xFF] << 8) |
-        lookupTables[2][c & 0xFF]
+        (alphaLookup[paletteA[i] ?? 0xFF] << 24) |
+        mapCol(c >>> 16, (c >>> 8) & 0xFF, c & 0xFF)
       );
     }
     lookup = ([i]) => lookupPalette[i];
   } else if (rgb && alpha) {
-    lookup = ([r, g, b, a]) => (
-      (lookupTables[3][a] << 24) |
-      (lookupTables[0][r] << 16) |
-      (lookupTables[1][g] << 8) |
-      lookupTables[2][b]
-    );
+    lookup = ([r, g, b, a]) => ((alphaLookup[a] << 24) | mapCol(r, g, b));
   } else if (rgb) {
     let transR = -1;
     let transG = -1;
@@ -173,23 +236,14 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
       transG = state.trns.sampleGreen ?? 0;
       transB = state.trns.sampleBlue ?? 0;
     }
-    lookup = ([r, g, b]) => (r === transR && g === transG && b === transB) ? 0 : (
-      0xFF000000 |
-      (lookupTables[0][r] << 16) |
-      (lookupTables[1][g] << 8) |
-      lookupTables[2][b]
-    );
+    lookup = ([r, g, b]) => (r === transR && g === transG && b === transB)
+      ? 0
+      : (0xFF000000 | mapCol(r, g, b));
   } else if (alpha) {
-    lookup = ([l, a]) => (
-      (lookupTables[1][a] << 24) |
-      (lookupTables[0][l] * 0x010101)
-    );
+    lookup = ([l, a]) => (alphaLookup[a] << 24) | mapCol(l, l, l);
   } else {
     const trans = state.trns?.sampleGray ?? -1;
-    lookup = ([l]) => l === trans ? 0 : (
-      0xFF000000 |
-      (lookupTables[0][l] * 0x010101)
-    );
+    lookup = ([l]) => l === trans ? 0 : (0xFF000000 | mapCol(l, l, l));
   }
 
   lookup = state.customLookup?.({
@@ -197,7 +251,8 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     indexed,
     rgb,
     alpha,
-    gammaLookupTables: lookupTables,
+    alphaLookup,
+    mapCol,
   }) ?? lookup;
 
   if (filterMethod !== 0) {
@@ -307,6 +362,25 @@ registerChunk('IDAT', { min: 1, sequential: true }, (chunk, /** @type {IDATState
     warnings.push(`Expected ${p} uncompressed bytes, got ${raw.byteLength}`);
   }
 });
+
+/**
+ * @param {number} colBits
+ * @param {number | undefined} originalBits
+ * @param {(v: number) => number} fn
+ */
+function makeTransferTable(colBits, originalBits, fn = (v) => v) {
+  const max = (1 << colBits) - 1;
+  const originalMax = (1 << (originalBits ?? colBits)) - 1;
+
+  /** @type {number[]} */ const table = [];
+  for (let j = 0; j < (1 << colBits); ++j) {
+    // scale to original bit depth, round, then scale to [0 1]
+    let v = ((j * originalMax / max + 0.5)|0) / originalMax;
+    // apply transfer function / gamma correction
+    table[j] = fn(v);
+  }
+  return table;
+}
 
 const ADAM_LOOKUP = [
   0, 5, 3, 5, 1, 5, 3, 5,
