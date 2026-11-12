@@ -40,7 +40,11 @@ export function debugWrite(bytes) {
         rowC.push('.');
       }
     }
-    all.push(rowN.join(' ') + '   ' + rowC.join(''));
+    let pad = '';
+    if (i + 16 > bytes.byteLength) {
+      pad = '   '.repeat(i + 16 - bytes.byteLength);
+    }
+    all.push(rowN.join(' ') + pad + '   ' + rowC.join(''));
   }
   return all.join('\n') + '\n';
 }

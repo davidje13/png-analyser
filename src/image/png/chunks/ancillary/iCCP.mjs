@@ -1,5 +1,5 @@
 import { readICCProfile } from '../../../../colour/icc/ICCProfile.mjs';
-import { inflate } from '../../../../data/inflate.mjs';
+import { inflate, inflateRaw } from '../../../../data/inflate.mjs';
 import { findIndex, getLatin1, subViewFrom } from '../../../../data/utils.mjs';
 import { registerChunk } from '../registry.mjs';
 
@@ -32,10 +32,21 @@ registerChunk('iCCP', { max: 1, notAfter: ['sRGB', 'PLTE', 'IDAT'], notBefore: [
     if (chunk.compressionMethod !== 0) {
       warnings.push(`non-standard iCCP compression method ${chunk.compressionMethod}`);
     }
+    let raw = subViewFrom(chunk.data, sep + 2);
     try {
-      chunk.value = readICCProfile(await inflate(subViewFrom(chunk.data, sep + 2)), warnings);
+      raw = await inflate(raw);
+    } catch (e1) {
+      try {
+        raw = await inflateRaw(raw);
+        warnings.push(`iCCP data stored compressed but without zlib header`);
+      } catch {
+        warnings.push(`iCCP data is not compressed: ${e1}`);
+      }
+    }
+    try {
+      chunk.value = readICCProfile(raw, warnings);
     } catch (e) {
-      warnings.push(`iCCP compressed data is unreadable ${e}`);
+      warnings.push(`iCCP data is unreadable: ${e}`);
       chunk.value = null;
     }
   }

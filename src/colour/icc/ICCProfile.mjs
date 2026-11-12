@@ -1,5 +1,6 @@
 import { getBinaryCodedDecimal, getLatin1, getUTF8, subViewFrom, subViewLen } from '../../data/utils.mjs';
 import { visualiseColourSpace } from '../../display/colour.mjs';
+import { makeCanvas } from '../../display/pretty.mjs';
 import { project_XYZ_xy } from '../xyz.mjs';
 
 /**
@@ -13,7 +14,7 @@ import { project_XYZ_xy } from '../xyz.mjs';
  *   cmmType: string,
  *   profileClass: string,
  *   colourSpace: string,
- *   pcs: number,
+ *   pcs: string,
  *   platformSignature: string,
  *   flags: number,
  *   deviceManufacturer: string,
@@ -27,6 +28,12 @@ import { project_XYZ_xy } from '../xyz.mjs';
  *   tags: ICCTag[],
  *   display(target: HTMLElement): void,
  * }} ICCProfile
+ *
+ * @typedef {(
+ *   | { type: 'identity' }
+ *   | { type: 'gamma', g: number }
+ *   | { type: 'table', points: number[] }
+ * )} Transfer
  */
 
 /**
@@ -84,7 +91,7 @@ export function readICCProfile(data, warnings) {
   // "ECLR": 14 colour
   // "FCLR": 15 colour
 
-  const pcs = data.getUint32(20, false);
+  const pcs = getLatin1(data, 20, 24, warnings);
   const created = new Date(Date.UTC(
     data.getUint16(24, false),
     data.getUint16(26, false),
@@ -166,7 +173,7 @@ export function readICCProfile(data, warnings) {
           } else {
             const points = [];
             for (let n = 0; n < datapoints; ++n) {
-              points.push(tagData.getUint16(n * 2 + 4, false));
+              points.push(tagData.getUint16(n * 2 + 4, false) / 0xFFFF);
             }
             value = { type: 'table', points };
           }
@@ -386,26 +393,15 @@ export function readICCProfile(data, warnings) {
     tags,
 
     display(content) {
-      content.append(
-        `ICC Profile v${vMajor}.${vMinor}.${vSub1}.${vSub2}\n`,
-        `Created:                  ${created.toISOString()}\n`,
-        `CMM Type:                 ${cmmType} (see https://registry.color.org/cmm-signatures/)\n`,
-        `Profile Class:            ${profileClass}\n`,
-        `Colour Space:             ${colourSpace}\n`,
-        `pcs:                      ${pcs}\n`,
-        `Platform:                 ${platformSignature}\n`,
-        `Flags:                    ${flags.toString(2).padStart(32, '0')}\n`,
-        `Device Manufacturer:      ${deviceManufacturer} (see https://registry.color.org/manufacturer-signatures/)\n`,
-        `Device Model:             ${deviceManufacturer} (see https://registry.color.org/device-signatures/)\n`,
-        `Device Attributes:        ${standardDeviceAttributes.toString(2).padStart(32, '0')}\n`,
-        `Vendor Device Attributes: ${vendorDeviceAttributes.toString(2).padStart(32, '0')}\n`,
-        `Rendering Intent:         ${renderingIntent}\n`,
-        `Creator:                  ${creatorSignature}\n`,
-      );
+      let desc = '';
+      let license = '';
       /** @type {xy | undefined} */ let white;
       /** @type {xy | undefined} */ let red;
       /** @type {xy | undefined} */ let green;
       /** @type {xy | undefined} */ let blue;
+      /** @type {Transfer} */ let redTr = { type: 'identity' };
+      /** @type {Transfer} */ let greenTr = { type: 'identity' };
+      /** @type {Transfer} */ let blueTr = { type: 'identity' };
       let black = { x: 0, y: 0 };
 
       for (const tag of tags) {
@@ -420,13 +416,42 @@ export function readICCProfile(data, warnings) {
           green = project_XYZ_xy(v[0]);
         } else if (tag.type === 'bXYZ' && tag.dataType === 'XYZ ' && v.length === 1) {
           blue = project_XYZ_xy(v[0]);
+        } else if (tag.type === 'rTRC' && tag.dataType === 'curv') {
+          redTr = v;
+        } else if (tag.type === 'gTRC' && tag.dataType === 'curv') {
+          greenTr = v;
+        } else if (tag.type === 'bTRC' && tag.dataType === 'curv') {
+          blueTr = v;
+        } else if (tag.type === 'desc' && tag.dataType === 'desc') {
+          desc = v.unicode?.value || v.ascii;
+        } else if (tag.type === 'cprt' && tag.dataType === 'text') {
+          license = v;
         }
       }
 
+      content.append(
+        `ICC Profile v${vMajor}.${vMinor}.${vSub1}.${vSub2}\n`,
+        `Description:              ${desc || '-'}\n`,
+        `License:                  ${license || '-'}\n`,
+        `Created:                  ${created.toISOString()}\n`,
+        `CMM Type:                 ${cmmType} (see https://registry.color.org/cmm-signatures/)\n`,
+        `Profile Class:            ${profileClass}\n`,
+        `Colour Space:             ${colourSpace}\n`,
+        `pcs:                      ${pcs}\n`,
+        `Platform:                 ${platformSignature}\n`,
+        `Flags:                    ${flags.toString(2).padStart(32, '0')}\n`,
+        `Device Manufacturer:      ${deviceManufacturer} (see https://registry.color.org/manufacturer-signatures/)\n`,
+        `Device Model:             ${deviceManufacturer} (see https://registry.color.org/device-signatures/)\n`,
+        `Device Attributes:        ${standardDeviceAttributes.toString(2).padStart(32, '0')}\n`,
+        `Vendor Device Attributes: ${vendorDeviceAttributes.toString(2).padStart(32, '0')}\n`,
+        `Rendering Intent:         ${renderingIntent}\n`,
+        `Creator:                  ${creatorSignature}\n`,
+      );
       if (red || green || blue || white) {
         content.append(visualiseColourSpace({
           perimeter: red && green && blue ? [red, green, blue] : null,
           points: [
+            [illuminant, '#FFFF00'],
             [black, '#000000'],
             [red, '#FF0000'],
             [green, '#00FF00'],
@@ -436,11 +461,56 @@ export function readICCProfile(data, warnings) {
         }));
       }
 
+      content.append(drawTransferFunctions(200, 200, 1, [
+        [redTr, '#FF0000'],
+        [greenTr, '#00FF00'],
+        [blueTr, '#0000FF'],
+      ]));
+
       for (const tag of tags) {
         content.append(`\n- '${tag.type}': [${tag.dataType}] ${JSON.stringify(tag.value)}`);
       }
     },
   };
+}
+
+/**
+ * @param {number} w
+ * @param {number} h
+ * @param {number} pad
+ * @param {[Transfer, string][]} lines
+ * @return {HTMLCanvasElement}
+ */
+function drawTransferFunctions(w, h, pad, lines) {
+  const chart = makeCanvas(w + pad * 2, h + pad * 2);
+  chart.ctx.fillStyle = '#FFFFFF';
+  chart.ctx.fillRect(0, 0, w + pad * 2, h + pad * 2);
+  chart.ctx.lineWidth = 1;
+  chart.ctx.globalCompositeOperation = 'darken';
+  for (const [t, c] of lines) {
+    chart.ctx.strokeStyle = c;
+    chart.ctx.beginPath();
+    switch (t.type) {
+      case 'identity':
+        chart.ctx.moveTo(pad, h + pad);
+        chart.ctx.lineTo(w + pad, pad);
+        break;
+      case 'gamma':
+        chart.ctx.moveTo(pad, h + pad);
+        for (let x = 1; x <= w; ++x) {
+          chart.ctx.lineTo(x + pad, (1 - Math.pow(x / w, t.g)) * h + pad);
+        }
+        break;
+      case 'table':
+        chart.ctx.moveTo(pad, (1 - t.points[0]) * h + pad);
+        for (let i = 1, n = t.points.length; i < n; ++i) {
+          chart.ctx.lineTo((i / (n - 1)) * w + pad, (1 - t.points[i]) * h + pad);
+        }
+        break;
+    }
+    chart.ctx.stroke();
+  }
+  return chart.canvas;
 }
 
 /**

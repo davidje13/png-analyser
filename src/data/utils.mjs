@@ -81,6 +81,7 @@ export const getLatin1 = makeDecoder('latin1');
 export const getUTF8 = makeDecoder('utf8');
 export const getUTF16LE = makeDecoder('utf-16le');
 export const getUTF16BE = makeDecoder('utf-16be');
+export const getJIS = makeDecoder('sjis');
 
 /**
  * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} data

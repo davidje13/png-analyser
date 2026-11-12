@@ -14,8 +14,8 @@ export function visualiseColourSpace({ perimeter = null, points = [], height = 3
 
 	return svgEl('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
-    viewBox: `0 0 750 850`,
-    width: height * 750 / 850,
+    viewBox: `0 0 760 860`,
+    width: height * 760 / 860,
     height: height,
     'stroke-linejoin': 'round',
     'stroke-linecap': 'round',
@@ -29,7 +29,7 @@ export function visualiseColourSpace({ perimeter = null, points = [], height = 3
         perimeter ? svgEl('use', { href: `#${id}-b`, fill: '#FFFFFF' }) : null,
       ]),
     ]),
-    svgEl('g', { transform: 'translate(0 850) scale(1 -1)' }, [
+    svgEl('g', { transform: 'translate(10 850) scale(1 -1)' }, [
       svgEl('image', {
         href: (cachedXY ??= generateXYImage()),
         width: '750',
@@ -66,15 +66,20 @@ function generateXYImage() {
   for (let y = 0; y < h; ++y) {
     for (let x = 0; x < w; ++x) {
       const p = (y * w + x) * 4;
-      const xx = Math.max(x * sx, 0.0001);
+      const xx = x * sx;
       const yy = Math.max(y * sy, 0.0001);
-      const c = toGamut(pNorm(to({
+			let c = to({
         space: XYZ_D65,
         coords: [xx / yy, 1, (1 - xx - yy) / yy],
-      }, targetSpace), 10), { method: 'clip' }).coords;
-      dat.data[p] = (c[0] ?? 0) * 255;
-      dat.data[p + 1] = (c[1] ?? 0) * 255;
-      dat.data[p + 2] = (c[2] ?? 0) * 255;
+      }, P3);
+			c = pNorm(c, 8);
+			if (targetSpace !== P3) {
+				c = to(c, targetSpace);
+			}
+      c = toGamut(c, { method: 'clip' });
+      dat.data[p] = (c.coords[0] ?? 0) * 255;
+      dat.data[p + 1] = (c.coords[1] ?? 0) * 255;
+      dat.data[p + 2] = (c.coords[2] ?? 0) * 255;
       dat.data[p + 3] = 255;
     }
   }
